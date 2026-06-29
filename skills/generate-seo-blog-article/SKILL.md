@@ -1,6 +1,7 @@
 ---
 name: generate-seo-blog-article
 description: Draft SEO blog articles in a founder-engineer voice using plain Markdown. Includes article templates, voice principles, AI-wording blacklist, phrase bank, and pre-publish checks. Use when writing blog posts, briefing AI on brand voice, creating educational or product content, or when the user mentions SEO blog articles, content voice, or blog drafting.
+version: 1.0.0
 license: MIT
 metadata:
   version: 1.0.0
