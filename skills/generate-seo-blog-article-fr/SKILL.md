@@ -1,6 +1,7 @@
 ---
 name: generate-seo-blog-article-fr
 description: Rédiger des articles de blog SEO en français dans une voix fondateur-ingénieur, en Markdown simple. Inclut templates d'articles, principes de voix, blacklist IA française, banque de phrases et contrôles pré-publication. À utiliser pour rédiger des posts blog, briefer une IA sur la voix de marque, créer du contenu éducatif ou produit, ou quand l'utilisateur mentionne articles blog SEO en français, voix éditoriale ou rédaction blog.
+version: 1.0.0
 license: MIT
 metadata:
   version: 1.0.0
@@ -123,7 +124,7 @@ Avant de retourner le brouillon :
 | Fichier | Rôle |
 |---------|------|
 | `references/guide_voix_blog.md` | Guide complet : principes, blacklist FR, templates, banque de phrases, avertissements, bloc prompt IA |
-| `../generate-seo-blog-article/references/blog_voice_guide.md` | Compagnon anglais (même logique, blacklist EN) |
+| `../generate-seo-blog-article/references/blog_voice_guide.md` | Compagnon anglais (même logique, blacklist EN ; chemin relatif depuis ce skill) |
 
 ## Bloc prompt IA par défaut
 

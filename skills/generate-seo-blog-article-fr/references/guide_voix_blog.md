@@ -1,6 +1,6 @@
 Référence réutilisable pour rédiger des articles de blog en français dans une voix fondateur-ingénieur. Adaptez le nom du produit, l'auteur, les liens et les avertissements juridiques à votre contexte avant utilisation.
 
-**Compagnon anglais :** `generate-seo-blog-article/references/blog_voice_guide.md`
+**Compagnon anglais :** `../generate-seo-blog-article/references/blog_voice_guide.md`
 
 ---
 

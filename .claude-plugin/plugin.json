@@ -1,0 +1,13 @@
+{
+  "name": "seo-blog-skills",
+  "version": "1.0.0",
+  "description": "Product-agnostic SEO blog article skills in English and French founder-engineer voice. Plain Markdown output, article templates, AI wording blacklists, and pre-publish checks.",
+  "author": {
+    "name": "Herklos",
+    "url": "https://github.com/Herklos"
+  },
+  "homepage": "https://github.com/Herklos/skills",
+  "repository": "https://github.com/Herklos/skills",
+  "license": "MIT",
+  "skills": "./skills/"
+}
