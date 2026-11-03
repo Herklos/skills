@@ -121,32 +121,44 @@ Notes:
 
 ## Subagents (`delegate_task`)
 
-Subagents are **not** separate profiles. They are fresh child runs with isolated context; only the final summary returns to the parent.
+Docs: https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation#configuration
 
-```yaml
-delegation:
-  model: google/gemini-2.5-flash      # optional cheaper workers
-  provider: openrouter                # optional; else inherit parent
-  max_concurrent_children: 10
-  max_spawn_depth: 1                  # 1 = flat (default); raise for nested orchestrators
-  orchestrator_enabled: true
-  # independent_completions: false
-```
+**Expectation for every Hermes profile that should fan out work:** enable the
+`delegation` toolset and configure Subagent Delegation so the parent can use
+**different models for different tasks**. Default single-model workers are fine
+for simple fleets; prefer **`model_map`** when task difficulty varies.
+
+Subagents are **not** separate profiles. They are fresh child runs with isolated
+context; only the final summary returns to the parent. Parent must pass full
+`goal` + `context` (children know nothing of prior chat). Repo context files may
+still inject into the child system prompt; `SOUL.md` does not.
 
 ```bash
+hermes -p <slug> tools enable delegation
 hermes -p <slug> config set delegation.model google/gemini-2.5-flash
 hermes -p <slug> config set delegation.provider openrouter
 ```
 
-Parent must pass full `goal` + `context` (children know nothing of prior chat). Repo context files may still inject into the child system prompt; `SOUL.md` does not.
+### Default backend (one worker model for all children)
 
-**Strategies** (`delegation.backend`, often via `advanced-delegation` plugin):
+```yaml
+delegation:
+  model: google/gemini-2.5-flash      # optional cheaper workers; empty = inherit parent
+  provider: openrouter                # optional; else inherit parent
+  max_iterations: 250                 # turns per child
+  max_concurrent_children: 10
+  max_spawn_depth: 1                  # 1 = flat; raise for nested orchestrators
+  orchestrator_enabled: true
+  # independent_completions: false    # true = each task/group returns as it finishes
+  # worktree_isolation: false
+```
 
-| Backend | Behavior |
-|---------|----------|
-| `default` | All children use `delegation.model` / inherit |
-| `model_map` | Parent picks named options (`fast`, `deep`, …) per task |
-| `profile_routes` | Child runs **as another Hermes profile** (that profile's model, SOUL, skills, credentials) |
+With `default`, every `delegate_task` child uses `delegation.model` (or the
+parent model). There is **no** per-task model argument on the tool in this mode.
+
+### Per-task models (`model_map`) — recommended when tasks differ
+
+Install/enable the official **`advanced-delegation`** plugin, then:
 
 ```yaml
 delegation:
@@ -156,17 +168,53 @@ delegation:
       default: fast
       options:
         - name: fast
-          description: Lookups and summaries.
+          description: Cheap and quick; lookups, summaries, simple edits.
           provider: openrouter
           model: google/gemini-2.5-flash
         - name: deep
-          description: Hard debugging.
+          description: Slow and careful; hard debugging and design work.
           provider: anthropic
           model: claude-opus-4
           reasoning_effort: high
 ```
 
-`/review` uses a background reviewer; pin with `auxiliary.review` if desired. Monitor with `/agents` (Ctrl+T).
+While `model_map` or `profile_routes` is active, top-level `delegation.model` /
+`provider` are inactive: the chosen route decides. The parent only sees option
+**names and descriptions** (never raw keys). CLI helpers from the plugin:
+`hermes delegation config`, `/delegation model_map`, `/delegation default`.
+
+| Backend | Behavior |
+|---------|----------|
+| `default` | All children use `delegation.model` / inherit |
+| `model_map` | Parent picks named options (`fast`, `deep`, …) **per task** |
+| `profile_routes` | Child runs **as another Hermes profile** (that profile's model, SOUL, skills, credentials) |
+
+```yaml
+delegation:
+  backend: profile_routes
+  backends:
+    profile_routes:
+      profiles:
+        - name: coder
+          description: Writes and refactors code; runs tests.
+```
+
+Only list profiles whose credentials and terminal access this parent may use.
+
+### Related knobs
+
+| Knob | Role |
+|------|------|
+| `delegation.max_iterations` | Tool-calling turns per child (default 250) |
+| `delegation.max_concurrent_children` | Parallel children per batch (default 10) |
+| `delegation.independent_completions` | Per-task/group wake-ups vs one consolidated return |
+| `delegation.request_overrides` | Extra API kwargs / `extra_body` on every child call |
+| `delegation.base_url` + `api_key` | Direct endpoint instead of named provider |
+| `auxiliary.review` | Dedicated model for `/review` (separate from `delegate_task`) |
+
+`/review` uses a background reviewer; pin with `auxiliary.review` if desired.
+Monitor with `/agents` (Ctrl+T). New sessions pick up `delegation.backend`
+changes; use `/delegation <backend> --now` or `/new` to refresh a live chat.
 
 ## Mixture of Agents (MoA)
 
@@ -202,7 +250,10 @@ moa:
 
 Configure also via Dashboard / Desktop → Model → Mixture of Agents.
 
-## Recipe: frontier planner, cheap workers, flash aux
+## Recipe: frontier planner + per-task workers (`model_map`)
+
+Preferred when the parent plans on a strong model and children should pick
+`fast` vs `deep` (or more named routes) per task:
 
 ```yaml
 model:
@@ -223,7 +274,32 @@ auxiliary:
   approval:
     provider: openrouter
     model: google/gemini-2.5-flash
+  review:
+    provider: openrouter
+    model: anthropic/claude-opus-4.6
 
+delegation:
+  backend: model_map
+  max_concurrent_children: 8
+  max_iterations: 250
+  backends:
+    model_map:
+      default: fast
+      options:
+        - name: fast
+          description: Lookups, summaries, simple edits.
+          provider: openrouter
+          model: google/gemini-2.5-flash
+        - name: deep
+          description: Hard debugging, design, careful refactors.
+          provider: openrouter
+          model: anthropic/claude-sonnet-4
+          reasoning_effort: high
+```
+
+Simpler single-worker fleet (all children one cheap model):
+
+```yaml
 delegation:
   provider: openrouter
   model: google/gemini-2.5-flash
@@ -233,9 +309,10 @@ delegation:
 Verify:
 
 ```bash
+hermes -p <slug> tools enable delegation
 hermes -p <slug> doctor
 hermes -p <slug> config get model.default
-# Inspect YAML sections: model, auxiliary, fallback_providers, delegation, moa
+# Inspect YAML: model, auxiliary, fallback_providers, delegation, moa
 ```
 
 ## Decision guide
@@ -245,6 +322,7 @@ hermes -p <slug> config get model.default
 | Default chat brain | `model.*` |
 | Cheaper summaries / vision / approvals | `auxiliary.<task>.*` |
 | Survive primary outages | `fallback_providers` |
-| Parallel research / isolated workers | `delegation.*` + `delegate_task` |
+| Parallel research / isolated workers | `delegation.*` + `delegate_task` + `tools enable delegation` |
+| **Different models per delegated task** | `delegation.backend: model_map` (+ `advanced-delegation` plugin) |
 | Child uses another profile's persona | `delegation.backend: profile_routes` |
 | Multi-model advice, one acting loop | `moa` preset as main via provider `moa` |

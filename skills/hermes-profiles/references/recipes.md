@@ -113,8 +113,12 @@ hermes -p forge model
 hermes -p forge fallback add
 hermes -p forge config set auxiliary.compression.provider openrouter
 hermes -p forge config set auxiliary.compression.model google/gemini-2.5-flash
+hermes -p forge tools enable delegation
 hermes -p forge config set delegation.model google/gemini-2.5-flash
 hermes -p forge config set delegation.provider openrouter
+# Prefer per-task models when difficulty varies (needs advanced-delegation plugin):
+# hermes -p forge config set delegation.backend model_map
+# then edit delegation.backends.model_map.options (see models-and-delegation.md)
 hermes -p forge moa configure deep_review   # optional
 ```
 

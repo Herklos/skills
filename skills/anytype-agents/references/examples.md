@@ -72,7 +72,7 @@ Skills: Agent → Team → Project → Global
 - compression: openrouter · google/gemini-2.5-flash
 - approval: auto (main)
 - review: openrouter · anthropic/claude-opus-4
-**Subagents / delegation:** cheaper worker openrouter · google/gemini-2.5-flash; max_concurrent_children 8; backend default
+**Subagents / delegation:** enabled. backend `model_map` (default `fast`): `fast` = openrouter · google/gemini-2.5-flash; `deep` = openrouter · anthropic/claude-sonnet-4 · high. max_concurrent_children 8; max_iterations 250
 **Mixture of Agents:** off
 **Personality:**
 - SOUL: pragmatic implementer; short status; ask before destructive git

@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.8.0
+version: 1.8.1
 license: MIT
 metadata:
   category: agents
@@ -219,10 +219,15 @@ Full guide: `references/models-and-delegation.md`. Short map:
 | Main brain | `model.*` / `hermes -p <slug> model` / `/model` |
 | Side jobs (vision, compression, titles, approval, review, …) | `auxiliary.<task>.*` (default `auto` = main) |
 | Backup when primary fails | `fallback_providers` / `hermes -p <slug> fallback` |
-| `delegate_task` workers | `delegation.model` / `provider` / concurrency / `backend` |
+| `delegate_task` workers | `tools enable delegation` + `delegation.*` (model/provider, concurrency, `backend`) |
+| Different models per delegated task | `delegation.backend: model_map` (`advanced-delegation`; see `models-and-delegation.md`) |
 | Multi-model advice + one acting loop | `moa.presets` / `hermes -p <slug> moa configure` / provider `moa` |
 
-Subagents are fresh child runs, not separate profiles. Optional `delegation.backend: profile_routes` can run a child **as** another profile. MoA presets appear as selectable models under provider `moa`.
+Subagents are fresh child runs, not separate profiles. Enable the `delegation`
+toolset so profiles that fan out work can call `delegate_task`. Prefer
+`delegation.backend: model_map` when tasks need different models; use
+`profile_routes` to run a child **as** another profile. MoA presets appear as
+selectable models under provider `moa`.
 
 ### .env
 
