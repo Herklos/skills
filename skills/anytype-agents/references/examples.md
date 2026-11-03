@@ -41,9 +41,13 @@ Central home for teams and shared rules.
 - Engineering HQ
 - Growth HQ
 
+## Subteams (type `subteam`, under HQs)
+- Customer & Analytics – Product (example domain under Product HQ)
+- Prefer `subteam` objects; do not create new Sub-teams as `team` with `kind: Sub-team`
+
 ## Hierarchy
 Human ↔ Nova → chiefs → specialists
-Skills: Agent → Team → Project → Global
+Skills: Agent → Subteam → Team → Project → Global
 ```
 
 ### Routing table (example)
@@ -108,7 +112,8 @@ Skills: Agent → Team → Project → Global
 - Enabled toolsets: terminal, file, web, browser, cronjob
 - Approvals: smart · cron/unattended: deny
 **Terminal / execution:**
-- Backend: cua · cwd: unset (Space home) · timeout: 180 · plugin cua-spaces installed**Limits:**
+- Backend: cua · cwd: unset (Space home) · timeout: 180 · plugin cua-spaces installed
+**Limits:**
 - max_turns: 150 · tool_output: 50000/2000 · compression: on @ 0.50
 **Security / privacy / restoration:**
 - Approvals: smart · cron: deny · hard deny: none

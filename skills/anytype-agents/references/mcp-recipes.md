@@ -84,6 +84,30 @@ tables: `object-types.md`.
 }
 ```
 
+`kind` is `Board` | `HQ` | `Group` only. Domains under an HQ use **`subteam`**.
+
+## Create a Subteam
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "subteam",
+    "name": "Platform – Engineering",
+    "properties": {
+      "lifecycle": "live",
+      "parent_team": ["<engineeringHqObjectId>"],
+      "mission": "…"
+    },
+    "markdown": "## Mission\n…\n\n## Members\n…\n"
+  }
+}
+```
+
+Omit `template` to use **Subteam default** when the type has one. Patch the
+parent HQ map to link the new Subteam. Prefer this over `team` + `kind: Sub-team`.
+
 ## Create a project portfolio root
 
 ```json
@@ -136,7 +160,7 @@ tables: `object-types.md`.
 }
 ```
 
-Filter inventory with `"type": "agent"`, `"team"`, or `"project"` (support docs often stay `"page"`).
+Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, or `"project"` (support docs often stay `"page"`).
 
 ## Archive
 

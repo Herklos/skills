@@ -6,7 +6,7 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `object-types.md` | Agent / Team / Project type keys, properties, templates |
+| `object-types.md` | Agent / Team / Subteam / Project type keys, properties, templates |
 | `page-templates.md` | Creating/auditing body shapes |
 | `suggested-runtime.md` | Suggested runtime field list |
 | `shared-rules-starter.md` | Bootstrapping Shared Rules |
@@ -43,7 +43,7 @@ Agents
 ├── Board HQ (+ Board Group)
 ├── {Domain} HQ
 │   ├── Chief agent page
-│   ├── Sub-team pages
+│   ├── Subteam pages (type `subteam`)
 │   ├── Group page
 │   ├── Skills (team)
 │   └── Specialist agent pages
@@ -68,18 +68,21 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 |------|----------|
 | Primary | Human front door, cross-HQ coordination, approvals |
 | Board | Chiefs alignment; not day-to-day specialist delivery |
-| HQ | Domain ownership, sub-teams, routing rules |
+| HQ | Domain ownership, Subteams, routing rules |
+| Subteam | Domain / pod under an HQ (type `subteam`) |
 | Specialist | Narrow delivery; reports to a chief |
 | Group | Chat membership paste + welcome |
-| Skills hub | Index + template; resolution Agent → Team → Project → Global |
+| Skills hub | Index + template; resolution Agent → Subteam → Team → Project → Global |
 
 ## Types
 
-Org inventory uses custom keys **`agent`** and **`team`**, plus extended built-in
-**`project`**. Supporting docs (Shared Rules, Skills, memory children, hubs) stay
-**`page`**. Spaces also expose `task`, `note`, `collection`, `query`, `template`,
-media types. See `object-types.md` for property keys, default templates, create
-and `set_type` migration.
+Org inventory uses custom keys **`agent`**, **`team`**, and **`subteam`**, plus
+extended built-in **`project`**. Prefer **`subteam`** for domains under an HQ;
+do not place new Sub-teams on `team` with `kind: Sub-team`. Supporting docs
+(Shared Rules, Skills, memory children, hubs) stay **`page`**. Spaces also
+expose `task`, `note`, `collection`, `query`, `template`, media types. See
+`object-types.md` for property keys, default templates, create and `set_type`
+migration.
 
 ## Runtime vs docs
 

@@ -1,9 +1,9 @@
 # Page templates (generic)
 
 Use these shapes when creating or auditing **bodies**. Inventory objects use
-types `agent`, `team`, and `project` (see `object-types.md`); memory children,
-Shared Rules, and Skills stay `page`. Prefer duplicating a live peer in the same
-space over inventing a new layout.
+types `agent`, `team`, `subteam`, and `project` (see `object-types.md`); memory
+children, Shared Rules, and Skills stay `page`. Prefer duplicating a live peer
+in the same space over inventing a new layout.
 
 Suggested runtime field list: **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
@@ -17,7 +17,7 @@ Title: `{Name} – {Role}`
 3. **Short Description** (one paragraph: mission, HQ, reporting line, ownership)
 4. **Full System Prompt** fenced block (copy into the bot)
 5. **Your Memory Pages** (links)
-6. Map line: `Agents → {HQ} → [{Sub-team} →] {Agent}` and any `Projects → …` paths
+6. Map line: `Agents → {HQ} → [{Subteam} →] {Agent}` and any `Projects → …` paths
 
 Body outline (write as normal page markdown, not nested fences):
 
@@ -39,7 +39,7 @@ Link memory children after create.
 **Mission**
 …
 
-## Sub-teams | Domains | Members
+## Subteams | Domains | Members
 …
 
 ## Routing
@@ -53,7 +53,30 @@ n. Follow Agents → Shared Rules.
 - Agents → {HQ} → …
 ```
 
-Link: chief, group, skills, transition notes, sub-teams.
+Link: chief, group, skills, transition notes, **`subteam`** children (not `team` + `kind: Sub-team`).
+
+## Subteam page
+
+Type **`subteam`**. Title: `{Domain} – {HQ short name}` or `{Name} Subteam`.
+
+```markdown
+# {Name} Subteam
+> Parent HQ: **{HQ}**. Lead: **{Name or HQ chief}**.
+
+**Mission**
+…
+
+## Members
+- …
+
+## Routing
+Members → Subteam lead (if any) → HQ chief → Primary.
+
+## Map
+- Agents → {HQ} → {Subteam} → …
+```
+
+Set `parent_team` to the HQ. Optional `chief` when the Subteam has its own lead.
 
 ## Group page
 
@@ -70,7 +93,7 @@ Document membership here; applying it to a messaging platform is a separate runt
 
 ## Skill page
 
-1. Metadata: name, title, scope (`global` / `team:[HQ]` / `project:[name]` / `agent:[name]`), owner, status, version
+1. Metadata: name, title, scope (`global` / `team:[HQ]` / `subteam:[name]` / `project:[name]` / `agent:[name]`), owner, status, version
 2. Description router: third person, what + when (+ when not)
 3. Goal
 4. When to use / When not to use

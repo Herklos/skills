@@ -1,4 +1,4 @@
-# Object types (Agent, Team, Project)
+# Object types (Agent, Team, Subteam, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
@@ -12,11 +12,15 @@ Skills, Shared Rules, Groups, memory children, and other hub pages stay type
 | Type key | Plural | Use for |
 |----------|--------|---------|
 | `agent` | Agents | Primary, chiefs, specialists, archived agents |
-| `team` | Teams | Board, HQs, sub-teams, groups-as-org-units when typed |
+| `team` | Teams | Board, HQs, and groups-as-org-units when typed |
+| `subteam` | Subteams | Domains / pods under an HQ (**preferred**; do not model these as `team` with `kind: Sub-team`) |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 
 Hub roots named **Agents** / **Projects** may remain `page`; their inventory
 children use the keys above.
+
+Skills resolution order when a space uses Subteams:
+**Agent → Subteam → Team → Project → Global**.
 
 ## Agent (`api_key`: `agent`)
 
@@ -50,16 +54,41 @@ fence, Memory Pages). Body shapes: `page-templates.md`; runtime fields:
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `kind` | select | `Board` \| `HQ` \| `Sub-team` \| `Group` |
+| `kind` | select | `Board` \| `HQ` \| `Group` |
 | `chief` | objects | Link to chief Agent |
-| `parent_team` | objects | Parent Team / HQ |
+| `parent_team` | objects | Parent Team when nested (rare; HQs usually sit under Agents) |
 | `lifecycle` | select | Shared with Agent (`draft` / `live` / `archived`) |
 | `mission` | text | Short mission |
 
 Also `tag`, `links`, `backlinks`.
 
-**Default template name:** `Team default` (Mission, Sub-teams / Domains / Members,
-Routing, Rules, Map). Mirror shapes in `page-templates.md` (HQ page).
+**Default template name:** `Team default` (Mission, Subteams / Domains / Members,
+Routing, Rules, Map). Mirror shapes in `page-templates.md` (HQ page). Link child
+**`subteam`** objects from the HQ map; do not create new Sub-teams as `team`.
+
+Legacy: older spaces may still have `team` objects with `kind: Sub-team`. Prefer
+migrating those to type **`subteam`** via `set_type` (see below). Do not mint new
+`Sub-team` select options.
+
+## Subteam (`api_key`: `subteam`)
+
+Dedicated type for domains / pods under an HQ. Prefer this over putting
+sub-teams on the `team` type.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `parent_team` | objects | Owning HQ / Team (required when known) |
+| `chief` | objects | Lead agent when the subteam has one (else HQ chief) |
+| `lifecycle` | select | Shared with Agent / Team (`draft` / `live` / `archived`) |
+| `mission` | text | Short domain mission |
+
+Also `tag`, `links`, `backlinks`. No `kind` property: the type itself is the kind.
+
+**Default template name:** `Subteam default` (Mission, Members, Routing, Map).
+Body shape: `page-templates.md` (Subteam page).
+
+Agent `team` (objects) may link the owning HQ **or** this Subteam when the agent
+sits under a domain.
 
 ## Project (`api_key`: `project`)
 
@@ -103,8 +132,8 @@ template id from `API-list-templates` when you need a specific one; pass
 }
 ```
 
-Team / project the same way with `"type": "team"` or `"type": "project"` and the
-property keys above.
+Team / Subteam / project the same way with `"type": "team"`, `"type": "subteam"`,
+or `"type": "project"` and the property keys above.
 
 ## Search by type
 
@@ -117,7 +146,7 @@ property keys above.
 }
 ```
 
-Use `"type": "team"` or `"type": "project"` the same way.
+Use `"type": "team"`, `"type": "subteam"`, or `"type": "project"` the same way.
 
 ## Migrate an existing page (`set_type`)
 
@@ -144,19 +173,45 @@ Keep the same object id and links. Apply `set_type` then `set_properties` in one
 }
 ```
 
-Recommended inventory scope: Agents hub agents + Board/HQ/sub-teams, and Projects
-hub portfolio roots. Leave Skills, Shared Rules, memory children, bugs, and other
-support pages as `page`.
+Recommended inventory scope: Agents hub agents + Board/HQ (`team`) + Subteams
+(`subteam`), and Projects hub portfolio roots. Leave Skills, Shared Rules,
+memory children, bugs, and other support pages as `page`.
+
+### Migrate legacy `team` + `kind: Sub-team` → `subteam`
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<objectId>",
+  "create_missing_options": true,
+  "ops": [
+    { "op": "set_type", "type": "subteam" },
+    {
+      "op": "set_properties",
+      "set": {
+        "lifecycle": "live",
+        "parent_team": ["<hqTeamObjectId>"],
+        "mission": "…"
+      }
+    }
+  ]
+}
+```
+
+Keep `parent_team` / `chief` / `mission` when the keys already exist on the
+object; re-set only what is missing after the type change.
 
 ## Bootstrap types in a new space
 
-1. `API-create-type` for `agent` and `team` with the property definitions above
-   (`create_missing_options: true` for selects).
+1. `API-create-type` for `agent`, `team`, and `subteam` with the property
+   definitions above (`create_missing_options: true` for selects). On `team`,
+   define `kind` options `Board` / `HQ` / `Group` only (no `Sub-team`).
 2. `API-update-type` on built-in `project` with `add_property` ops for the Project
    fields (or create them once if the space already has matching keys).
-3. `API-create-template` with `template_for`: `agent` | `team` | `project`.
+3. `API-create-template` with `template_for`: `agent` | `team` | `subteam` | `project`.
 4. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
-5. Migrate existing inventory with `set_type` as above.
+5. Migrate existing inventory with `set_type` as above (including legacy Sub-team
+   `team` objects → `subteam`).
 
 Do not hardcode space or template ids in skill text; resolve them via list/get
 each session.

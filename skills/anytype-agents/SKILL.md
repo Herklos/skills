@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.11.0
+version: 1.12.0
 license: MIT
 metadata:
   category: agents
@@ -17,18 +17,18 @@ metadata:
 # Anytype Agents
 
 Org source of truth for a multi-agent roster lives in **Anytype** as typed
-objects (`agent`, `team`, `project`) plus supporting `page`s. Runtime bots (chat
-harnesses, CLIs, local agents) are separate: editing Anytype does not by itself
-update a live bot prompt or messaging group. Verify runtime separately after doc
-changes.
+objects (`agent`, `team`, `subteam`, `project`) plus supporting `page`s. Runtime
+bots (chat harnesses, CLIs, local agents) are separate: editing Anytype does not
+by itself update a live bot prompt or messaging group. Verify runtime separately
+after doc changes.
 
 ## References (load when needed)
 
 | File | When |
 |------|------|
 | `references/structure.md` | Hub discovery and typical tree |
-| `references/object-types.md` | Agent / Team / Project type keys, properties, templates, migration |
-| `references/page-templates.md` | Agent / HQ / group / skill / project body shapes |
+| `references/object-types.md` | Agent / Team / Subteam / Project type keys, properties, templates, migration |
+| `references/page-templates.md` | Agent / HQ / Subteam / group / skill / project body shapes |
 | `references/suggested-runtime.md` | Suggested runtime field list (Hermes mapping; **Cua Spaces** default computer) |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
@@ -58,11 +58,12 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Term | Meaning |
 |------|---------|
 | Agents | Root hub: shared rules, skills index, Primary, HQ index |
-| HQ / Team | Typed `team` object (Board / HQ / Sub-team / Group) under Agents |
+| HQ / Team | Typed `team` object (`kind`: Board / HQ / Group) under Agents |
+| Subteam | Typed `subteam` object: domain / pod under an HQ (preferred over `team` + `kind: Sub-team`) |
 | Agent | Typed `agent` object: role, system prompt, memory links, skills |
 | Group | Messaging roster notes; membership text is not auto-synced to chat |
 | Shared Rules | Mandatory rules every agent must follow (`page`) |
-| Skills | Procedures (`page`); resolve most-specific first: Agent → Team → Project → Global |
+| Skills | Procedures (`page`); resolve most-specific first: Agent → Subteam → Team → Project → Global |
 | Drafts | Agent designs not live until approved |
 | Projects | Portfolio roots as typed `project`; children often stay `page` |
 | Primary | Coordinator agent; usually the only path to the human for escalations |
@@ -124,11 +125,19 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update a Team / HQ
 
-1. Create type **`team`** with `kind` (`Board` / `HQ` / `Sub-team` / `Group`) and `lifecycle`
-2. Mirror an existing HQ's body sections (mission, sub-teams, routing, rules, map) from `page-templates.md` / **Team default** template
+1. Create type **`team`** with `kind` (`Board` / `HQ` / `Group`) and `lifecycle`
+2. Mirror an existing HQ's body sections (mission, Subteams / Domains / Members, routing, rules, map) from `page-templates.md` / **Team default** template
 3. Set `chief`, `parent_team`, `mission` when known
 4. Link from Agents
 5. Update roster/routing and Board/group welcome text if membership changes
+
+### Create or update a Subteam
+
+1. Prefer type **`subteam`** (do not create new Sub-teams as `team` with `kind: Sub-team`)
+2. Set `parent_team` to the owning HQ, plus `lifecycle`, optional `chief` / `mission`
+3. Body from `page-templates.md` / **Subteam default** template
+4. Link from the HQ map; point member agents' `team` (or map line) at this Subteam when they sit under it
+5. Migrate legacy `team` + `kind: Sub-team` with `set_type` → `subteam` (`object-types.md`)
 
 ### Create or update a Project portfolio root
 
@@ -184,9 +193,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ## Common recipes (summary)
 
-- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|project`
-- **New specialist:** draft vs live → create `agent` + properties (`object-types.md`) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ → prompt copy reminder
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|project`
+- **New specialist:** draft vs live → create `agent` + properties (`object-types.md`) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
 - **New HQ:** create `team` (`kind: HQ`) → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
+- **New Subteam:** create `subteam` with `parent_team` → link HQ map → optional member agents
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub
 - **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)
 - **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
