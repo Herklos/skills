@@ -104,22 +104,33 @@ hermes profile delete old-bot
 | Near-full copy of source | `--clone-all` (+ optional `--clone-from`) |
 | Also copy messaging tokens | add `--clone-channels` (confirm first) |
 
-## 11. Wire main, aux, fallback, subagents
+## 11. Wire main (routing model), aux, fallback, task-specific subagents
 
-See `models-and-delegation.md` for full YAML. Minimal sequence:
+See `models-and-delegation.md` for full YAML. Preferred sequence (routing model
++ named task routes via **advanced-delegation**):
 
 ```bash
-hermes -p forge model
+hermes -p forge model                                   # strong routing / main model
 hermes -p forge fallback add
 hermes -p forge config set auxiliary.compression.provider openrouter
 hermes -p forge config set auxiliary.compression.model google/gemini-2.5-flash
 hermes -p forge tools enable delegation
+hermes -p forge plugins install advanced-delegation     # needs Hermes >= 0.22.5
+hermes -p forge delegation config                       # Model routes: add fast/deep/… + default
+# Or: hermes -p forge config set delegation.backend model_map
+# then edit delegation.backends.model_map.options (see models-and-delegation.md)
+# In chat later: /delegation model_map   or   /delegation model_map --now
+hermes -p forge delegation config --show
+hermes -p forge moa configure deep_review               # optional
+```
+
+Single cheap worker for every child (no plugin):
+
+```bash
+hermes -p forge tools enable delegation
+hermes -p forge config set delegation.backend default
 hermes -p forge config set delegation.model google/gemini-2.5-flash
 hermes -p forge config set delegation.provider openrouter
-# Prefer per-task models when difficulty varies (needs advanced-delegation plugin):
-# hermes -p forge config set delegation.backend model_map
-# then edit delegation.backends.model_map.options (see models-and-delegation.md)
-hermes -p forge moa configure deep_review   # optional
 ```
 
 ## 12. Personality (SOUL + overlay)

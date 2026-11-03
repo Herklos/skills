@@ -88,12 +88,16 @@ hermes -p <slug> pairing list|approve|revoke|clear-pending
 hermes -p <slug> approvals suggest [--apply …]
 hermes -p <slug> checkpoints status|prune|clear
 hermes -p <slug> backup [--quick]
-hermes -p <slug> tools enable cronjob
+hermes -p <slug> tools enable cronjob|delegation
+hermes -p <slug> plugins install advanced-delegation
+hermes -p <slug> delegation config|--show
+hermes -p <slug> config set delegation.backend model_map|profile_routes|default
 hermes -p <slug> cron create|list|edit|pause|resume|run|cancel|remove|status|tick|doctor
 hermes -p <slug> config set cron.model <name>
 hermes -p <slug> config set approvals.cron_mode deny|approve
 hermes -p <slug> gateway start|stop|restart|install
-# In session: /cron … ; /personality [name|none] ; /skin <name> ; /verbose ; /focus ;
+# In session: /delegation model_map|profiles|default [--now] ; /cron … ;
+#   /personality [name|none] ; /skin <name> ; /verbose ; /focus ;
 #   /reasoning show|hide ; /memory pending|approve|reject ; /rollback …
 ```
 
@@ -149,6 +153,8 @@ ui_meta:
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/tools
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/skins
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation
+- https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation
 - https://hermes-agent.nousresearch.com/docs/user-guide/git-worktrees
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files
 - https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference

@@ -30,7 +30,19 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - title_generation: …
 - review (`/review`): …
 - other tasks: …
-**Subagents / delegation:** enabled (`delegation` toolset). Prefer **model_map** so each `delegate_task` can pick a named route (e.g. `fast` = {provider}·{model}; `deep` = {provider}·{model} · {reasoning}). Alternatives: single cheaper worker {provider}·{model} (`backend` default) | `profile_routes` ({profile names}). Also note max_concurrent_children / max_iterations when non-default. Docs: hermes-profiles → `models-and-delegation.md` / https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation#configuration
+**Subagents / delegation:**
+- Enabled: yes (`delegation` toolset) | no
+- **Routing model:** same as Primary (main) | {provider}·{model} · {reasoning} (parent plans and picks the route per task; there is no separate routing_model key)
+- **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
+- Plugin: **advanced-delegation** installed on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
+- **Task-specific models** (`model_map` options; name = what the agent picks):
+  - `{fast}` = {provider}·{model} · {reasoning?} · {tier?} — {one-line when to use}
+  - `{deep}` = {provider}·{model} · {reasoning?} — {when to use}
+  - default route for unrouted tasks: `{fast}` | parent main
+- Alternatives: single worker {provider}·{model} (`backend: default`) | `profile_routes` ({profile}: {description})
+- Concurrency: max_concurrent_children {n} · max_iterations {n}
+- Setup: `hermes plugins install advanced-delegation` → `hermes delegation config` → `/delegation model_map`
+- Docs: hermes-profiles → `models-and-delegation.md` / https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation / https://github.com/NousResearch/hermes-official-plugins/tree/main/advanced-delegation
 **Scheduled tasks:** none yet | list each intended job (docs do not auto-create live cron). For Hermes: enable `cronjob` toolset; gateway must run for agent jobs. Per job note: name · schedule · prompt intent · deliver · skills · workdir · model pin (`per-job` \| `cron.model` \| main) · no_agent/script if any · approvals.cron_mode. Apply with `/cron`, `hermes cron`, or `cronjob_manage`. Docs: hermes-profiles → `cron.md` / https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
 **Mixture of Agents (optional):** off | preset `{name}` (references: …; aggregator: …; fanout: user_turn|per_iteration|every_n:N)
 **Personality:**
@@ -224,7 +236,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Workspace pages under Agents / Projects (source of truth)
 - {MCP / CLI / browser as applicable}
 - Runtime: {harness}
-- Models: primary {…}; fallback {…}; aux {…}; subagents {…}; MoA {off|preset}
+- Models: primary/routing {…}; fallback {…}; aux {…}; subagents model_map {fast/deep/…} | default worker {…}; MoA {off|preset}
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
 - Browser: {none|source + identity}

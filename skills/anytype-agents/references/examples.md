@@ -72,7 +72,15 @@ Skills: Agent → Team → Project → Global
 - compression: openrouter · google/gemini-2.5-flash
 - approval: auto (main)
 - review: openrouter · anthropic/claude-opus-4
-**Subagents / delegation:** enabled. backend `model_map` (default `fast`): `fast` = openrouter · google/gemini-2.5-flash; `deep` = openrouter · anthropic/claude-sonnet-4 · high. max_concurrent_children 8; max_iterations 250
+**Subagents / delegation:**
+- Enabled: yes (`delegation` toolset)
+- Routing model: openrouter · anthropic/claude-sonnet-4 · high (Primary / main; picks `option` per task)
+- Mode: `model_map` · plugin advanced-delegation installed
+- Task-specific models (default `fast`):
+  - `fast` = openrouter · google/gemini-2.5-flash — lookups, summaries, simple edits
+  - `deep` = openrouter · anthropic/claude-sonnet-4 · high — hard debugging, careful refactors
+- max_concurrent_children 8; max_iterations 250
+- Setup: `hermes plugins install advanced-delegation` → `hermes delegation config`
 **Scheduled tasks:**
 - `pr-hygiene` · `0 8 * * 1-5` · list stale draft PRs in cwd repo and open Ready follow-ups · deliver origin · workdir /absolute/path/to/repo · model: cron.model · cronjob toolset on · approvals.cron_mode deny
 - (no no_agent watchdogs on this implementer)
@@ -154,7 +162,7 @@ Ops agent with Bot Screen + shared team browser cookies:
 - Permission mode: standard
 ```
 
-Apply Hermes model fields with skill `hermes-profiles` → `references/models-and-delegation.md`.  
+Apply Hermes model / routing / task-specific subagent fields with skill `hermes-profiles` → `references/models-and-delegation.md` (plugin: https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation).  
 Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.  
 Apply memory with `hermes-profiles` → `references/memory.md`.  
 Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.  

@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.8.2
+version: 1.8.3
 license: MIT
 metadata:
   category: agents
@@ -27,7 +27,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | File | When |
 |------|------|
 | `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
-| `references/models-and-delegation.md` | Main, auxiliary, fallback, subagents, Mixture of Agents |
+| `references/models-and-delegation.md` | Main/routing model, auxiliary, fallback, subagents (`advanced-delegation` model_map), MoA |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
 | `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
@@ -48,7 +48,9 @@ Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/pers
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
 Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
 Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use  
-Cron: https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
+Cron: https://hermes-agent.nousresearch.com/docs/user-guide/features/cron  
+Delegation: https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation  
+Advanced delegation: https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation
 
 ## Resolve home
 
@@ -219,18 +221,21 @@ Full guide: `references/models-and-delegation.md`. Short map:
 
 | Concern | Config / CLI |
 |---------|----------------|
-| Main brain | `model.*` / `hermes -p <slug> model` / `/model` |
+| Main / **routing** model | `model.*` / `hermes -p <slug> model` / `/model` (picks per-task route when delegating) |
 | Side jobs (vision, compression, titles, approval, review, …) | `auxiliary.<task>.*` (default `auto` = main) |
 | Backup when primary fails | `fallback_providers` / `hermes -p <slug> fallback` |
-| `delegate_task` workers | `tools enable delegation` + `delegation.*` (model/provider, concurrency, `backend`) |
-| Different models per delegated task | `delegation.backend: model_map` (`advanced-delegation`; see `models-and-delegation.md`) |
+| `delegate_task` workers | `tools enable delegation` + `delegation.*` (concurrency, `backend`) |
+| **Task-specific models** | `plugins install advanced-delegation` + `delegation.backend: model_map` + named `options` (`hermes delegation config`) |
+| Child as another profile | `delegation.backend: profile_routes` (same plugin) |
 | Multi-model advice + one acting loop | `moa.presets` / `hermes -p <slug> moa configure` / provider `moa` |
 
-Subagents are fresh child runs, not separate profiles. Enable the `delegation`
-toolset so profiles that fan out work can call `delegate_task`. Prefer
-`delegation.backend: model_map` when tasks need different models; use
-`profile_routes` to run a child **as** another profile. MoA presets appear as
-selectable models under provider `moa`.
+Subagents are fresh child runs, not separate profiles (unless
+`profile_routes`). Enable `delegation`, install **`advanced-delegation`**
+(Hermes >= 0.22.5) on fan-out profiles, set a capable routing model (`model.*`),
+and define task-specific routes under `backends.model_map.options` (`fast` /
+`deep` / …). Chat: `/delegation model_map`. Docs:
+`models-and-delegation.md` + https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation.
+MoA presets appear as selectable models under provider `moa`.
 
 ### .env
 
