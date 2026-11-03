@@ -75,11 +75,18 @@ hermes -p <slug> config set computer_use.<key> <value>
 hermes -p <slug> config set bot_desktop.<key> <value>
 hermes -p <slug> config set terminal.<key> <value>
 hermes -p <slug> config set approvals.<key> <value>
+hermes -p <slug> config set security.<key> <value>
+hermes -p <slug> config set privacy.redact_pii true|false
+hermes -p <slug> config set checkpoints.enabled true|false
 hermes -p <slug> config set agent.max_turns <n|null>
 hermes -p <slug> config set tool_output.max_bytes <n>
 hermes -p <slug> config set compression.<key> <value>
+hermes -p <slug> pairing list|approve|revoke|clear-pending
+hermes -p <slug> approvals suggest [--apply …]
+hermes -p <slug> checkpoints status|prune|clear
+hermes -p <slug> backup [--quick]
 hermes -p <slug> gateway start|stop|restart|install
-# In session: /personality [name|none] ; /memory pending|approve|reject
+# In session: /personality [name|none] ; /memory pending|approve|reject ; /rollback …
 ```
 
 ## Clone flag matrix
@@ -128,6 +135,9 @@ ui_meta:
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/bot-screen
 - https://hermes-agent.nousresearch.com/docs/user-guide/configuration
+- https://hermes-agent.nousresearch.com/docs/user-guide/security
+- https://hermes-agent.nousresearch.com/docs/user-guide/checkpoints-and-rollback
+- https://hermes-agent.nousresearch.com/docs/user-guide/session-storage-recovery
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/tools
 - https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference
 - https://hermes-agent.nousresearch.com/docs/reference/profile-commands

@@ -115,6 +115,31 @@ Approvals stuck unanswered: check `approvals.mode` and platform (cron uses
 or read with `offset`/`limit`. Turns cut short: inspect `agent.max_turns` /
 `run_budget_seconds`. See `runtime-limits-and-tools.md`.
 
+## Unauthorized messaging users / pairing
+
+```bash
+hermes -p <slug> pairing list
+# Approve only with owner confirmation:
+# hermes -p <slug> pairing approve <platform> <code>
+```
+
+Confirm allowlists exist in that profile's `.env` (never dump IDs into chat).
+Default is deny-all when nothing is configured. See `security.md`.
+
+## Session DB "old WAL" / refuse to write
+
+Stop all writers on the profile → `hermes -p <slug> doctor` → restart one process.
+Never delete `state.db-wal`. See `security.md` and official session-storage-recovery docs.
+
+## Rollback / checkpoints missing
+
+```bash
+hermes -p <slug> config get checkpoints.enabled
+hermes -p <slug> checkpoints status
+```
+
+Checkpoints are opt-in (`checkpoints.enabled` or `hermes chat --checkpoints`).
+
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.

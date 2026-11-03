@@ -97,6 +97,12 @@ Skills: Agent → Team → Project → Global
 - Backend: local · cwd: /absolute/path/to/repo · timeout: 180
 **Limits:**
 - max_turns: 150 · tool_output: 50000/2000 · compression: on @ 0.50
+**Security / privacy / restoration:**
+- Approvals: smart · cron: deny · hard deny: none
+- Redact secrets: on · redact PII: off · allow_private_urls: off
+- Protected instruction files: on
+- Messaging auth: n/a (no gateway)
+- Checkpoints: off · backup: quick before major changes
 **Gateway / messaging:** none
 ```
 
@@ -144,7 +150,8 @@ Apply Hermes model fields with skill `hermes-profiles` → `references/models-an
 Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.  
 Apply memory with `hermes-profiles` → `references/memory.md`.  
 Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.  
-Apply tools / terminal / limits with `hermes-profiles` → `references/runtime-limits-and-tools.md`.
+Apply tools / terminal / limits with `hermes-profiles` → `references/runtime-limits-and-tools.md`.  
+Apply security / privacy / restoration with `hermes-profiles` → `references/security.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

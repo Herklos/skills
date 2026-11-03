@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.6.0
+version: 1.7.0
 license: MIT
 metadata:
   category: agents
@@ -32,11 +32,14 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
 | `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
 | `references/runtime-limits-and-tools.md` | Toolsets, approvals, terminal backend, output/turn/compression limits |
+| `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles  
 Config: https://hermes-agent.nousresearch.com/docs/user-guide/configuration  
+Security: https://hermes-agent.nousresearch.com/docs/user-guide/security  
+Checkpoints: https://hermes-agent.nousresearch.com/docs/user-guide/checkpoints-and-rollback  
 Tools: https://hermes-agent.nousresearch.com/docs/user-guide/features/tools  
 Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
@@ -80,6 +83,7 @@ Do not print `.env` secret values into chat.
 | Browser | `browser` toolset (`browser_exec`); local / cloud / real-profile / CDP |
 | Computer use | `computer_use` toolset (cua-driver); optional Linux Bot Screen per profile |
 | Toolsets / limits | Enabled tools, approvals, terminal backend, output and turn caps |
+| Security | Approvals/YOLO floor, privacy redaction, pairing, checkpoints, backup |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the tool working directory.
 Profiles do not sandbox the filesystem. Never run two writers against the same profile.
@@ -268,6 +272,22 @@ Full guide: `references/runtime-limits-and-tools.md`.
 | Compression | `compression.threshold` (+ `auxiliary.compression` model) |
 | Loop caps | `tool_loop_guardrails.*` |
 
+### Security, privacy, restoration
+
+Full guide: `references/security.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Approvals / YOLO | `approvals.*`, `command_allowlist`, `/yolo`, `hermes approvals suggest` |
+| Redaction / URL guards | `security.redact_secrets`, `allow_private_urls`, `privacy.redact_pii` |
+| Instruction-file gate | `security.protected_instruction_files` |
+| Write sandbox | Protected paths + `HERMES_WRITE_SAFE_ROOT` |
+| Messaging who | Allowlists in `.env` / `hermes pairing approve\|revoke` |
+| Filesystem rollback | `checkpoints.enabled` + `/rollback` / `hermes checkpoints …` |
+| Backup / restore | `hermes backup`, `hermes import`, `updates.pre_update_backup` |
+
+Confirm before `approvals.mode: off`, open gateway allow-all, or destructive restore.
+
 ## Gateway
 
 ```bash
@@ -281,9 +301,9 @@ One gateway process per profile. Separate bot tokens per profile.
 
 ## Safety
 
-1. Confirm before `delete`, `--clone-channels`, bulk `.env` changes, or history wipes.
+1. Confirm before `delete`, `--clone-channels`, bulk `.env` changes, history wipes, YOLO/off approvals, open allow-all, or destructive `/rollback` / `checkpoints clear`.
 2. One writer per profile.
-3. Do not dump `.env` or auth tokens into chat.
+3. Do not dump `.env`, auth tokens, or allowlist IDs into chat.
 4. Export strips API keys; treat archives as sensitive.
 5. After SOUL / personality / config / memory edits, note that live sessions need reload.
 

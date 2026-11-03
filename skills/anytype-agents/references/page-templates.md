@@ -14,7 +14,7 @@ Document the intended runtime stack. Values are guidance for whoever configures
 the bot; they do not auto-apply. For Hermes, map these into that profile's
 `config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
 `models-and-delegation.md`, `soul-templates.md`, `memory.md`,
-`browser-and-computer.md`, `runtime-limits-and-tools.md`).
+`browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`).
 
 **Harness:** hermes | grok | claude | codex | noodle | cli | other
 **Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
@@ -62,6 +62,13 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - max_turns: unlimited | {n} · run_budget_seconds: off | {n} · gateway_timeout: {1800}
 - tool_output max_bytes/lines: {50000}/{2000} · file_read_max_chars: {100000}
 - compression: on|off · threshold {0.50} · loop hard-stop: interactive warn | unattended hard
+**Security / privacy / restoration:**
+- Approvals: smart | manual | off · cron/unattended: deny | approve · hard deny: {none|globs}
+- Redact secrets: on|off · redact PII: on|off · allow_private_urls: on|off
+- Protected instruction files: on|off · write safe root: unset | {policy label only}
+- Messaging auth: allowlist | pairing | open (never put IDs/tokens here)
+- Checkpoints /rollback: off | on · backup cadence: none | quick | full pre-update
+- Notes: {YOLO allowed? disposable sandbox?}
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
 
 # {Name} – {Role}
@@ -204,6 +211,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Computer: {none|surface + dedicated|shared}
 - Tools: {toolsets}; approvals {smart|manual|off}; terminal {backend}/{cwd}
 - Limits: max_turns {…}; tool_output {…}; compression {…}
+- Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.

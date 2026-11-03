@@ -184,6 +184,21 @@ hermes -p forge config set tool_output.max_bytes 50000
 hermes -p forge config set compression.threshold 0.50
 ```
 
+## 16. Security, privacy, restoration
+
+See `security.md`. Minimal sequence:
+
+```bash
+hermes -p forge config set approvals.mode smart
+hermes -p forge config set approvals.cron_mode deny
+hermes -p forge config set security.redact_secrets true
+hermes -p forge config set security.protected_instruction_files true
+hermes -p forge config set privacy.redact_pii false
+hermes -p forge config set checkpoints.enabled false    # true + /rollback if wanted
+hermes -p forge backup --quick                          # optional snapshot
+# Messaging: set allowlists in .env, or hermes -p forge pairing approve …
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -195,9 +210,10 @@ hermes -p forge config set compression.threshold 0.50
 | User preferences / durable facts | memory tool → `USER.md` / `MEMORY.md` |
 | Memory limits, approval, provider | `memory.*` / `hermes -p <slug> memory …` (`memory.md`) |
 | Browser / computer / Bot Screen | `browser-and-computer.md` / `hermes tools` / `computer-use` |
-| Toolsets, approvals, terminal, output/turn caps | `runtime-limits-and-tools.md` |
+| Toolsets, terminal, output/turn caps | `runtime-limits-and-tools.md` |
+| Approvals, privacy, pairing, checkpoints, backup | `security.md` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
-| API keys / bot tokens | profile `.env` (never echo values) |
+| API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |
 | Kanban one-liner | `hermes profile describe` |
 | Bot roster avatar/section | Desktop Bot Mode / `ui_meta` |

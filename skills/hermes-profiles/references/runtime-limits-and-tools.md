@@ -50,6 +50,9 @@ Common toolsets: `web`, `search`, `terminal`, `file`, `browser`, `vision`, `imag
 
 ## Approvals (dangerous commands)
 
+Short form here. Full security stack (hardline blocklist, pairing, privacy,
+checkpoints, backup): `security.md`.
+
 ```yaml
 approvals:
   mode: smart              # manual | smart | off (= --yolo)
