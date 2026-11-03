@@ -264,7 +264,65 @@ hermes -p <slug> delegation config --show
 ```
 
 Document on the agent page: routing model (primary) + named task routes
-(`fast` / `deep` / …) under **Subagents / delegation**.
+(`fast` / `deep` / …) under **Subagents / delegation**. Prefer sourcing those
+routes from Anytype **Subagent** objects (see below).
+
+## Decline from Anytype Subagent objects
+
+When the org uses skill `anytype-agents`, each parent Agent may link zero or more
+typed **`subagent`** objects (`parent_agent` + Agent.`subagents`). Treat those as
+the source of truth for `model_map` routes; re-apply after Subagent edits.
+
+| Anytype Subagent field | Hermes `model_map` option |
+|------------------------|---------------------------|
+| `task_key` | `name` |
+| `intent` | `description` |
+| `harness_profile` primary (or `model_override`) | `provider` + `model` (resolve labels to runtime ids) |
+| `spawn_effort` (else profile `primary_effort`) | `reasoning_effort` when the provider supports it |
+| `scope`, `toolsets`, `deliver_back` | Child brief / parent prompt notes (Hermes children inherit parent tools unless you use `profile_routes`) |
+
+Steps:
+
+1. Read the parent Agent in Anytype (`format: md`) and list linked Subagents
+   (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
+2. For each live Subagent, open its `harness_profile` and take primary model /
+   effort (honor `model_override` / `effort` when set).
+3. `hermes -p <slug> tools enable delegation`
+4. `hermes -p <slug> plugins install advanced-delegation`
+5. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
+   one option per Subagent `task_key`
+6. Set `model_map.default` to the usual cheap route (`fast` / `fetch`) when one exists
+7. `hermes -p <slug> delegation config --show` and note the routes on the Agent
+   Suggested runtime section
+
+Example declined from three Subagents (Coding + Data fetching profiles):
+
+```yaml
+delegation:
+  backend: model_map
+  backends:
+    model_map:
+      default: fast
+      options:
+        - name: fast
+          description: Small edits, simple tests
+          provider: anthropic
+          model: claude-sonnet-4-5
+          reasoning_effort: medium
+        - name: deep
+          description: Hard debugging and careful refactors
+          provider: anthropic
+          model: claude-sonnet-4-5
+          reasoning_effort: high
+        - name: fetch
+          description: Lookups, scrape, light summary
+          provider: openai
+          model: gpt-5.1-codex  # resolve Codex Terra label to the live id
+          reasoning_effort: high
+```
+
+Provider/model strings above are illustrative; resolve each Harness profile label
+to the ids your runtime actually accepts (`models.md`).
 
 ## Decision guide
 
@@ -273,5 +331,6 @@ Document on the agent page: routing model (primary) + named task routes
 | Parallel research / isolated workers | `tools enable delegation` + `delegate_task` |
 | **Routing model** (who picks routes) | Parent `model.*` — see `models.md` |
 | **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options` |
+| Routes from Anytype Subagent objects | Decline table above; keep Agent.`subagents` in sync |
 | Child uses another profile's persona | `delegation.backend: profile_routes` (+ plugin) |
 | One cheap worker for every child | `delegation.backend: default` + `delegation.model` |

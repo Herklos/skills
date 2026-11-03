@@ -13,7 +13,8 @@ Companion shapes (HQ / Group / Skill / prompt skeleton): `page-templates.md`.
 Property keys: `object-types.md`.
 
 Dumped / authored **2026-11-04**: Agent / Team / Project from live org; Harness /
-Harness profile from live bootstrap; Subteam skill-authored until type is live.
+Harness profile / Subagent from live bootstrap; Subteam skill-authored until type
+is live.
 
 ---
 
@@ -27,7 +28,7 @@ Harness profile from live bootstrap; Subteam skill-authored until type is live.
 - 1: {Harness} · {model} · {effort}
 - 2: {Harness} · {model} · {effort}
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
-**Subagents / delegation:** enabled. Prefer model_map (fast/deep named routes) for different models per delegate_task; else cheaper single worker.
+**Subagents / delegation:** enabled. Prefer model_map routes from linked Agent.`subagents` (each Subagent = one task_key + harness_profile); else cheaper single worker.
 **Personality / Memory / Browser / Computer / Tools / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## Autonomy
@@ -151,6 +152,39 @@ medium).
 
 ---
 
+## Subagent default (`template_for`: `subagent`)
+
+```markdown
+## When to use
+{intent / task the parent should pick this route for}
+
+## Route
+- task_key: {fast | deep | fetch | …}
+- parent_agent: {Agent name}
+- harness_profile: {Coding | Data fetching | …}
+- spawn_effort override: none | low | medium | high
+- model_override: none | {label}
+
+## Scope
+{cwd / read-only / web-only / single-repo / …}
+
+## Tools
+{toolsets list or inherit}
+
+## Deliver back
+{what the child must return to the parent}
+
+## Hermes apply
+Decline into the parent's `delegation.backends.model_map.options` (see
+hermes-profiles `delegation.md`). Re-apply after Subagent edits; Anytype does
+not push configs automatically.
+```
+
+Set `parent_agent`, `task_key`, and `harness_profile` on create. Also add this
+object to Agent.`subagents`.
+
+---
+
 ## Project default (`template_for`: `project`)
 
 ```markdown
@@ -180,8 +214,8 @@ Common children: Technical, Business, Project Management (Roadmap / Backlog / TO
 ## Recreate a default template (MCP)
 
 1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
-   `harness` | `harness_profile` | `project`, name `{Type} default`, and body
-   blocks from the matching section above (`heading_2` + `paragraph`).
+   `subagent` | `harness` | `harness_profile` | `project`, name `{Type} default`,
+   and body blocks from the matching section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -189,7 +223,7 @@ Common children: Technical, Business, Project Management (Roadmap / Backlog / TO
 
 ## Drift check
 
-1. `API-list-templates` for `agent`, `team`, `subteam`, `harness`,
+1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
    `harness_profile`, `project`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally

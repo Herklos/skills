@@ -53,6 +53,11 @@ Central home for teams and shared rules.
 - Data fetching → Codex Terra 6.1 high; backups Claude Haiku 5.5 medium, Grok 4.5 medium
 - Agents link `harness_profile` (not a harness select)
 
+## Subagents (type `subagent`, under Agents)
+- Lee → Fast fetch (`fetch`, Data fetching), Deep code (`deep`, Coding), Quick edit (`fast`, Coding)
+- Remy → same pattern for chief orchestration
+- Keep Subagent.`parent_agent` and Agent.`subagents` both ways
+
 ## Hierarchy
 Human ↔ Nova → chiefs → specialists
 Skills: Agent → Subteam → Team → Project → Global
@@ -88,13 +93,15 @@ Skills: Agent → Subteam → Team → Project → Global
 - review: openrouter · anthropic/claude-opus-4
 **Subagents / delegation:**
 - Enabled: yes (`delegation` toolset)
+- Anytype Subagents: Quick edit (`fast`, Coding), Deep code (`deep`, Coding), Fast fetch (`fetch`, Data fetching)
 - Routing model: openrouter · anthropic/claude-sonnet-4 · high (Primary / main; picks `option` per task)
 - Mode: `model_map` · plugin advanced-delegation installed
-- Task-specific models (default `fast`):
-  - `fast` = openrouter · google/gemini-2.5-flash — lookups, summaries, simple edits
-  - `deep` = openrouter · anthropic/claude-sonnet-4 · high — hard debugging, careful refactors
+- Task-specific models (declined from Subagent objects; default `fast`):
+  - `fast` ← Quick edit · Coding · medium — small edits, simple tests
+  - `deep` ← Deep code · Coding · high — hard debugging, careful refactors
+  - `fetch` ← Fast fetch · Data fetching · high — lookups, scrape, light summary
 - max_concurrent_children 8; max_iterations 250
-- Setup: `hermes plugins install advanced-delegation` → `hermes delegation config`
+- Setup: `hermes plugins install advanced-delegation` → decline Subagents (`delegation.md`) → `hermes delegation config`
 **Scheduled tasks:**
 - `pr-hygiene` · `0 8 * * 1-5` · list stale draft PRs in cwd repo and open Ready follow-ups · deliver origin · workdir /absolute/path/to/repo · model: cron.model · cronjob toolset on · approvals.cron_mode deny
 - (no no_agent watchdogs on this implementer)
@@ -237,5 +244,6 @@ Agents reference `Projects → Harbor → Project Management → TODO` for Ready
 2. Memory children linked (at least Skills)
 3. HQ map links to the agent
 4. Shared Rules pointer in the prompt
-5. User told: copy prompt into runtime; verify chat group separately
-6. If Hermes: profile created/updated via `hermes-profiles`
+5. Optional Subagent objects linked (`parent_agent` + Agent.`subagents`)
+6. User told: copy prompt into runtime; verify chat group separately
+7. If Hermes: profile created/updated via `hermes-profiles` (models from harness_profile; routes from Subagents)

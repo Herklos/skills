@@ -1,4 +1,4 @@
-# Object types (Agent, Team, Subteam, Harness, Harness profile, Project)
+# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
@@ -14,13 +14,18 @@ Skills, Shared Rules, Groups, memory children, and other hub pages stay type
 | `agent` | Agents | Primary, chiefs, specialists, archived agents |
 | `team` | Teams | Board, HQs, and groups-as-org-units when typed |
 | `subteam` | Subteams | Domains / pods under an HQ (**preferred**; do not model these as `team` with `kind: Sub-team`) |
+| `subagent` | Subagents | Spawn configs an Agent may start (task, harness profile, scope, tools). Not the same as `subteam` |
 | `harness` | Harnesses | Product catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
-| `harness_profile` | Harness profiles | Reusable model stacks (primary + backups). Agents link here so one edit updates many agents |
+| `harness_profile` | Harness profiles | Reusable model stacks (primary + backups). Agents and Subagents link here |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 
 Hub roots named **Agents** / **Projects** may remain `page`; their inventory
 children use the keys above. Keep Harness + Harness profile objects under
-Agents → Shared (or a Harnesses index).
+Agents → Shared (or a Harnesses index). Keep Subagent objects linked from their
+parent Agent (`parent_agent` + Agent.`subagents`).
+
+**Name collision:** `subteam` = org domain under an HQ. `subagent` = runtime
+worker/route the parent Agent can `delegate_task` (or equivalent). Do not mix them.
 
 Skills resolution order when a space uses Subteams:
 **Agent → Subteam → Team → Project → Global**.
@@ -36,6 +41,7 @@ Featured properties (API keys):
 | `reports_to` | objects | Link to chief / Primary agent |
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
 | `harness_profile` | objects | Link to one **Harness profile** (source of primary + backup models) |
+| `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
 
 Other properties:
 
@@ -47,6 +53,8 @@ Other properties:
 | `short_description` | text | One-liner mission |
 
 Also includes shared `tag`, `links`, `backlinks`.
+
+Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 
 **Do not** use a select `harness` on Agent. Legacy spaces may still have an old
 `harness` select (`hermes` / `grok` / …); migrate by linking `harness_profile`
@@ -95,6 +103,44 @@ until live): `type-templates.md`. Also `page-templates.md` (Subteam page).
 
 Agent `team` (objects) may link the owning HQ **or** this Subteam when the agent
 sits under a domain.
+
+## Subagent (`api_key`: `subagent`)
+
+Spawn / route config a parent **Agent** may start. An agent has zero or more
+Subagents. Distinct from **`subteam`** (org domain).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `parent_agent` | objects | Owning Agent (required). Keep in sync with Agent.`subagents` |
+| `task_key` | text | Stable route name the parent picks (`fast`, `deep`, `fetch`, …). Maps to Hermes `model_map` option `name` |
+| `harness_profile` | objects | **Harness profile** for this spawn (may differ from the parent's) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` |
+| `intent` | text | Short when-to-use (becomes route `description` when declined to Hermes) |
+| `scope` | text | Bounds: cwd, read-only, web-only, single-repo, … |
+| `toolsets` | text | Enabled toolsets for the child (e.g. `web,terminal,file` or `inherit`) |
+| `spawn_effort` | select | Optional override: `low` \| `medium` \| `high` (else use profile primary effort). Display name **Spawn effort** (avoids clash with a numeric Effort property) |
+| `model_override` | text | Optional pin over the linked Harness profile primary |
+| `deliver_back` | text | What the child must return to the parent (summary shape) |
+| `notes` | text | Extra apply notes |
+
+Also `tag`, `links`, `backlinks`.
+
+**Default template name:** `Subagent default`. Body: `type-templates.md`.
+
+**Hermes decline** (skill `hermes-profiles` → `delegation.md`): each live Subagent
+on a parent becomes one `model_map` option (`task_key` → `name`, `intent` →
+`description`, models from `harness_profile` / `model_override` / `spawn_effort`).
+Toolsets and scope are documented on the Subagent and applied to the parent
+prompt / child brief; Hermes children inherit the parent's tool policy unless
+you use `profile_routes` for a dedicated child profile.
+
+**Example Subagents** (link from Engineering chiefs / implementers):
+
+| Name | task_key | Profile | Intent |
+|------|----------|---------|--------|
+| Fast fetch | `fetch` | Data fetching | Lookups, scrape, light summary |
+| Deep code | `deep` | Coding | Hard debug, careful refactor |
+| Quick edit | `fast` | Coding (lower effort note) | Small edits, simple tests |
 
 ## Harness (`api_key`: `harness`)
 
@@ -184,6 +230,7 @@ template id from `API-list-templates` when you need a specific one; pass
       "role": "Implementer",
       "lifecycle": "draft",
       "harness_profile": ["<codingHarnessProfileObjectId>"],
+      "subagents": ["<fastFetchSubagentId>", "<deepCodeSubagentId>"],
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…"
     },
@@ -192,8 +239,11 @@ template id from `API-list-templates` when you need a specific one; pass
 }
 ```
 
-Team / Subteam / Harness / Harness profile / project the same way with the matching
-`"type"` and property keys above.
+Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
+`task_key`, `harness_profile`, then add its id to the parent's `subagents`.
+
+Team / Subteam / Subagent / Harness / Harness profile / project the same way with
+the matching `"type"` and property keys above.
 
 ## Search by type
 
@@ -202,11 +252,11 @@ Team / Subteam / Harness / Harness profile / project the same way with the match
   "space_id": "<spaceId>",
   "type": "agent",
   "limit": 50,
-  "fields": ["name", "role", "lifecycle", "harness_profile"]
+  "fields": ["name", "role", "lifecycle", "harness_profile", "subagents"]
 }
 ```
 
-Use `"type": "team"`, `"type": "subteam"`, `"type": "harness"`,
+Use `"type": "team"`, `"type": "subteam"`, `"type": "subagent"`, `"type": "harness"`,
 `"type": "harness_profile"`, or `"type": "project"` the same way.
 
 ## Migrate an existing page (`set_type`)
@@ -235,9 +285,9 @@ Keep the same object id and links. Apply `set_type` then `set_properties` in one
 ```
 
 Recommended inventory scope: Agents hub agents + Board/HQ (`team`) + Subteams
-(`subteam`) + Harnesses + Harness profiles, and Projects hub portfolio roots.
-Leave Skills, Shared Rules, memory children, bugs, and other support pages as
-`page`.
+(`subteam`) + Subagents (`subagent`) + Harnesses + Harness profiles, and Projects
+hub portfolio roots. Leave Skills, Shared Rules, memory children, bugs, and other
+support pages as `page`.
 
 ### Migrate legacy `team` + `kind: Sub-team` → `subteam`
 
@@ -265,20 +315,21 @@ object; re-set only what is missing after the type change.
 
 ## Bootstrap types in a new space
 
-1. `API-create-type` for `agent`, `team`, `subteam`, `harness`, and
+1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`, and
    `harness_profile` with the property definitions above
    (`create_missing_options: true` for selects). On `team`, define `kind` options
    `Board` / `HQ` / `Group` only (no `Sub-team`).
-2. On existing Agent types: `add_property` `harness_profile` (objects, featured);
-   `remove_property` legacy `harness` select when ready.
+2. On existing Agent types: `add_property` `harness_profile` and `subagents`
+   (objects, featured); `remove_property` legacy `harness` select when ready.
 3. `API-update-type` on built-in `project` with `add_property` ops for the Project
    fields (or create them once if the space already has matching keys).
 4. `API-create-template` with `template_for`: `agent` | `team` | `subteam` |
-   `harness` | `harness_profile` | `project` and body markdown from
+   `subagent` | `harness` | `harness_profile` | `project` and body markdown from
    **`type-templates.md`**.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (Coding,
-   Data fetching, …); link agents via `harness_profile`.
+   Data fetching, …); create Subagent spawn configs; link agents via
+   `harness_profile` + `subagents` (and Subagent.`parent_agent`).
 7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
    `team` objects → `subteam`).
 

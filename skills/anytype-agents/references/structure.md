@@ -6,7 +6,7 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `object-types.md` | Agent / Team / Subteam / Harness / Harness profile / Project type keys |
+| `object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Project type keys |
 | `type-templates.md` | Dumped default template bodies (bootstrap / drift) |
 | `page-templates.md` | Creating/auditing body shapes |
 | `suggested-runtime.md` | Suggested runtime field list |
@@ -41,6 +41,7 @@ Agents
 ├── Primary (coordinator)
 │   ├── Roster / routing
 │   ├── Delegation playbook
+│   ├── Subagents (type `subagent` spawn configs; optional)
 │   ├── Open loops / approvals (optional)
 │   └── Memory pages
 ├── Board HQ (+ Board Group)
@@ -50,6 +51,7 @@ Agents
 │   ├── Group page
 │   ├── Skills (team)
 │   └── Specialist agent pages
+│       ├── Subagents (type `subagent`; 0..n per agent)
 │       ├── Skills (agent)
 │       └── Memory children
 └── Drafts
@@ -73,6 +75,7 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 | Board | Chiefs alignment; not day-to-day specialist delivery |
 | HQ | Domain ownership, Subteams, routing rules |
 | Subteam | Domain / pod under an HQ (type `subteam`) |
+| Subagent | Spawn/route config under an Agent (type `subagent`; not a Subteam) |
 | Specialist | Narrow delivery; reports to a chief |
 | Group | Chat membership paste + welcome |
 | Skills hub | Index + template; resolution Agent → Subteam → Team → Project → Global |
@@ -80,12 +83,14 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 ## Types
 
 Org inventory uses custom keys **`agent`**, **`team`**, **`subteam`**,
-**`harness`**, **`harness_profile`**, plus extended built-in **`project`**.
-Prefer **`subteam`** for domains under an HQ. Prefer **`harness_profile`** on
-agents (not a harness select). Supporting docs (Shared Rules, Skills, memory
-children, hubs) stay **`page`**. Spaces also expose `task`, `note`,
-`collection`, `query`, `template`, media types. See `object-types.md` for
-property keys, default templates, create and `set_type` migration.
+**`subagent`**, **`harness`**, **`harness_profile`**, plus extended built-in
+**`project`**. Prefer **`subteam`** for domains under an HQ. Prefer
+**`harness_profile`** on agents (not a harness select). Prefer **`subagent`**
+objects linked via Agent.`subagents` for spawn routes (decline to Hermes
+`model_map`). Supporting docs (Shared Rules, Skills, memory children, hubs) stay
+**`page`**. Spaces also expose `task`, `note`, `collection`, `query`,
+`template`, media types. See `object-types.md` for property keys, default
+templates, create and `set_type` migration.
 
 ## Runtime vs docs
 

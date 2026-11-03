@@ -37,16 +37,16 @@ Paste under the agent title (date the heading when you revise it).
 - other tasks: …
 **Subagents / delegation:**
 - Enabled: yes (`delegation` toolset) | no
+- **Anytype Subagents:** none | list linked Agent.`subagents` (type `subagent`; each has task_key + harness_profile + scope/tools)
 - **Routing model:** same as Primary (main) | {provider}·{model} · {reasoning}
 - **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
 - Plugin: **advanced-delegation** on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
-- **Task-specific models** (`model_map` options; name = what the agent picks):
-  - `{fast}` = {provider}·{model} · {reasoning?} · {tier?} — {when to use}
-  - `{deep}` = {provider}·{model} · {reasoning?} — {when to use}
+- **Task-specific models** (prefer decline from Subagent objects; else hand-list):
+  - `{task_key}` ← Subagent "{name}" · profile {Coding|…} · effort {…} — {intent}
   - default route for unrouted tasks: `{fast}` | parent main
 - Alternatives: single worker {provider}·{model} (`backend: default`) | `profile_routes` ({profile}: {description})
 - Concurrency: max_concurrent_children {n} · max_iterations {n}
-- Setup: `hermes plugins install advanced-delegation` → `hermes delegation config` → `/delegation model_map`
+- Setup: `hermes plugins install advanced-delegation` → decline Subagents via hermes-profiles `delegation.md` → `/delegation model_map`
 **Scheduled tasks:**
 - none yet
 - or: `{name}` · `{schedule}` · {prompt intent} · deliver {target} · skills {…} · workdir {path?} · model pin {per-job|cron.model|main} · no_agent/script {if any}

@@ -116,6 +116,43 @@ Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | 
 
 Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 
+## Create a Subagent (spawn route)
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "subagent",
+    "name": "Deep code",
+    "properties": {
+      "parent_agent": ["<leeAgentObjectId>"],
+      "task_key": "deep",
+      "harness_profile": ["<codingHarnessProfileObjectId>"],
+      "lifecycle": "live",
+      "intent": "Hard debugging and careful refactors",
+      "scope": "single-repo cwd",
+      "toolsets": "terminal,file,web",
+      "spawn_effort": "high",
+      "deliver_back": "Diff summary + test result + open questions"
+    },
+    "markdown": "## When to use\n…\n\n## Route\n…\n"
+  }
+}
+```
+
+Then patch the parent Agent:
+
+```json
+{
+  "op": "set_properties",
+  "set": { "subagents": ["<deepCodeSubagentId>", "<fastFetchSubagentId>"] }
+}
+```
+
+Keep Subagent.`parent_agent` and Agent.`subagents` both ways. Decline into Hermes
+`model_map` with hermes-profiles `delegation.md`.
+
 ## Create a team / HQ
 
 ```json
@@ -211,8 +248,8 @@ parent HQ map to link the new Subteam. Prefer this over `team` + `kind: Sub-team
 }
 ```
 
-Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, `"harness"`,
-`"harness_profile"`, or `"project"` (support docs often stay `"page"`).
+Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, `"subagent"`,
+`"harness"`, `"harness_profile"`, or `"project"` (support docs often stay `"page"`).
 
 ## Archive
 
