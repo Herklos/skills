@@ -40,7 +40,7 @@ Featured properties (API keys):
 | `team` | objects | Link to owning Team or Subteam |
 | `reports_to` | objects | Link to chief / Primary agent |
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
-| `harness_profile` | objects | Link to one **Harness profile** (source of primary + backup models) |
+| `harness_profile` | objects | Link to one **Harness profile** (source of primary + backup models). **Default for most agents: Local router** |
 | `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
 
 Other properties:
@@ -55,6 +55,13 @@ Other properties:
 Also includes shared `tag`, `links`, `backlinks`.
 
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
+
+**Recommended parent pattern (most agents):**
+1. Agent.`harness_profile` → **Local router** (local model is the routing brain)
+2. Several Subagents with richer profiles (Coding, Data fetching, …) for work that
+   needs a stronger/cheaper specialized stack
+3. Parent answers peers / light questions itself when no Subagent route is needed
+   (no “quick answer” Subagent required)
 
 **Do not** use a select `harness` on Agent. Legacy spaces may still have an old
 `harness` select (`hermes` / `grok` / …); migrate by linking `harness_profile`
@@ -185,10 +192,15 @@ Also `tag`, `links`, `backlinks`. Put longer rationale and apply notes in the bo
 
 **Example profiles:**
 
-| Profile | Primary | Backup 1 | Backup 2 |
-|---------|---------|----------|-----------|
-| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high |
-| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium |
+| Profile | Primary | Backup 1 | Backup 2 | Typical use |
+|---------|---------|----------|-----------|-------------|
+| **Local router** | Local model · medium | Grok · 4.5 · medium | Claude · Haiku 5.5 · medium | **Most Agents** (parent routing brain + quick peer answers) |
+| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high | Subagent routes (`deep`, `fast`, …) |
+| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium | Subagent routes (`fetch`, …) |
+
+Parent Agents usually link **Local router**. Subagents link Coding / Data fetching
+(or other specialized stacks). The local parent picks a Subagent `task_key` when
+needed and answers directly otherwise.
 
 **Default template name:** `Harness profile default`. Body: `type-templates.md`.
 
@@ -229,7 +241,7 @@ template id from `API-list-templates` when you need a specific one; pass
     "properties": {
       "role": "Implementer",
       "lifecycle": "draft",
-      "harness_profile": ["<codingHarnessProfileObjectId>"],
+      "harness_profile": ["<localRouterHarnessProfileObjectId>"],
       "subagents": ["<fastFetchSubagentId>", "<deepCodeSubagentId>"],
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…"
@@ -327,9 +339,9 @@ object; re-set only what is missing after the type change.
    `subagent` | `harness` | `harness_profile` | `project` and body markdown from
    **`type-templates.md`**.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
-6. Create the seven Harness catalog objects; create Harness profiles (Coding,
-   Data fetching, …); create Subagent spawn configs; link agents via
-   `harness_profile` + `subagents` (and Subagent.`parent_agent`).
+6. Create the seven Harness catalog objects; create Harness profiles (**Local
+   router**, Coding, Data fetching, …); create Subagent spawn configs; link most
+   agents to Local router + `subagents` (and Subagent.`parent_agent`).
 7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
    `team` objects → `subteam`).
 

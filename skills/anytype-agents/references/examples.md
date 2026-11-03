@@ -49,13 +49,14 @@ Central home for teams and shared rules.
 - Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model
 
 ## Harness profiles (type `harness_profile`)
-- Coding → Claude Sonnet 5.5 high; backups Codex Sol 6.1 high, Grok 4.5 high
-- Data fetching → Codex Terra 6.1 high; backups Claude Haiku 5.5 medium, Grok 4.5 medium
+- **Local router** → Local model medium; backups Grok 4.5 medium, Haiku 5.5 medium (**most Agents**)
+- Coding → Claude Sonnet 5.5 high; backups Codex Sol 6.1 high, Grok 4.5 high (**Subagent routes**)
+- Data fetching → Codex Terra 6.1 high; backups Claude Haiku 5.5 medium, Grok 4.5 medium (**Subagent routes**)
 - Agents link `harness_profile` (not a harness select)
 
 ## Subagents (type `subagent`, under Agents)
-- Lee → Fast fetch (`fetch`, Data fetching), Deep code (`deep`, Coding), Quick edit (`fast`, Coding)
-- Remy → same pattern for chief orchestration
+- Lee (Local router parent) → Fast fetch (`fetch`, Data fetching), Deep code (`deep`, Coding), Quick edit (`fast`, Coding)
+- Remy → same pattern; parent answers peer chiefs itself when no Subagent is needed
 - Keep Subagent.`parent_agent` and Agent.`subagents` both ways
 
 ## Hierarchy
@@ -81,11 +82,11 @@ Skills: Agent → Subteam → Team → Project → Global
 
 ```markdown
 ## Suggested runtime (2026-11-04)
-**Harness profile:** Coding (Agent.`harness_profile` → Coding)
-**Primary (from profile):** Claude · Claude Code Sonnet 5.5 · high
+**Harness profile:** Local router (Agent.`harness_profile` → Local router)
+**Primary (from profile):** Local model · medium (routing brain + quick peer answers)
 **Fallback / backup (from profile):**
-- 1: Codex · Codex Sol 6.1 · high
-- 2: Grok · Grok 4.5 · high
+- 1: Grok · Grok 4.5 · medium
+- 2: Claude · Claude Haiku 5.5 · medium
 **Auxiliary:**
 - vision: openrouter · google/gemini-2.5-flash
 - compression: openrouter · google/gemini-2.5-flash
@@ -93,10 +94,11 @@ Skills: Agent → Subteam → Team → Project → Global
 - review: openrouter · anthropic/claude-opus-4
 **Subagents / delegation:**
 - Enabled: yes (`delegation` toolset)
+- Pattern: parent Local router answers peers / light asks; spawn Subagent only when specialized
 - Anytype Subagents: Quick edit (`fast`, Coding), Deep code (`deep`, Coding), Fast fetch (`fetch`, Data fetching)
-- Routing model: openrouter · anthropic/claude-sonnet-4 · high (Primary / main; picks `option` per task)
+- Routing model: Local model · medium (parent main; picks `option` per task)
 - Mode: `model_map` · plugin advanced-delegation installed
-- Task-specific models (declined from Subagent objects; default `fast`):
+- Task-specific models (declined from Subagent objects; unrouted work stays on parent):
   - `fast` ← Quick edit · Coding · medium — small edits, simple tests
   - `deep` ← Deep code · Coding · high — hard debugging, careful refactors
   - `fetch` ← Fast fetch · Data fetching · high — lookups, scrape, light summary

@@ -22,13 +22,13 @@ is live.
 
 ````markdown
 ## Suggested runtime (YYYY-MM-DD)
-**Harness profile:** {Coding | Data fetching | …}  (Agent.`harness_profile`)
-**Primary (from profile):** {Harness} · {model} · {low|medium|high}
+**Harness profile:** {Local router (default) | Coding | Data fetching | …}  (Agent.`harness_profile`)
+**Primary (from profile):** {Local model · medium | …}
 **Fallback / backup (from profile):**
 - 1: {Harness} · {model} · {effort}
 - 2: {Harness} · {model} · {effort}
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
-**Subagents / delegation:** enabled. Prefer model_map routes from linked Agent.`subagents` (each Subagent = one task_key + harness_profile); else cheaper single worker.
+**Subagents / delegation:** enabled. Parent Local router answers light/peer asks itself; model_map routes from Agent.`subagents` (Coding / Data fetching / …) when specialized work is needed.
 **Personality / Memory / Browser / Computer / Tools / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## Autonomy
@@ -146,9 +146,8 @@ Editing this profile updates the intended models for every Agent linked via
 separately. Anytype does not push configs automatically.
 ```
 
-Example stacks: Coding (Claude Sonnet 5.5 high → Codex Sol 6.1 high → Grok 4.5
-high); Data fetching (Codex Terra 6.1 high → Claude Haiku 5.5 medium → Grok 4.5
-medium).
+Example stacks: **Local router** (Local model medium → Grok 4.5 medium → Haiku
+5.5 medium) for most Agents; Coding / Data fetching for Subagent routes.
 
 ---
 

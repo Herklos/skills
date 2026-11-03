@@ -21,8 +21,8 @@ Paste under the agent title (date the heading when you revise it).
 
 ```markdown
 ## Suggested runtime (YYYY-MM-DD)
-**Harness profile:** {Coding | Data fetching | …}  (link Agent.`harness_profile`; edit the profile to refresh many agents)
-**Primary (from profile):** {Harness} · {model} · {low|medium|high}
+**Harness profile:** {Local router (default for most agents) | Coding | Data fetching | …}  (link Agent.`harness_profile`)
+**Primary (from profile):** {Harness} · {model} · {low|medium|high}  (Local router → Local model · medium)
 **Fallback / backup (from profile, ordered):**
 - 1: {Harness} · {model} · {effort}
 - 2: {Harness} · {model} · {effort}
@@ -37,13 +37,14 @@ Paste under the agent title (date the heading when you revise it).
 - other tasks: …
 **Subagents / delegation:**
 - Enabled: yes (`delegation` toolset) | no
+- **Pattern:** parent Local router answers peers / light asks itself; spawn a Subagent only when a specialized route fits
 - **Anytype Subagents:** none | list linked Agent.`subagents` (type `subagent`; each has task_key + harness_profile + scope/tools)
-- **Routing model:** same as Primary (main) | {provider}·{model} · {reasoning}
+- **Routing model:** same as Primary (Local model) | {provider}·{model} · {reasoning}
 - **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
 - Plugin: **advanced-delegation** on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
 - **Task-specific models** (prefer decline from Subagent objects; else hand-list):
-  - `{task_key}` ← Subagent "{name}" · profile {Coding|…} · effort {…} — {intent}
-  - default route for unrouted tasks: `{fast}` | parent main
+  - `{task_key}` ← Subagent "{name}" · profile {Coding|Data fetching|…} · effort {…} — {intent}
+  - default for unrouted / no-spawn work: **parent main** (Local router); optional `model_map.default` only if you want a cheap child fallback
 - Alternatives: single worker {provider}·{model} (`backend: default`) | `profile_routes` ({profile}: {description})
 - Concurrency: max_concurrent_children {n} · max_iterations {n}
 - Setup: `hermes plugins install advanced-delegation` → decline Subagents via hermes-profiles `delegation.md` → `/delegation model_map`

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.15.0
+version: 1.16.0
 license: MIT
 metadata:
   category: agents
@@ -21,9 +21,12 @@ objects (`agent`, `team`, `subteam`, `subagent`, `harness`, `harness_profile`,
 `project`) plus supporting `page`s. Runtime bots are separate: editing Anytype
 does not by itself update a live bot prompt or messaging group. Verify runtime
 separately after doc changes. Model stacks live on **Harness profile** objects;
-agents link `harness_profile` so one profile edit covers many agents. Spawn
-routes live on **Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`);
-decline them into Hermes via `hermes-profiles` `delegation.md`.
+agents link `harness_profile` so one profile edit covers many agents. **Most
+agents use Local router** (local model as parent brain). Spawn routes live on
+**Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
+profiles (Coding, Data fetching, …); the local parent routes when needed and
+answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
+`delegation.md`.
 
 ## References (load when needed)
 
@@ -119,10 +122,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update an agent
 
-1. Confirm HQ, reporting line, **Harness profile**, and draft vs live
+1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties: `role`, `lifecycle`, `harness_profile`, optional `subagents`, `team` / `reports_to` when known, `autonomy`, optional `hermes_profile` / `short_description`
+4. Set properties: `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents` (Coding / Data fetching routes), `team` / `reports_to` when known, `autonomy`, optional `hermes_profile` / `short_description`
 5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
 6. Link from the HQ map / sub-team page
 7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
@@ -220,7 +223,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 ## Common recipes (summary)
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|project`
-- **New specialist:** draft vs live → create `agent` + `harness_profile` → optional `subagent`s → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
+- **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → optional `subagent`s (Coding / Data fetching) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
 - **New HQ:** create `team` (`kind: HQ`) → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
 - **New Subteam:** create `subteam` with `parent_team` → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying

@@ -14,10 +14,15 @@ Related: `models.md` for main / auxiliary / fallback / MoA. The parent **routing
 ## Overview
 
 **Expectation for every Hermes profile that should fan out work:** enable the
-`delegation` toolset, set a strong **routing model** (parent `model.*`), and
-prefer **task-specific models** via the official **`advanced-delegation`**
-plugin (`delegation.backend: model_map`). Default single-model workers are fine
-for simple fleets.
+`delegation` toolset, set the **routing model** (parent `model.*`), and prefer
+**task-specific models** via the official **`advanced-delegation`** plugin
+(`delegation.backend: model_map`).
+
+**Org default (Anytype Local router):** most parents use a **local model** as
+`model.*`. That parent answers other agents / light asks itself when no Subagent
+is needed, and picks named `model_map` routes (from Anytype Subagent objects)
+for specialized work. Default single-model workers are fine for simple fleets
+that never fan out.
 
 ### Two layers: routing model vs task-specific models
 
@@ -184,16 +189,17 @@ Only list profiles this parent may use. Unlisted profiles cannot be picked.
 `/review` uses a background reviewer; pin with `auxiliary.review` if desired.
 Monitor with `/agents` (Ctrl+T).
 
-## Recipe: strong routing model + task-specific workers (`model_map`)
+## Recipe: local routing model + task-specific workers (`model_map`)
 
-Preferred pattern: capable parent (routing model) plans and picks `fast` /
-`deep` / … per task; children run on the named route.
+**Preferred org pattern:** local parent (routing model) answers peers / light
+asks itself and picks `fast` / `deep` / `fetch` / … only when a Subagent route
+fits; children run on the named route (often Coding / Data fetching stacks).
 
 ```bash
 hermes -p <slug> tools enable delegation
 hermes -p <slug> plugins install advanced-delegation
-hermes -p <slug> model                    # set strong routing / main model
-hermes -p <slug> delegation config        # mode = Model routes; add fast/deep/…
+hermes -p <slug> model                    # set local routing / main model
+hermes -p <slug> delegation config        # mode = Model routes; add fast/deep/fetch…
 # or hand-edit config.yaml as below, then:
 hermes -p <slug> config set delegation.backend model_map
 hermes -p <slug> doctor
@@ -202,8 +208,9 @@ hermes -p <slug> delegation config --show
 
 ```yaml
 model:
-  provider: openrouter
-  default: anthropic/claude-opus-4        # routing model (picks option per task)
+  provider: custom                        # or your local provider key
+  default: local-model                    # Local router (picks option per task; answers alone when no spawn)
+  # base_url: http://localhost:8080/v1    # when using a local OpenAI-compatible server
 
 fallback_providers:
   - provider: openrouter
@@ -269,9 +276,12 @@ routes from Anytype **Subagent** objects (see below).
 
 ## Decline from Anytype Subagent objects
 
-When the org uses skill `anytype-agents`, each parent Agent may link zero or more
-typed **`subagent`** objects (`parent_agent` + Agent.`subagents`). Treat those as
-the source of truth for `model_map` routes; re-apply after Subagent edits.
+When the org uses skill `anytype-agents`, most parents link **Local router** as
+`harness_profile` and zero or more typed **`subagent`** objects
+(`parent_agent` + Agent.`subagents`). Decline Local router → parent `model.*`.
+Treat Subagents as the source of truth for `model_map` routes; re-apply after
+edits. Do not invent a Subagent for “quick peer answers”; that stays on the
+local parent.
 
 | Anytype Subagent field | Hermes `model_map` option |
 |------------------------|---------------------------|
@@ -285,14 +295,17 @@ Steps:
 
 1. Read the parent Agent in Anytype (`format: md`) and list linked Subagents
    (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
-2. For each live Subagent, open its `harness_profile` and take primary model /
-   effort (honor `model_override` / `effort` when set).
-3. `hermes -p <slug> tools enable delegation`
-4. `hermes -p <slug> plugins install advanced-delegation`
-5. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
+2. Decline parent Agent.`harness_profile` (usually **Local router**) into `model.*`.
+3. For each live Subagent, open its `harness_profile` and take primary model /
+   effort (honor `model_override` / `spawn_effort` when set).
+4. `hermes -p <slug> tools enable delegation`
+5. `hermes -p <slug> plugins install advanced-delegation`
+6. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
    one option per Subagent `task_key`
-6. Set `model_map.default` to the usual cheap route (`fast` / `fetch`) when one exists
-7. `hermes -p <slug> delegation config --show` and note the routes on the Agent
+7. Prefer leaving unrouted / no-spawn work on the **parent local model**. Only set
+   `model_map.default` if you want a child fallback when the parent still calls
+   `delegate_task` without an option.
+8. `hermes -p <slug> delegation config --show` and note the routes on the Agent
    Suggested runtime section
 
 Example declined from three Subagents (Coding + Data fetching profiles):
@@ -329,6 +342,7 @@ to the ids your runtime actually accepts (`models.md`).
 | Need | Configure |
 |------|-----------|
 | Parallel research / isolated workers | `tools enable delegation` + `delegate_task` |
+| **Local parent router (org default)** | Anytype Local router → parent `model.*` (local); answer peers without spawning |
 | **Routing model** (who picks routes) | Parent `model.*` — see `models.md` |
 | **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options` |
 | Routes from Anytype Subagent objects | Decline table above; keep Agent.`subagents` in sync |
