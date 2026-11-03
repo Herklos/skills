@@ -68,11 +68,16 @@ hermes -p <slug> config set <dotted.key> <value>
 hermes -p <slug> config set display.personality <name|''>
 hermes -p <slug> memory setup|status|off|reset
 hermes -p <slug> config set memory.<key> <value>
-hermes -p <slug> tools enable|disable|list browser|computer_use
+hermes -p <slug> tools enable|disable|list [toolsets…]
 hermes -p <slug> computer-use install|status|doctor|permissions|screen …
 hermes -p <slug> config set browser.<key> <value>
 hermes -p <slug> config set computer_use.<key> <value>
 hermes -p <slug> config set bot_desktop.<key> <value>
+hermes -p <slug> config set terminal.<key> <value>
+hermes -p <slug> config set approvals.<key> <value>
+hermes -p <slug> config set agent.max_turns <n|null>
+hermes -p <slug> config set tool_output.max_bytes <n>
+hermes -p <slug> config set compression.<key> <value>
 hermes -p <slug> gateway start|stop|restart|install
 # In session: /personality [name|none] ; /memory pending|approve|reject
 ```
@@ -122,6 +127,9 @@ ui_meta:
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/browser
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/bot-screen
+- https://hermes-agent.nousresearch.com/docs/user-guide/configuration
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/tools
+- https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference
 - https://hermes-agent.nousresearch.com/docs/reference/profile-commands
 - https://hermes-agent.nousresearch.com/docs/user-guide/which-file-does-what
 - https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode

@@ -99,6 +99,22 @@ Confirm `browser.cloud_provider` and keys if using cloud. Real-profile issues:
 check `use_real_profile`, pin, and (Windows) whether the browser must quit for
 the first cookie copy. See `browser-and-computer.md`.
 
+## Terminal commands fail / wrong cwd / sandbox
+
+```bash
+hermes -p <slug> config get terminal.backend
+hermes -p <slug> config get terminal.cwd
+# Local smoke test:
+hermes -p <slug> config set terminal.backend local
+# Docker: docker version ; check image / network / mounts
+hermes -p <slug> tools list
+```
+
+Approvals stuck unanswered: check `approvals.mode` and platform (cron uses
+`cron_mode: deny` by default). Output truncated: raise `tool_output.max_bytes`
+or read with `offset`/`limit`. Turns cut short: inspect `agent.max_turns` /
+`run_budget_seconds`. See `runtime-limits-and-tools.md`.
+
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.

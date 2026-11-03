@@ -169,6 +169,21 @@ hermes -p forge computer-use screen install
 hermes -p forge computer-use screen start
 ```
 
+## 15. Tools, terminal, limits
+
+See `runtime-limits-and-tools.md`. Minimal sequence:
+
+```bash
+hermes -p forge tools enable terminal file web
+hermes -p forge config set terminal.backend local
+hermes -p forge config set terminal.cwd /absolute/path/to/repo
+hermes -p forge config set terminal.timeout 180
+hermes -p forge config set approvals.mode smart
+hermes -p forge config set agent.max_turns 150          # or unset for unlimited
+hermes -p forge config set tool_output.max_bytes 50000
+hermes -p forge config set compression.threshold 0.50
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -180,6 +195,7 @@ hermes -p forge computer-use screen start
 | User preferences / durable facts | memory tool → `USER.md` / `MEMORY.md` |
 | Memory limits, approval, provider | `memory.*` / `hermes -p <slug> memory …` (`memory.md`) |
 | Browser / computer / Bot Screen | `browser-and-computer.md` / `hermes tools` / `computer-use` |
+| Toolsets, approvals, terminal, output/turn caps | `runtime-limits-and-tools.md` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
 | API keys / bot tokens | profile `.env` (never echo values) |

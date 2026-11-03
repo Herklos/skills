@@ -90,6 +90,13 @@ Skills: Agent → Team → Project → Global
 - Headed: no
 **Computer access:**
 - Needed: no
+**Tools access:**
+- Enabled toolsets: terminal, file, web, browser
+- Approvals: smart · cron/unattended: deny
+**Terminal / execution:**
+- Backend: local · cwd: /absolute/path/to/repo · timeout: 180
+**Limits:**
+- max_turns: 150 · tool_output: 50000/2000 · compression: on @ 0.50
 **Gateway / messaging:** none
 ```
 
@@ -136,7 +143,8 @@ Ops agent with Bot Screen + shared team browser cookies:
 Apply Hermes model fields with skill `hermes-profiles` → `references/models-and-delegation.md`.  
 Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.  
 Apply memory with `hermes-profiles` → `references/memory.md`.  
-Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.
+Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.  
+Apply tools / terminal / limits with `hermes-profiles` → `references/runtime-limits-and-tools.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

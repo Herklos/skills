@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.5.0
+version: 1.6.0
 license: MIT
 metadata:
   category: agents
@@ -31,10 +31,13 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
 | `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
+| `references/runtime-limits-and-tools.md` | Toolsets, approvals, terminal backend, output/turn/compression limits |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles  
+Config: https://hermes-agent.nousresearch.com/docs/user-guide/configuration  
+Tools: https://hermes-agent.nousresearch.com/docs/user-guide/features/tools  
 Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
 Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
@@ -76,6 +79,7 @@ Do not print `.env` secret values into chat.
 | Memory | Per-profile curated `MEMORY.md` / `USER.md`, optional one external provider |
 | Browser | `browser` toolset (`browser_exec`); local / cloud / real-profile / CDP |
 | Computer use | `computer_use` toolset (cua-driver); optional Linux Bot Screen per profile |
+| Toolsets / limits | Enabled tools, approvals, terminal backend, output and turn caps |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the tool working directory.
 Profiles do not sandbox the filesystem. Never run two writers against the same profile.
@@ -249,6 +253,20 @@ Full guide: `references/browser-and-computer.md`.
 
 Browser ≠ computer use. Prefer `web_search` when pages need no interaction.
 Confirm before real-profile browsing or shared `user_data_dir`.
+
+### Tools, terminal, limits
+
+Full guide: `references/runtime-limits-and-tools.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Toolsets | `hermes -p <slug> tools enable\|disable\|list` / `toolsets` / `agent.disabled_toolsets` |
+| Approvals | `approvals.mode` (`smart` \| `manual` \| `off`) + `deny` / `command_allowlist` |
+| Terminal backend | `terminal.backend` (`local` \| `docker` \| `ssh` \| cloud sandboxes) + `cwd` / timeout |
+| Output caps | `tool_output.max_bytes` / `max_lines`, `file_read_max_chars` |
+| Turn / time | `agent.max_turns`, `run_budget_seconds`, `gateway_timeout` |
+| Compression | `compression.threshold` (+ `auxiliary.compression` model) |
+| Loop caps | `tool_loop_guardrails.*` |
 
 ## Gateway
 

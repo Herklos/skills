@@ -14,7 +14,7 @@ Document the intended runtime stack. Values are guidance for whoever configures
 the bot; they do not auto-apply. For Hermes, map these into that profile's
 `config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
 `models-and-delegation.md`, `soul-templates.md`, `memory.md`,
-`browser-and-computer.md`).
+`browser-and-computer.md`, `runtime-limits-and-tools.md`).
 
 **Harness:** hermes | grok | claude | codex | noodle | cli | other
 **Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
@@ -48,6 +48,20 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - Surface: host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
 - Scope: dedicated (this profile) | team/shared host (same OS user; not isolated)
 - Permission mode: standard | bounded (manifest) · Notes: {TCC / takeover for 2FA}
+**Tools access:**
+- Enabled toolsets: {web, terminal, file, browser, memory, delegation, …}
+- Disabled / denied: {list or none}
+- Approvals: smart | manual | off · cron/unattended: deny | approve
+- Hard deny patterns: {none | globs}
+**Terminal / execution:**
+- Backend: local | docker | ssh | modal | daytona | vercel_sandbox | singularity
+- cwd: {absolute path or .}
+- Timeout (s): {180} · Container CPU/RAM/disk/network: {…} if sandboxed
+- Env passthrough / forwarded secrets: {names only, never values}
+**Limits:**
+- max_turns: unlimited | {n} · run_budget_seconds: off | {n} · gateway_timeout: {1800}
+- tool_output max_bytes/lines: {50000}/{2000} · file_read_max_chars: {100000}
+- compression: on|off · threshold {0.50} · loop hard-stop: interactive warn | unattended hard
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
 
 # {Name} – {Role}
@@ -188,6 +202,8 @@ Follow **Agents → {Shared Rules title}** in full.
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
 - Browser: {none|source + identity}
 - Computer: {none|surface + dedicated|shared}
+- Tools: {toolsets}; approvals {smart|manual|off}; terminal {backend}/{cwd}
+- Limits: max_turns {…}; tool_output {…}; compression {…}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.
