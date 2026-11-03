@@ -23,13 +23,18 @@ hermes profile alias <slug>
 # wrapper should appear on PATH (often ~/.local/bin/<slug>)
 ```
 
-## SOUL / memory changes ignored
+## SOUL / personality / memory changes ignored
 
 Context loads at session start. Open a new session or:
 
 ```bash
 hermes sessions refresh-prompts
 ```
+
+Personality overlay is `display.personality` (slash `/personality`). Clearing needs
+`none` / `default` / `neutral` or an empty config value. Confirm with
+`hermes -p <slug> config get display.personality`. Custom presets live under
+`agent.personalities` and only apply after the name is selected.
 
 ## Gateway conflict / token lock
 

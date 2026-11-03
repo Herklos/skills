@@ -12,7 +12,8 @@ hermes -p forge doctor
 hermes profile show forge
 ```
 
-Edit `$HERMES_HOME/profiles/forge/SOUL.md` using `soul-templates.md`, then open a new session.
+Edit `$HERMES_HOME/profiles/forge/SOUL.md` using `soul-templates.md`, optionally set
+`display.personality`, then open a new session.
 
 ## 2. Clone config from an existing profile
 
@@ -117,11 +118,27 @@ hermes -p forge config set delegation.provider openrouter
 hermes -p forge moa configure deep_review   # optional
 ```
 
+## 12. Personality (SOUL + overlay)
+
+See `soul-templates.md`. Minimal sequence:
+
+```bash
+# Edit $HERMES_HOME/profiles/forge/SOUL.md for durable identity
+hermes -p forge config set display.personality concise   # sticky overlay, or ''
+# Optional custom preset: edit agent.personalities in config.yaml, then:
+hermes -p forge config set display.personality codereviewer
+# In a live session you can also /personality teacher | /personality none
+hermes sessions refresh-prompts   # after SOUL edits
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
 |--------|--------|
-| Voice / standing instructions | `SOUL.md` |
+| Durable voice / role | `SOUL.md` |
+| Named mode overlay (built-in or custom) | `display.personality` / `/personality` |
+| Custom personality definitions | `agent.personalities` in `config.yaml` |
+| Manual prompt when no personality name | `agent.system_prompt` |
 | User preferences / durable facts | memory (agent) or `USER.md` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |

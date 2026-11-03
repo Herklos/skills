@@ -74,6 +74,10 @@ Skills: Agent → Team → Project → Global
 - review: openrouter · anthropic/claude-opus-4
 **Subagents / delegation:** cheaper worker openrouter · google/gemini-2.5-flash; max_concurrent_children 8; backend default
 **Mixture of Agents:** off
+**Personality:**
+- SOUL: pragmatic implementer; short status; ask before destructive git
+- Overlay: none (use `/personality concise` only for terse triage)
+- Custom presets: none
 **Gateway / messaging:** none
 ```
 
@@ -83,7 +87,17 @@ Chiefs that need multi-model review can set MoA, for example:
 **Mixture of Agents:** preset `deep_review` (references: codex gpt + flash advisor; aggregator: opus; fanout: user_turn)
 ```
 
-Apply Hermes fields with skill `hermes-profiles` → `references/models-and-delegation.md`.
+A sticky named voice looks like:
+
+```markdown
+**Personality:**
+- SOUL: coordinator; routes work; does not implement
+- Overlay: teacher (sticky `display.personality: teacher`)
+- Custom presets: `brief_ops` — terse SRE status voice
+```
+
+Apply Hermes model fields with skill `hermes-profiles` → `references/models-and-delegation.md`.  
+Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

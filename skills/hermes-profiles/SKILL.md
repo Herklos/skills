@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.2.0
+version: 1.3.0
 license: MIT
 metadata:
   category: agents
@@ -28,11 +28,12 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 |------|------|
 | `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
 | `references/models-and-delegation.md` | Main, auxiliary, fallback, subagents, Mixture of Agents |
-| `references/soul-templates.md` | Writing or rewriting `SOUL.md` |
+| `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
-Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles
+Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles  
+Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
 
 ## Resolve home
 
@@ -53,7 +54,8 @@ hermes profile list
 hermes profile show <slug>
 ```
 
-Read `SOUL.md`, `profile.yaml` (description / ui_meta), and `config.yaml` model block as needed.
+Read `SOUL.md`, `display.personality` / `agent.personalities` in `config.yaml`,
+`profile.yaml` (description / ui_meta), and the model block as needed.
 Do not print `.env` secret values into chat.
 
 ## Mental model
@@ -65,6 +67,7 @@ Do not print `.env` secret values into chat.
 | Bot | Profile in Desktop Bot Mode roster (`ui_meta` in `profile.yaml`) |
 | Messaging bot | Platform account token in that profile's `.env` |
 | Subagent | Child from `delegate_task` (fresh chat, not a separate profile) |
+| Personality | Named voice overlay (`display.personality` / `/personality`) on top of SOUL |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the tool working directory.
 Profiles do not sandbox the filesystem. Never run two writers against the same profile.
@@ -147,12 +150,27 @@ Distributions are versioned agent packages. Recipient keeps their own `.env`, me
 
 ## Identity and config
 
-### SOUL.md
+### SOUL.md and personality
 
-Path: `<profile>/SOUL.md`. Personality and standing instructions (system prompt slot #1).
-Restart the session (or `hermes sessions refresh-prompts`) after edits.
+Full guide: `references/soul-templates.md`.
 
-Put voice and role here. Put user facts in memory (`USER.md` / `MEMORY.md`).
+| Layer | Path / key | Role |
+|-------|------------|------|
+| Durable identity | `<profile>/SOUL.md` | System prompt slot #1 (who the agent is) |
+| Named overlay | `display.personality` + `/personality` | Built-in or custom preset on top of SOUL |
+| Manual overlay | `agent.system_prompt` | Free-form; used only when no personality name is set |
+| Custom presets | `agent.personalities` (or top-level `personalities`) | User-defined / overrides of built-ins |
+
+```bash
+# Sticky personality for this profile
+hermes -p <slug> config set display.personality concise
+hermes -p <slug> config set display.personality ''     # clear → SOUL only
+# In session: /personality teacher | /personality none
+```
+
+Put standing voice and role in SOUL. Use `/personality` for temporary mode shifts
+(or a sticky named default). Put user facts in memory (`USER.md` / `MEMORY.md`).
+Reload the session (or `hermes sessions refresh-prompts`) after SOUL edits.
 
 ### profile.yaml
 
@@ -165,6 +183,7 @@ Put voice and role here. Put user facts in memory (`USER.md` / `MEMORY.md`).
 ```bash
 hermes -p <slug> config set model.default <model-id>
 hermes -p <slug> config set terminal.cwd /absolute/path
+hermes -p <slug> config set display.personality concise
 hermes -p <slug> doctor
 hermes -p <slug> skills list
 ```
@@ -212,11 +231,11 @@ One gateway process per profile. Separate bot tokens per profile.
 2. One writer per profile.
 3. Do not dump `.env` or auth tokens into chat.
 4. Export strips API keys; treat archives as sensitive.
-5. After SOUL/config/memory edits, note that live sessions need reload.
+5. After SOUL / personality / config / memory edits, note that live sessions need reload.
 
 ## Common recipes (summary)
 
-- **New specialist:** `create` → `setup` → set `terminal.cwd` → edit SOUL → `doctor` (see `recipes.md`)
+- **New specialist:** `create` → `setup` → set `terminal.cwd` → edit SOUL → optional `display.personality` → `doctor` (see `recipes.md`)
 - **Twin of existing:** `create <new> --clone-from <src>` (add `--clone-all` only if needed)
 - **Empty orchestrator:** `create <slug> --no-skills`
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`

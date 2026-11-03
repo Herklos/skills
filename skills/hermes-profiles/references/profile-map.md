@@ -16,9 +16,9 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 | Path | Role |
 |------|------|
 | `profile.yaml` | `description` / `description_auto`, optional `display_name`, Bot Mode `ui_meta` |
-| `config.yaml` | Model, provider, toolsets, MCP, terminal, memory, plugins, gateway, TTS, … |
+| `config.yaml` | Model, provider, toolsets, MCP, terminal, memory, plugins, gateway, TTS, `display.personality`, `agent.personalities`, … |
 | `.env` | API keys, messaging bot tokens, gateway allowlists |
-| `SOUL.md` | Personality / standing instructions (system prompt slot #1) |
+| `SOUL.md` | Durable identity / standing voice (system prompt slot #1). Overlays: `/personality` |
 | `memories/USER.md` | User profile facts (agent-written via memory tool) |
 | `memories/MEMORY.md` | Agent notes (agent-written) |
 | `skills/` | Per-profile skills and curator state |
@@ -36,7 +36,9 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 
 | File | Who writes | When loaded |
 |------|------------|-------------|
-| `SOUL.md` | Operator | Session start, system prompt |
+| `SOUL.md` | Operator | Session start, system prompt slot #1 |
+| `display.personality` | Operator / `/personality` | Named overlay on top of SOUL |
+| `agent.personalities` | Operator | Custom / override personality presets |
 | `USER.md` / `MEMORY.md` | Agent (memory tool) | Frozen snapshot at session start |
 | Project `AGENTS.md` / `.hermes.md` | Operator | From working directory |
 | `config.yaml` | Operator / setup / `config set` | Process start |
@@ -62,7 +64,9 @@ hermes profile info <slug>
 
 hermes -p <slug> setup|doctor|chat|skills list
 hermes -p <slug> config set <dotted.key> <value>
+hermes -p <slug> config set display.personality <name|''>
 hermes -p <slug> gateway start|stop|restart|install
+# In session: /personality [name|none]
 ```
 
 ## Clone flag matrix
@@ -104,6 +108,7 @@ ui_meta:
 ## Doc links
 
 - https://hermes-agent.nousresearch.com/docs/user-guide/profiles
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
 - https://hermes-agent.nousresearch.com/docs/reference/profile-commands
 - https://hermes-agent.nousresearch.com/docs/user-guide/which-file-does-what
 - https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode
