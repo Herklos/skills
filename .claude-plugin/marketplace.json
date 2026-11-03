@@ -1,29 +1,17 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "herklos-skills",
-  "description": "Product-agnostic content and marketing skills for Claude Code, Cursor, and compatible AI agents.",
+  "description": "Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent orgs.",
   "owner": {
     "name": "Herklos",
     "url": "https://github.com/Herklos"
   },
   "plugins": [
     {
-      "name": "seo-blog-skills",
-      "description": "SEO blog article skills bundle (EN + FR) in founder-engineer voice with plain Markdown output.",
+      "name": "agent-ops-skills",
+      "description": "Bundle: Hermes profiles + Anytype Agents management.",
       "source": "./",
-      "category": "marketing"
-    },
-    {
-      "name": "generate-seo-blog-article",
-      "description": "Draft SEO blog articles in English founder-engineer voice using plain Markdown.",
-      "source": "./skills/generate-seo-blog-article",
-      "category": "marketing"
-    },
-    {
-      "name": "generate-seo-blog-article-fr",
-      "description": "Rédiger des articles de blog SEO en français, voix fondateur-ingénieur, Markdown simple.",
-      "source": "./skills/generate-seo-blog-article-fr",
-      "category": "marketing"
+      "category": "productivity"
     },
     {
       "name": "hermes-profiles",

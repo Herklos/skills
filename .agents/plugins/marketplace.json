@@ -1,12 +1,12 @@
 {
   "name": "herklos-skills",
   "interface": {
-    "displayName": "Herklos Skills"
+    "displayName": "Agent Ops Skills"
   },
   "plugins": [
     {
-      "name": "seo-blog-skills",
-      "description": "SEO blog article skills bundle (EN + FR) in founder-engineer voice.",
+      "name": "agent-ops-skills",
+      "description": "Bundle: Hermes profiles + Anytype Agents management.",
       "source": {
         "source": "github",
         "repo": "Herklos/skills"
@@ -15,35 +15,7 @@
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       },
-      "category": "Marketing"
-    },
-    {
-      "name": "generate-seo-blog-article",
-      "description": "Draft SEO blog articles in English founder-engineer voice.",
-      "source": {
-        "source": "github",
-        "repo": "Herklos/skills",
-        "path": "skills/generate-seo-blog-article"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Marketing"
-    },
-    {
-      "name": "generate-seo-blog-article-fr",
-      "description": "Rédiger des articles de blog SEO en français, voix fondateur-ingénieur.",
-      "source": {
-        "source": "github",
-        "repo": "Herklos/skills",
-        "path": "skills/generate-seo-blog-article-fr"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Marketing"
+      "category": "Productivity"
     },
     {
       "name": "hermes-profiles",
