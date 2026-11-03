@@ -131,6 +131,23 @@ hermes -p forge config set display.personality codereviewer
 hermes sessions refresh-prompts   # after SOUL edits
 ```
 
+## 13. Memory settings
+
+See `memory.md`. Minimal sequence:
+
+```bash
+hermes -p forge memory status
+hermes -p forge config set memory.memory_enabled true
+hermes -p forge config set memory.user_profile_enabled true
+hermes -p forge config set memory.write_approval false    # true to gate saves
+hermes -p forge config set display.memory_notifications on
+# Optional external provider (one at a time):
+hermes -p forge memory setup          # or: config set memory.provider retaindb
+hermes -p forge memory off            # external off; built-in remains
+# Destructive — confirm first:
+# hermes -p forge memory reset --target all
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -139,7 +156,8 @@ hermes sessions refresh-prompts   # after SOUL edits
 | Named mode overlay (built-in or custom) | `display.personality` / `/personality` |
 | Custom personality definitions | `agent.personalities` in `config.yaml` |
 | Manual prompt when no personality name | `agent.system_prompt` |
-| User preferences / durable facts | memory (agent) or `USER.md` |
+| User preferences / durable facts | memory tool → `USER.md` / `MEMORY.md` |
+| Memory limits, approval, provider | `memory.*` / `hermes -p <slug> memory …` (`memory.md`) |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
 | API keys / bot tokens | profile `.env` (never echo values) |

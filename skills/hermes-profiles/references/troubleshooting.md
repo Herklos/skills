@@ -36,6 +36,11 @@ Personality overlay is `display.personality` (slash `/personality`). Clearing ne
 `hermes -p <slug> config get display.personality`. Custom presets live under
 `agent.personalities` and only apply after the name is selected.
 
+Memory tool writes hit disk immediately but the system-prompt snapshot stays frozen
+until the next session. Staged writes (`memory.write_approval: true`) never land until
+`/memory approve`. Confirm the profile path: `hermes -p work` uses
+`profiles/work/memories/`, not `~/.hermes/memories/`. See `memory.md`.
+
 ## Gateway conflict / token lock
 
 Two profiles cannot share the same messaging bot token. Second gateway fails with a conflict naming the other profile.

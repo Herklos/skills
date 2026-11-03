@@ -19,8 +19,8 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 | `config.yaml` | Model, provider, toolsets, MCP, terminal, memory, plugins, gateway, TTS, `display.personality`, `agent.personalities`, … |
 | `.env` | API keys, messaging bot tokens, gateway allowlists |
 | `SOUL.md` | Durable identity / standing voice (system prompt slot #1). Overlays: `/personality` |
-| `memories/USER.md` | User profile facts (agent-written via memory tool) |
-| `memories/MEMORY.md` | Agent notes (agent-written) |
+| `memories/USER.md` | User profile facts (agent-written via memory tool; `memory.user_*`) |
+| `memories/MEMORY.md` | Agent notes (agent-written; `memory.memory_*`) |
 | `skills/` | Per-profile skills and curator state |
 | `state.db` (+ `-shm`/`-wal`) | Sessions and history |
 | `cron/` | Scheduled jobs; Bot routines are namespaced cron |
@@ -40,6 +40,7 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 | `display.personality` | Operator / `/personality` | Named overlay on top of SOUL |
 | `agent.personalities` | Operator | Custom / override personality presets |
 | `USER.md` / `MEMORY.md` | Agent (memory tool) | Frozen snapshot at session start |
+| `memory.*` / `memory.provider` | Operator / `hermes memory` | Built-in limits + optional external provider |
 | Project `AGENTS.md` / `.hermes.md` | Operator | From working directory |
 | `config.yaml` | Operator / setup / `config set` | Process start |
 | `profile.yaml` description | `hermes profile describe` | Kanban routing + UI |
@@ -65,8 +66,10 @@ hermes profile info <slug>
 hermes -p <slug> setup|doctor|chat|skills list
 hermes -p <slug> config set <dotted.key> <value>
 hermes -p <slug> config set display.personality <name|''>
+hermes -p <slug> memory setup|status|off|reset
+hermes -p <slug> config set memory.<key> <value>
 hermes -p <slug> gateway start|stop|restart|install
-# In session: /personality [name|none]
+# In session: /personality [name|none] ; /memory pending|approve|reject
 ```
 
 ## Clone flag matrix
@@ -109,6 +112,8 @@ ui_meta:
 
 - https://hermes-agent.nousresearch.com/docs/user-guide/profiles
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/memory
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers
 - https://hermes-agent.nousresearch.com/docs/reference/profile-commands
 - https://hermes-agent.nousresearch.com/docs/user-guide/which-file-does-what
 - https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode

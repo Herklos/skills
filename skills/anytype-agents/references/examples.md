@@ -78,6 +78,11 @@ Skills: Agent → Team → Project → Global
 - SOUL: pragmatic implementer; short status; ask before destructive git
 - Overlay: none (use `/personality concise` only for terse triage)
 - Custom presets: none
+**Memory:**
+- Built-in: MEMORY.md on · USER.md on · limits 2200 / 1375
+- Write approval: off
+- Notifications: on
+- External provider: none
 **Gateway / messaging:** none
 ```
 
@@ -96,8 +101,19 @@ A sticky named voice looks like:
 - Custom presets: `brief_ops` — terse SRE status voice
 ```
 
+A gated memory + Honcho example:
+
+```markdown
+**Memory:**
+- Built-in: MEMORY.md on · USER.md on · defaults
+- Write approval: on
+- Notifications: verbose
+- External provider: honcho (workspace shared; AI peer per profile)
+```
+
 Apply Hermes model fields with skill `hermes-profiles` → `references/models-and-delegation.md`.  
-Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.
+Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.  
+Apply memory with `hermes-profiles` → `references/memory.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

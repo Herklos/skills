@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.3.0
+version: 1.4.0
 license: MIT
 metadata:
   category: agents
@@ -29,11 +29,13 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
 | `references/models-and-delegation.md` | Main, auxiliary, fallback, subagents, Mixture of Agents |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
+| `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles  
-Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
+Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
+Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory
 
 ## Resolve home
 
@@ -68,6 +70,7 @@ Do not print `.env` secret values into chat.
 | Messaging bot | Platform account token in that profile's `.env` |
 | Subagent | Child from `delegate_task` (fresh chat, not a separate profile) |
 | Personality | Named voice overlay (`display.personality` / `/personality`) on top of SOUL |
+| Memory | Per-profile curated `MEMORY.md` / `USER.md`, optional one external provider |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the tool working directory.
 Profiles do not sandbox the filesystem. Never run two writers against the same profile.
@@ -211,8 +214,19 @@ Never paste secret values into the conversation.
 
 ### Memory
 
+Full guide: `references/memory.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Built-in stores | `memory.memory_enabled` / `user_profile_enabled` + char limits |
+| Gate saves | `memory.write_approval` + `/memory pending\|approve\|reject` |
+| External provider (one) | `memory.provider` / `hermes -p <slug> memory setup\|status\|off` |
+| Notifications | `display.memory_notifications` (`off` \| `on` \| `verbose`) |
+| Wipe built-in files | `hermes -p <slug> memory reset` (confirm first) |
+
 `<profile>/memories/USER.md` and `MEMORY.md` freeze into the prompt at session start.
-Prefer in-chat memory saves. Mid-session disk edits apply on the next session.
+Prefer in-chat memory tool saves. Mid-session disk edits apply on the next session.
+One external provider is additive; built-in stays unless you disable it.
 
 ## Gateway
 

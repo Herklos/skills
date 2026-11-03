@@ -13,7 +13,7 @@ Title: `{Name} – {Role}`
 Document the intended runtime stack. Values are guidance for whoever configures
 the bot; they do not auto-apply. For Hermes, map these into that profile's
 `config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
-`references/models-and-delegation.md` and `references/soul-templates.md`).
+`references/models-and-delegation.md`, `soul-templates.md`, and `memory.md`).
 
 **Harness:** hermes | grok | claude | codex | noodle | cli | other
 **Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
@@ -31,6 +31,12 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - SOUL / durable identity: {summary or "see Full System Prompt / SOUL.md"}
 - Overlay (`display.personality` / `/personality`): none | helpful | concise | technical | creative | teacher | … | custom `{name}`
 - Custom presets (`agent.personalities`): none | list names + one-line intent
+**Memory (Hermes profile):**
+- Built-in: MEMORY.md on|off · USER.md on|off · limits {2200}/{1375} or custom
+- Write approval: off | on (`/memory pending`)
+- Notifications: off | on | verbose
+- External provider: none | retaindb | byterover | honcho | hindsight | … (one)
+- Notes: {shared across profiles via provider? / reset policy}
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
 
 # {Name} – {Role}
@@ -168,6 +174,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Runtime: {harness}
 - Models: primary {…}; fallback {…}; aux {…}; subagents {…}; MoA {off|preset}
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
+- Memory: built-in {on|off}; approval {on|off}; provider {none|name}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.
