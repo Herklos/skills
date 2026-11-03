@@ -63,7 +63,7 @@ Outline only:
 
 Omit `template` to use the type default (**Agent default**). Create memory
 children as `page`. Patch the parent Team / HQ to add a link. Full property
-tables: `object-types.md`.
+tables: `object-types.md`. Default template body dumps: `type-templates.md`.
 
 ## Create a team / HQ
 

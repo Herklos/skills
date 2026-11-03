@@ -6,7 +6,8 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `object-types.md` | Agent / Team / Subteam / Project type keys, properties, templates |
+| `object-types.md` | Agent / Team / Subteam / Project type keys, properties |
+| `type-templates.md` | Dumped default template bodies (bootstrap / drift) |
 | `page-templates.md` | Creating/auditing body shapes |
 | `suggested-runtime.md` | Suggested runtime field list |
 | `shared-rules-starter.md` | Bootstrapping Shared Rules |

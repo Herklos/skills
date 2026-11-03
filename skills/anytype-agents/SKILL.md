@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.12.0
+version: 1.13.0
 license: MIT
 metadata:
   category: agents
@@ -27,7 +27,8 @@ after doc changes.
 | File | When |
 |------|------|
 | `references/structure.md` | Hub discovery and typical tree |
-| `references/object-types.md` | Agent / Team / Subteam / Project type keys, properties, templates, migration |
+| `references/object-types.md` | Agent / Team / Subteam / Project type keys, properties, migration |
+| `references/type-templates.md` | Dumped default template bodies (Agent / Team / Subteam / Project) for bootstrap and drift |
 | `references/page-templates.md` | Agent / HQ / Subteam / group / skill / project body shapes |
 | `references/suggested-runtime.md` | Suggested runtime field list (Hermes mapping; **Cua Spaces** default computer) |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |

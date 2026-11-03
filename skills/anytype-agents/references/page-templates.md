@@ -7,6 +7,7 @@ in the same space over inventing a new layout.
 
 Suggested runtime field list: **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
+Type default template dumps (Agent / Team / Subteam / Project): **`type-templates.md`**.
 
 ## Agent page
 

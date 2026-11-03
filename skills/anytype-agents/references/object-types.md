@@ -45,9 +45,8 @@ Other properties:
 
 Also includes shared `tag`, `links`, `backlinks`.
 
-**Default template name:** `Agent default` (sections: Suggested runtime including
-Subagents and Scheduled tasks, Autonomy, Short Description, Full System Prompt
-fence, Memory Pages). Body shapes: `page-templates.md`; runtime fields:
+**Default template name:** `Agent default`. Full dumped body:
+`type-templates.md`. Also: `page-templates.md`; runtime fields:
 `suggested-runtime.md`.
 
 ## Team (`api_key`: `team`)
@@ -62,9 +61,9 @@ fence, Memory Pages). Body shapes: `page-templates.md`; runtime fields:
 
 Also `tag`, `links`, `backlinks`.
 
-**Default template name:** `Team default` (Mission, Subteams / Domains / Members,
-Routing, Rules, Map). Mirror shapes in `page-templates.md` (HQ page). Link child
-**`subteam`** objects from the HQ map; do not create new Sub-teams as `team`.
+**Default template name:** `Team default`. Full dumped body: `type-templates.md`.
+Mirror shapes in `page-templates.md` (HQ page). Link child **`subteam`** objects
+from the HQ map; do not create new Sub-teams as `team`.
 
 Legacy: older spaces may still have `team` objects with `kind: Sub-team`. Prefer
 migrating those to type **`subteam`** via `set_type` (see below). Do not mint new
@@ -84,8 +83,8 @@ sub-teams on the `team` type.
 
 Also `tag`, `links`, `backlinks`. No `kind` property: the type itself is the kind.
 
-**Default template name:** `Subteam default` (Mission, Members, Routing, Map).
-Body shape: `page-templates.md` (Subteam page).
+**Default template name:** `Subteam default`. Full dumped body (skill-authored
+until live): `type-templates.md`. Also `page-templates.md` (Subteam page).
 
 Agent `team` (objects) may link the owning HQ **or** this Subteam when the agent
 sits under a domain.
@@ -103,8 +102,8 @@ Built-in Project type extended with org fields:
 | `public_url` | url | Public product URL |
 | `one_liner` | text | Positioning line |
 
-**Default template name:** `Project default` (Overview, Features, Architecture,
-Users, Differentiators, related projects, common children callout).
+**Default template name:** `Project default`. Full dumped body:
+`type-templates.md`.
 
 ## Create with type + template
 
@@ -208,7 +207,8 @@ object; re-set only what is missing after the type change.
    define `kind` options `Board` / `HQ` / `Group` only (no `Sub-team`).
 2. `API-update-type` on built-in `project` with `add_property` ops for the Project
    fields (or create them once if the space already has matching keys).
-3. `API-create-template` with `template_for`: `agent` | `team` | `subteam` | `project`.
+3. `API-create-template` with `template_for`: `agent` | `team` | `subteam` | `project`
+   and body markdown from **`type-templates.md`**.
 4. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 5. Migrate existing inventory with `set_type` as above (including legacy Sub-team
    `team` objects → `subteam`).
