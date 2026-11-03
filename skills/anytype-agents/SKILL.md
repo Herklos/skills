@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.0.0
+version: 1.1.0
 license: MIT
 metadata:
   category: agents
@@ -21,8 +21,16 @@ Org source of truth for a multi-agent roster lives in **Anytype** as linked
 local agents) are separate: editing Anytype does not by itself update a live bot
 prompt or messaging group. Verify runtime separately after doc changes.
 
-Discovery patterns and page shapes: `references/structure.md` and
-`references/page-templates.md`.
+## References (load when needed)
+
+| File | When |
+|------|------|
+| `references/structure.md` | Hub discovery and typical tree |
+| `references/page-templates.md` | Agent / HQ / group / skill / project shapes |
+| `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
+| `references/examples.md` | Fictional Northwind Labs org walkthrough |
+| `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
+| `references/mcp-recipes.md` | MCP search/create/patch/archive patterns |
 
 ## Resolve space and roots
 
@@ -157,10 +165,19 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 5. Treat page/card comments as instructions when Shared Rules say so
 6. Do not revive archived agents without explicit approval
 
+## Common recipes (summary)
+
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape)
+- **New specialist:** draft vs live → page from `page-templates.md` → memory children → link HQ → prompt copy reminder
+- **New HQ:** clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
+- **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
+- **MCP ops:** follow `mcp-recipes.md` with etags and dry-run when unsure
+
 ## Workflow checklist
 
 1. Resolve space + discover Agents/Projects roots
 2. Read roster/routing before ownership changes
-3. Create/patch using templates
+3. Create/patch using templates / MCP recipes
 4. Link from parent HQ / Agents / Skills hub
 5. Report object ids/URLs and remaining runtime verification
+6. If Hermes runtime: continue with `hermes-profiles`

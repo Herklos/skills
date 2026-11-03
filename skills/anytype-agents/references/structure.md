@@ -2,6 +2,16 @@
 
 No space ids or personal names here. Discover live ids with MCP search each session.
 
+## Companion references
+
+| File | When |
+|------|------|
+| `page-templates.md` | Creating/auditing page shapes |
+| `shared-rules-starter.md` | Bootstrapping Shared Rules |
+| `examples.md` | Fictional org / project walkthrough |
+| `handoff-templates.md` | Briefs, handoffs, welcome paste |
+| `mcp-recipes.md` | Concrete MCP call patterns |
+
 ## How to find hubs
 
 ```

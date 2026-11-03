@@ -21,10 +21,20 @@ Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent or
 ├── skills/
 │   ├── hermes-profiles/
 │   │   ├── SKILL.md
-│   │   └── references/profile-map.md
+│   │   └── references/
+│   │       ├── profile-map.md
+│   │       ├── soul-templates.md
+│   │       ├── recipes.md
+│   │       └── troubleshooting.md
 │   └── anytype-agents/
 │       ├── SKILL.md
-│       └── references/{structure,page-templates}.md
+│       └── references/
+│           ├── structure.md
+│           ├── page-templates.md
+│           ├── shared-rules-starter.md
+│           ├── examples.md
+│           ├── handoff-templates.md
+│           └── mcp-recipes.md
 ├── LICENSE
 └── README.md
 ```

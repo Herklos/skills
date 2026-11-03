@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.0.0
+version: 1.1.0
 license: MIT
 metadata:
   category: agents
@@ -22,7 +22,14 @@ default profile is `$HERMES_HOME` itself (id `default`).
 Bot Mode bots are the same profiles with roster metadata in `profile.yaml`. Prefer
 the `hermes` CLI over hand-editing for lifecycle and config.
 
-File map, clone flags, and CLI cheat sheet: `references/profile-map.md`.
+## References (load when needed)
+
+| File | When |
+|------|------|
+| `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
+| `references/soul-templates.md` | Writing or rewriting `SOUL.md` |
+| `references/recipes.md` | End-to-end create/clone/gateway/export examples |
+| `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles
 
@@ -192,10 +199,19 @@ One gateway process per profile. Separate bot tokens per profile.
 4. Export strips API keys; treat archives as sensitive.
 5. After SOUL/config/memory edits, note that live sessions need reload.
 
+## Common recipes (summary)
+
+- **New specialist:** `create` → `setup` → set `terminal.cwd` → edit SOUL → `doctor` (see `recipes.md`)
+- **Twin of existing:** `create <new> --clone-from <src>` (add `--clone-all` only if needed)
+- **Empty orchestrator:** `create <slug> --no-skills`
+- **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
+- **Share package:** `export` / `import` or `profile install <git-url>`
+
 ## Workflow checklist
 
 1. `hermes profile list` / `show <slug>`
-2. Choose action
+2. Choose action (use `recipes.md` for multi-step flows)
 3. Run the matching `hermes` command
 4. Verify with `show` / `doctor`
 5. For identity edits, note session reload
+6. On failure, check `troubleshooting.md`
