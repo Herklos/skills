@@ -45,6 +45,14 @@ Central home for teams and shared rules.
 - Customer & Analytics – Product (example domain under Product HQ)
 - Prefer `subteam` objects; do not create new Sub-teams as `team` with `kind: Sub-team`
 
+## Harnesses (type `harness`)
+- Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model
+
+## Harness profiles (type `harness_profile`)
+- Coding → Claude Sonnet 5.5 high; backups Codex Sol 6.1 high, Grok 4.5 high
+- Data fetching → Codex Terra 6.1 high; backups Claude Haiku 5.5 medium, Grok 4.5 medium
+- Agents link `harness_profile` (not a harness select)
+
 ## Hierarchy
 Human ↔ Nova → chiefs → specialists
 Skills: Agent → Subteam → Team → Project → Global
@@ -64,13 +72,15 @@ Skills: Agent → Subteam → Team → Project → Global
 
 > Lee – Implementer. Ships one Ready TODO as a small PR under Remy. Runtime: coding CLI. Does not set product scope.
 
-### Sample Suggested runtime (Hermes implementer)
+### Sample Suggested runtime (coding implementer)
 
 ```markdown
-## Suggested runtime (2026-11-03)
-**Harness:** hermes
-**Primary (main):** openrouter · anthropic/claude-sonnet-4 · high
-**Fallback / backup:** openrouter · google/gemini-2.5-pro
+## Suggested runtime (2026-11-04)
+**Harness profile:** Coding (Agent.`harness_profile` → Coding)
+**Primary (from profile):** Claude · Claude Code Sonnet 5.5 · high
+**Fallback / backup (from profile):**
+- 1: Codex · Codex Sol 6.1 · high
+- 2: Grok · Grok 4.5 · high
 **Auxiliary:**
 - vision: openrouter · google/gemini-2.5-flash
 - compression: openrouter · google/gemini-2.5-flash

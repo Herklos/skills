@@ -155,8 +155,8 @@ Follow **Agents → {Shared Rules title}** in full.
 # Tools and systems
 - Workspace pages under Agents / Projects (source of truth)
 - {MCP / CLI / browser as applicable}
-- Runtime: {harness}
-- Models: primary/routing {…}; fallback {…}; aux {…}; subagents model_map {fast/deep/…} | default worker {…}; MoA {off|preset}
+- Harness profile: {Coding | Data fetching | …}
+- Models: from profile (primary + backups); optional local overrides; aux {…}; subagents model_map {fast/deep/…} | default worker {…}; MoA {off|preset}
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
 - Browser: {none|source + identity}

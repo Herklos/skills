@@ -6,7 +6,7 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `object-types.md` | Agent / Team / Subteam / Project type keys, properties |
+| `object-types.md` | Agent / Team / Subteam / Harness / Harness profile / Project type keys |
 | `type-templates.md` | Dumped default template bodies (bootstrap / drift) |
 | `page-templates.md` | Creating/auditing body shapes |
 | `suggested-runtime.md` | Suggested runtime field list |
@@ -36,6 +36,8 @@ From an `https://object.any.coop/<objectId>?spaceId=<spaceId>` or `anytype://obj
 Agents
 ├── Shared Rules (template / mandatory rules)
 ├── Skills (global) ── Skill Template
+├── Harnesses (type `harness` catalog)
+├── Harness profiles (type `harness_profile` stacks)
 ├── Primary (coordinator)
 │   ├── Roster / routing
 │   ├── Delegation playbook
@@ -77,13 +79,13 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 
 ## Types
 
-Org inventory uses custom keys **`agent`**, **`team`**, and **`subteam`**, plus
-extended built-in **`project`**. Prefer **`subteam`** for domains under an HQ;
-do not place new Sub-teams on `team` with `kind: Sub-team`. Supporting docs
-(Shared Rules, Skills, memory children, hubs) stay **`page`**. Spaces also
-expose `task`, `note`, `collection`, `query`, `template`, media types. See
-`object-types.md` for property keys, default templates, create and `set_type`
-migration.
+Org inventory uses custom keys **`agent`**, **`team`**, **`subteam`**,
+**`harness`**, **`harness_profile`**, plus extended built-in **`project`**.
+Prefer **`subteam`** for domains under an HQ. Prefer **`harness_profile`** on
+agents (not a harness select). Supporting docs (Shared Rules, Skills, memory
+children, hubs) stay **`page`**. Spaces also expose `task`, `note`,
+`collection`, `query`, `template`, media types. See `object-types.md` for
+property keys, default templates, create and `set_type` migration.
 
 ## Runtime vs docs
 

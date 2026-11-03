@@ -12,9 +12,8 @@ current default.
 Companion shapes (HQ / Group / Skill / prompt skeleton): `page-templates.md`.
 Property keys: `object-types.md`.
 
-Dumped from a live Agents org on **2026-11-04** (Agent / Team / Project
-defaults). **Subteam default** is skill-authored (type not yet live in that
-space); create it when bootstrapping `subteam`.
+Dumped / authored **2026-11-04**: Agent / Team / Project from live org; Harness /
+Harness profile from live bootstrap; Subteam skill-authored until type is live.
 
 ---
 
@@ -22,11 +21,14 @@ space); create it when bootstrapping `subteam`.
 
 ````markdown
 ## Suggested runtime (YYYY-MM-DD)
-**Harness:** hermes | grok | claude | codex | noodle | cli | other
-**Primary (main):** {provider} · {model} · {reasoning}
-**Fallback / backup:** …
-**Subagents / delegation:** enabled. Prefer model_map (fast/deep named routes) for different models per delegate_task; else cheaper single worker. Hermes: tools enable delegation + models-and-delegation.md.
-**Personality / Memory / Browser / Computer / Tools / Limits / Security / Workspace:** fill from hermes-profiles references (see anytype-agents skill → page-templates.md / suggested-runtime.md).
+**Harness profile:** {Coding | Data fetching | …}  (Agent.`harness_profile`)
+**Primary (from profile):** {Harness} · {model} · {low|medium|high}
+**Fallback / backup (from profile):**
+- 1: {Harness} · {model} · {effort}
+- 2: {Harness} · {model} · {effort}
+**Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
+**Subagents / delegation:** enabled. Prefer model_map (fast/deep named routes) for different models per delegate_task; else cheaper single worker.
+**Personality / Memory / Browser / Computer / Tools / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## Autonomy
 read-only | propose | change-with-gates
@@ -43,7 +45,7 @@ You are {Name}, …
 Follow **Agents → Agent Template – Shared Rules** in full.
 
 # Tools and systems
-- Runtime: {harness}
+- Harness profile: {name} (primary + backups from that object)
 - Models / personality / memory / browser / computer / tools / security / workspace: see Suggested runtime
 
 # Escalation
@@ -111,6 +113,44 @@ Set property `parent_team` to the owning HQ on create.
 
 ---
 
+## Harness default (`template_for`: `harness`)
+
+```markdown
+## Purpose
+What this product is for in the org.
+
+## Notes
+Capability limits, auth, when to prefer another harness.
+```
+
+Set `slug` to one of: `claude`, `codex`, `grok`, `github-copilot`, `muse`,
+`nvidia-nim`, `local-model`.
+
+---
+
+## Harness profile default (`template_for`: `harness_profile`)
+
+```markdown
+## When to use
+Intent and agent roles this stack fits.
+
+## Stack summary
+- Primary: {Harness} · {model} · {effort}
+- Backup 1: {Harness} · {model} · {effort}
+- Backup 2: {Harness} · {model} · {effort}
+
+## Apply notes
+Editing this profile updates the intended models for every Agent linked via
+`harness_profile`. Re-apply into each live runtime (Claude / Codex / Grok / …)
+separately. Anytype does not push configs automatically.
+```
+
+Example stacks: Coding (Claude Sonnet 5.5 high → Codex Sol 6.1 high → Grok 4.5
+high); Data fetching (Codex Terra 6.1 high → Claude Haiku 5.5 medium → Grok 4.5
+medium).
+
+---
+
 ## Project default (`template_for`: `project`)
 
 ```markdown
@@ -139,10 +179,9 @@ Common children: Technical, Business, Project Management (Roadmap / Backlog / TO
 
 ## Recreate a default template (MCP)
 
-1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` | `project`,
-   name `{Type} default`, and body markdown from the matching section above
-   (document form or create-object-style markdown if the server accepts it on
-   templates; otherwise blocks from the markdown).
+1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
+   `harness` | `harness_profile` | `project`, name `{Type} default`, and body
+   blocks from the matching section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -150,7 +189,8 @@ Common children: Technical, Business, Project Management (Roadmap / Backlog / TO
 
 ## Drift check
 
-1. `API-list-templates` for `agent`, `team`, `subteam`, `project`.
+1. `API-list-templates` for `agent`, `team`, `subteam`, `harness`,
+   `harness_profile`, `project`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of

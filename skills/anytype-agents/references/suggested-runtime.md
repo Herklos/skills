@@ -21,9 +21,13 @@ Paste under the agent title (date the heading when you revise it).
 
 ```markdown
 ## Suggested runtime (YYYY-MM-DD)
-**Harness:** hermes | grok | claude | codex | noodle | cli | other
-**Primary (main / routing):** {provider} · {model} · {reasoning effort} · {speed tier if any}
-**Fallback / backup:** {provider} · {model}  (ordered list if several)
+**Harness profile:** {Coding | Data fetching | …}  (link Agent.`harness_profile`; edit the profile to refresh many agents)
+**Primary (from profile):** {Harness} · {model} · {low|medium|high}
+**Fallback / backup (from profile, ordered):**
+- 1: {Harness} · {model} · {effort}
+- 2: {Harness} · {model} · {effort}
+**Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
+**Optional agent overrides:** none | note local exceptions (prefer changing the shared profile)
 **Auxiliary (optional overrides; else auto = main):**
 - vision: …
 - compression: …

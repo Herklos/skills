@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.13.0
+version: 1.14.0
 license: MIT
 metadata:
   category: agents
@@ -17,18 +17,19 @@ metadata:
 # Anytype Agents
 
 Org source of truth for a multi-agent roster lives in **Anytype** as typed
-objects (`agent`, `team`, `subteam`, `project`) plus supporting `page`s. Runtime
-bots (chat harnesses, CLIs, local agents) are separate: editing Anytype does not
-by itself update a live bot prompt or messaging group. Verify runtime separately
-after doc changes.
+objects (`agent`, `team`, `subteam`, `harness`, `harness_profile`, `project`)
+plus supporting `page`s. Runtime bots are separate: editing Anytype does not by
+itself update a live bot prompt or messaging group. Verify runtime separately
+after doc changes. Model stacks live on **Harness profile** objects; agents link
+`harness_profile` so one profile edit covers many agents (then re-apply live).
 
 ## References (load when needed)
 
 | File | When |
 |------|------|
 | `references/structure.md` | Hub discovery and typical tree |
-| `references/object-types.md` | Agent / Team / Subteam / Project type keys, properties, migration |
-| `references/type-templates.md` | Dumped default template bodies (Agent / Team / Subteam / Project) for bootstrap and drift |
+| `references/object-types.md` | Agent / Team / Subteam / Harness / Harness profile / Project type keys, properties, migration |
+| `references/type-templates.md` | Dumped default template bodies (incl. Harness / Harness profile) for bootstrap and drift |
 | `references/page-templates.md` | Agent / HQ / Subteam / group / skill / project body shapes |
 | `references/suggested-runtime.md` | Suggested runtime field list (Hermes mapping; **Cua Spaces** default computer) |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
@@ -61,7 +62,9 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Agents | Root hub: shared rules, skills index, Primary, HQ index |
 | HQ / Team | Typed `team` object (`kind`: Board / HQ / Group) under Agents |
 | Subteam | Typed `subteam` object: domain / pod under an HQ (preferred over `team` + `kind: Sub-team`) |
-| Agent | Typed `agent` object: role, system prompt, memory links, skills |
+| Harness | Typed `harness` catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
+| Harness profile | Typed `harness_profile`: reusable primary + backup model stack; agents link here |
+| Agent | Typed `agent` object: role, system prompt, memory links, skills, `harness_profile` |
 | Group | Messaging roster notes; membership text is not auto-synced to chat |
 | Shared Rules | Mandatory rules every agent must follow (`page`) |
 | Skills | Procedures (`page`); resolve most-specific first: Agent → Subteam → Team → Project → Global |
@@ -98,7 +101,7 @@ Never invent roster membership, legal conclusions, or financial numbers. Prefer 
 
 1. Prefer `API-search-space` with `"type": "agent"` (or search by display name / role)
 2. Read: short description, suggested runtime, full system prompt, memory links, skills
-3. Note featured properties (`role`, `lifecycle`, `harness`, `autonomy`, …) and body sections
+3. Note featured properties (`role`, `lifecycle`, `harness_profile`, `autonomy`, …) and body sections
 
 ### Show a project (agent context)
 
@@ -113,10 +116,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update an agent
 
-1. Confirm HQ, reporting line, runtime harness, and draft vs live
+1. Confirm HQ, reporting line, **Harness profile**, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties: `role`, `lifecycle`, `harness`, `team` / `reports_to` when known, `autonomy`, optional `hermes_profile` / `primary_model` / `short_description`
+4. Set properties: `role`, `lifecycle`, `harness_profile`, `team` / `reports_to` when known, `autonomy`, optional `hermes_profile` / `short_description`
 5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
 6. Link from the HQ map / sub-team page
 7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
@@ -139,6 +142,16 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 3. Body from `page-templates.md` / **Subteam default** template
 4. Link from the HQ map; point member agents' `team` (or map line) at this Subteam when they sit under it
 5. Migrate legacy `team` + `kind: Sub-team` with `set_type` → `subteam` (`object-types.md`)
+
+### Create or update a Harness / Harness profile
+
+1. **Harness** (catalog): type `harness` with `slug` in
+   `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | `local-model`
+2. **Harness profile** (stack): type `harness_profile` with `intent`, `primary_harness` +
+   `primary_model` + `primary_effort`, and ordered backups (`backup_1_*`, `backup_2_*`)
+3. Bodies from `type-templates.md`; link profiles from Agents → Shared
+4. Point agents at a profile via `harness_profile` (no Agent `harness` select)
+5. After editing a shared profile, re-apply models into each linked agent's live runtime
 
 ### Create or update a Project portfolio root
 
@@ -194,10 +207,11 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ## Common recipes (summary)
 
-- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|project`
-- **New specialist:** draft vs live → create `agent` + properties (`object-types.md`) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|harness|harness_profile|project`
+- **New specialist:** draft vs live → create `agent` + `harness_profile` → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
 - **New HQ:** create `team` (`kind: HQ`) → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
 - **New Subteam:** create `subteam` with `parent_team` → link HQ map → optional member agents
+- **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents at it
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub
 - **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)
 - **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder

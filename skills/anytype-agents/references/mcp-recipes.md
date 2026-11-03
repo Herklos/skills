@@ -52,7 +52,7 @@ Outline only:
     "properties": {
       "role": "Implementer",
       "lifecycle": "draft",
-      "harness": "hermes",
+      "harness_profile": ["<codingHarnessProfileObjectId>"],
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…"
     },
@@ -64,6 +64,57 @@ Outline only:
 Omit `template` to use the type default (**Agent default**). Create memory
 children as `page`. Patch the parent Team / HQ to add a link. Full property
 tables: `object-types.md`. Default template body dumps: `type-templates.md`.
+
+## Create a Harness catalog entry
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "harness",
+    "name": "Claude",
+    "properties": {
+      "slug": "claude",
+      "lifecycle": "live",
+      "vendor": "Anthropic",
+      "notes": "Claude Code / Claude agent"
+    },
+    "markdown": "## Purpose\n…\n"
+  }
+}
+```
+
+Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | `local-model`.
+
+## Create a Harness profile
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "harness_profile",
+    "name": "Coding",
+    "properties": {
+      "intent": "coding",
+      "lifecycle": "live",
+      "primary_harness": ["<claudeObjectId>"],
+      "primary_model": "Claude Code Sonnet 5.5",
+      "primary_effort": "high",
+      "backup_1_harness": ["<codexObjectId>"],
+      "backup_1_model": "Codex Sol 6.1",
+      "backup_1_effort": "high",
+      "backup_2_harness": ["<grokObjectId>"],
+      "backup_2_model": "Grok 4.5",
+      "backup_2_effort": "high"
+    },
+    "markdown": "## When to use\n…\n\n## Stack summary\n…\n"
+  }
+}
+```
+
+Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 
 ## Create a team / HQ
 
@@ -136,7 +187,7 @@ parent HQ map to link the new Subteam. Prefer this over `team` + `kind: Sub-team
   "create_missing_options": true,
   "ops": [
     { "op": "set_type", "type": "agent" },
-    { "op": "set_properties", "set": { "lifecycle": "live", "harness": "grok" } }
+    { "op": "set_properties", "set": { "lifecycle": "live", "harness_profile": ["<profileObjectId>"] } }
   ]
 }
 ```
@@ -160,7 +211,8 @@ parent HQ map to link the new Subteam. Prefer this over `team` + `kind: Sub-team
 }
 ```
 
-Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, or `"project"` (support docs often stay `"page"`).
+Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, `"harness"`,
+`"harness_profile"`, or `"project"` (support docs often stay `"page"`).
 
 ## Archive
 
