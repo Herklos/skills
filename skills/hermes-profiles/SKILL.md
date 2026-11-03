@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.1.0
+version: 1.2.0
 license: MIT
 metadata:
   category: agents
@@ -27,6 +27,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | File | When |
 |------|------|
 | `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
+| `references/models-and-delegation.md` | Main, auxiliary, fallback, subagents, Mixture of Agents |
 | `references/soul-templates.md` | Writing or rewriting `SOUL.md` |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
@@ -169,6 +170,20 @@ hermes -p <slug> skills list
 ```
 
 Prefer `hermes -p <slug> …` / setup over large hand-edits.
+
+### Models, auxiliary, fallback, subagents, MoA
+
+Full guide: `references/models-and-delegation.md`. Short map:
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Main brain | `model.*` / `hermes -p <slug> model` / `/model` |
+| Side jobs (vision, compression, titles, approval, review, …) | `auxiliary.<task>.*` (default `auto` = main) |
+| Backup when primary fails | `fallback_providers` / `hermes -p <slug> fallback` |
+| `delegate_task` workers | `delegation.model` / `provider` / concurrency / `backend` |
+| Multi-model advice + one acting loop | `moa.presets` / `hermes -p <slug> moa configure` / provider `moa` |
+
+Subagents are fresh child runs, not separate profiles. Optional `delegation.backend: profile_routes` can run a child **as** another profile. MoA presets appear as selectable models under provider `moa`.
 
 ### .env
 

@@ -23,6 +23,7 @@ Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent or
 │   │   ├── SKILL.md
 │   │   └── references/
 │   │       ├── profile-map.md
+│   │       ├── models-and-delegation.md
 │   │       ├── soul-templates.md
 │   │       ├── recipes.md
 │   │       └── troubleshooting.md

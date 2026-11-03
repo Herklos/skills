@@ -10,9 +10,23 @@ Title: `{Name} – {Role}`
 # {Name} – {Role}
 
 ## Suggested runtime (YYYY-MM-DD)
-**Primary:** {harness} · {model} · {effort}
-**Fallback 1:** …
-**Fallback 2:** …
+Document the intended runtime stack. Values are guidance for whoever configures
+the bot; they do not auto-apply. For Hermes, map these into that profile's
+`config.yaml` (see skill `hermes-profiles` → `references/models-and-delegation.md`).
+
+**Harness:** hermes | grok | claude | codex | noodle | cli | other
+**Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
+**Fallback / backup:** {provider} · {model}  (ordered list if several)
+**Auxiliary (optional overrides; else auto = main):**
+- vision: …
+- compression: …
+- approval: …
+- title_generation: …
+- review (`/review`): …
+- other tasks: …
+**Subagents / delegation:** inherit | cheaper worker {provider}·{model} | model_map | profile_routes ({profile names})
+**Mixture of Agents (optional):** off | preset `{name}` (references: …; aggregator: …; fanout: user_turn|per_iteration|every_n:N)
+**Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
 
 # {Name} – {Role}
 **Autonomy:** …
@@ -147,6 +161,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Workspace pages under Agents / Projects (source of truth)
 - {MCP / CLI / browser as applicable}
 - Runtime: {harness}
+- Models: primary {…}; fallback {…}; aux {…}; subagents {…}; MoA {off|preset}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.

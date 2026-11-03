@@ -60,6 +60,31 @@ Skills: Agent → Team → Project → Global
 
 > Lee – Implementer. Ships one Ready TODO as a small PR under Remy. Runtime: coding CLI. Does not set product scope.
 
+### Sample Suggested runtime (Hermes implementer)
+
+```markdown
+## Suggested runtime (2026-11-03)
+**Harness:** hermes
+**Primary (main):** openrouter · anthropic/claude-sonnet-4 · high
+**Fallback / backup:** openrouter · google/gemini-2.5-pro
+**Auxiliary:**
+- vision: openrouter · google/gemini-2.5-flash
+- compression: openrouter · google/gemini-2.5-flash
+- approval: auto (main)
+- review: openrouter · anthropic/claude-opus-4
+**Subagents / delegation:** cheaper worker openrouter · google/gemini-2.5-flash; max_concurrent_children 8; backend default
+**Mixture of Agents:** off
+**Gateway / messaging:** none
+```
+
+Chiefs that need multi-model review can set MoA, for example:
+
+```markdown
+**Mixture of Agents:** preset `deep_review` (references: codex gpt + flash advisor; aggregator: opus; fanout: user_turn)
+```
+
+Apply Hermes fields with skill `hermes-profiles` → `references/models-and-delegation.md`.
+
 ### Sample handoff (Primary → HQ chief)
 
 ```text

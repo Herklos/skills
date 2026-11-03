@@ -103,6 +103,20 @@ hermes profile delete old-bot
 | Near-full copy of source | `--clone-all` (+ optional `--clone-from`) |
 | Also copy messaging tokens | add `--clone-channels` (confirm first) |
 
+## 11. Wire main, aux, fallback, subagents
+
+See `models-and-delegation.md` for full YAML. Minimal sequence:
+
+```bash
+hermes -p forge model
+hermes -p forge fallback add
+hermes -p forge config set auxiliary.compression.provider openrouter
+hermes -p forge config set auxiliary.compression.model google/gemini-2.5-flash
+hermes -p forge config set delegation.model google/gemini-2.5-flash
+hermes -p forge config set delegation.provider openrouter
+hermes -p forge moa configure deep_review   # optional
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -110,6 +124,7 @@ hermes profile delete old-bot
 | Voice / standing instructions | `SOUL.md` |
 | User preferences / durable facts | memory (agent) or `USER.md` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
+| Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
 | API keys / bot tokens | profile `.env` (never echo values) |
 | Kanban one-liner | `hermes profile describe` |
 | Bot roster avatar/section | Desktop Bot Mode / `ui_meta` |
