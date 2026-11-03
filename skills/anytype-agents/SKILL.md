@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.7.0
+version: 1.8.0
 license: MIT
 metadata:
   category: agents
@@ -112,9 +112,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 4. Create memory children (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
 5. Link from the HQ map / sub-team page
 6. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
-7. Fill **Suggested runtime** with primary, fallback, auxiliary, subagents, MoA, **personality**, **memory**, **browser / computer**, **tools / terminal / limits**, and **security / privacy / restoration** fields when known (see `page-templates.md`)
+7. Fill **Suggested runtime** with primary, fallback, auxiliary, subagents, MoA, **personality**, **memory**, **browser / computer**, **tools / terminal / limits**, **security / privacy / restoration**, and **workspace / display** fields when known (see `page-templates.md`)
 8. Tell the user Anytype is updated; **copy the Full System Prompt into the runtime bot** and verify groups/routines separately
-9. If the runtime is Hermes, use `hermes-profiles` for the profile home and apply Suggested runtime into `model` / `auxiliary` / `fallback_providers` / `delegation` / `moa` / `SOUL.md` / `display.personality` / `agent.personalities` / `memory.*` / `browser.*` / `computer_use.*` / `bot_desktop.*` / `toolsets` / `approvals.*` / `terminal.*` / `tool_output.*` / `agent.max_turns` / `compression.*` / `security.*` / `privacy.*` / `checkpoints.*` (`hermes-profiles` → `models-and-delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`)
+9. If the runtime is Hermes, use `hermes-profiles` for the profile home and apply Suggested runtime into `model` / `auxiliary` / `fallback_providers` / `delegation` / `moa` / `SOUL.md` / `display.*` / `agent.personalities` / `memory.*` / `browser.*` / `computer_use.*` / `bot_desktop.*` / `toolsets` / `approvals.*` / `terminal.*` / `desktop.*` / `tool_output.*` / `agent.max_turns` / `compression.*` / `security.*` / `privacy.*` / `checkpoints.*` / `hermes project …` (`hermes-profiles` → `models-and-delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace-and-display.md`)
 
 ### Create or update an HQ
 

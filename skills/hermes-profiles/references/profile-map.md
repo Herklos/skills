@@ -16,7 +16,7 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 | Path | Role |
 |------|------|
 | `profile.yaml` | `description` / `description_auto`, optional `display_name`, Bot Mode `ui_meta` |
-| `config.yaml` | Model, provider, toolsets, MCP, terminal, memory, plugins, gateway, TTS, `display.personality`, `agent.personalities`, … |
+| `config.yaml` | Model, provider, toolsets, MCP, terminal, memory, plugins, gateway, TTS, `display.*`, `desktop.*`, `agent.personalities`, … |
 | `.env` | API keys, messaging bot tokens, gateway allowlists |
 | `SOUL.md` | Durable identity / standing voice (system prompt slot #1). Overlays: `/personality` |
 | `memories/USER.md` | User profile facts (agent-written via memory tool; `memory.user_*`) |
@@ -81,12 +81,16 @@ hermes -p <slug> config set checkpoints.enabled true|false
 hermes -p <slug> config set agent.max_turns <n|null>
 hermes -p <slug> config set tool_output.max_bytes <n>
 hermes -p <slug> config set compression.<key> <value>
+hermes -p <slug> config set display.<key> <value>
+hermes -p <slug> config set desktop.<key> <value>
+hermes -p <slug> project create|list|show|add-folder|use|archive|…
 hermes -p <slug> pairing list|approve|revoke|clear-pending
 hermes -p <slug> approvals suggest [--apply …]
 hermes -p <slug> checkpoints status|prune|clear
 hermes -p <slug> backup [--quick]
 hermes -p <slug> gateway start|stop|restart|install
-# In session: /personality [name|none] ; /memory pending|approve|reject ; /rollback …
+# In session: /personality [name|none] ; /skin <name> ; /verbose ; /focus ;
+#   /reasoning show|hide ; /memory pending|approve|reject ; /rollback …
 ```
 
 ## Clone flag matrix
@@ -139,6 +143,9 @@ ui_meta:
 - https://hermes-agent.nousresearch.com/docs/user-guide/checkpoints-and-rollback
 - https://hermes-agent.nousresearch.com/docs/user-guide/session-storage-recovery
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/tools
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/skins
+- https://hermes-agent.nousresearch.com/docs/user-guide/git-worktrees
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files
 - https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference
 - https://hermes-agent.nousresearch.com/docs/reference/profile-commands
 - https://hermes-agent.nousresearch.com/docs/user-guide/which-file-does-what

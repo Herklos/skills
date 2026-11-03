@@ -140,6 +140,34 @@ hermes -p <slug> checkpoints status
 
 Checkpoints are opt-in (`checkpoints.enabled` or `hermes chat --checkpoints`).
 
+## Wrong workspace / missing repos in Desktop
+
+```bash
+hermes -p <slug> config get terminal.cwd
+hermes -p <slug> project list
+hermes -p <slug> config get desktop.repo_scan_enabled
+hermes sessions list --workspace <path-or-basename>
+```
+
+Gateway/cron use `terminal.cwd`; CLI uses the launch directory. Resume restores the
+session cwd unless `--no-restore-cwd`. Empty sidebar: enable scan or add folders via
+`hermes project add-folder`. Restrict roots with `desktop.repo_scan_roots`. See
+`workspace-and-display.md`.
+
+## Skin / reasoning / progress not changing
+
+`/skin` and `/verbose` / `/focus` / `/reasoning` are often session-scoped until
+`config set`. Confirm:
+
+```bash
+hermes -p <slug> config get display.skin
+hermes -p <slug> config get display.tool_progress
+hermes -p <slug> config get display.show_reasoning
+```
+
+Skin ≠ personality. Desktop theme/density live in `$HERMES_HOME/ui-preferences.json`
+(root home), not under `profiles/<slug>/`. See `workspace-and-display.md`.
+
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.

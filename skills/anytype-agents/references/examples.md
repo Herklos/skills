@@ -103,6 +103,11 @@ Skills: Agent → Team → Project → Global
 - Protected instruction files: on
 - Messaging auth: n/a (no gateway)
 - Checkpoints: off · backup: quick before major changes
+**Workspace / display:**
+- Gateway/cron cwd: /absolute/path/to/repo · Named project: forge-app
+- Repo scan: on · roots: default · exclude: none
+- Skin: slate · tool_progress: all · reasoning: on · streaming: off · resume: full
+- UI language: en
 **Gateway / messaging:** none
 ```
 
@@ -151,7 +156,8 @@ Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.m
 Apply memory with `hermes-profiles` → `references/memory.md`.  
 Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.  
 Apply tools / terminal / limits with `hermes-profiles` → `references/runtime-limits-and-tools.md`.  
-Apply security / privacy / restoration with `hermes-profiles` → `references/security.md`.
+Apply security / privacy / restoration with `hermes-profiles` → `references/security.md`.  
+Apply workspace / display with `hermes-profiles` → `references/workspace-and-display.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

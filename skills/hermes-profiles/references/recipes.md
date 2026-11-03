@@ -199,6 +199,25 @@ hermes -p forge backup --quick                          # optional snapshot
 # Messaging: set allowlists in .env, or hermes -p forge pairing approve …
 ```
 
+## 17. Workspace and display
+
+See `workspace-and-display.md`. Minimal sequence:
+
+```bash
+hermes -p forge config set terminal.cwd /absolute/path/to/repo
+hermes -p forge project create forge-app
+hermes -p forge project add-folder forge-app /absolute/path/to/repo
+hermes -p forge project use forge-app
+hermes -p forge config set desktop.repo_scan_enabled true
+hermes -p forge config set display.skin slate
+hermes -p forge config set display.tool_progress all
+hermes -p forge config set display.show_reasoning true
+hermes -p forge config set display.resume_display full
+# Optional Desktop fonts:
+# hermes -p forge config set desktop.font_family "Atkinson Hyperlegible"
+# hermes -p forge config set terminal.font_family "MesloLGS NF"
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -212,6 +231,7 @@ hermes -p forge backup --quick                          # optional snapshot
 | Browser / computer / Bot Screen | `browser-and-computer.md` / `hermes tools` / `computer-use` |
 | Toolsets, terminal, output/turn caps | `runtime-limits-and-tools.md` |
 | Approvals, privacy, pairing, checkpoints, backup | `security.md` |
+| cwd, projects, repo scan, skins, display chrome | `workspace-and-display.md` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |

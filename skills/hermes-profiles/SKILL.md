@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.7.0
+version: 1.8.0
 license: MIT
 metadata:
   category: agents
@@ -33,6 +33,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
 | `references/runtime-limits-and-tools.md` | Toolsets, approvals, terminal backend, output/turn/compression limits |
 | `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
+| `references/workspace-and-display.md` | Working directory, projects, repo scan, skins, display chrome, ui-preferences |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
@@ -41,6 +42,7 @@ Config: https://hermes-agent.nousresearch.com/docs/user-guide/configuration
 Security: https://hermes-agent.nousresearch.com/docs/user-guide/security  
 Checkpoints: https://hermes-agent.nousresearch.com/docs/user-guide/checkpoints-and-rollback  
 Tools: https://hermes-agent.nousresearch.com/docs/user-guide/features/tools  
+Skins: https://hermes-agent.nousresearch.com/docs/user-guide/features/skins  
 Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
 Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
@@ -84,9 +86,11 @@ Do not print `.env` secret values into chat.
 | Computer use | `computer_use` toolset (cua-driver); optional Linux Bot Screen per profile |
 | Toolsets / limits | Enabled tools, approvals, terminal backend, output and turn caps |
 | Security | Approvals/YOLO floor, privacy redaction, pairing, checkpoints, backup |
+| Workspace / display | `terminal.cwd`, projects, repo scan, skins, `display.*`, Desktop prefs |
 
-`HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the tool working directory.
-Profiles do not sandbox the filesystem. Never run two writers against the same profile.
+`HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the gateway/cron working directory
+(CLI uses the launch dir). Profiles do not sandbox the filesystem. Never run two writers
+against the same profile.
 
 ## Lifecycle
 
@@ -287,6 +291,22 @@ Full guide: `references/security.md`.
 | Backup / restore | `hermes backup`, `hermes import`, `updates.pre_update_backup` |
 
 Confirm before `approvals.mode: off`, open gateway allow-all, or destructive restore.
+
+### Workspace and display
+
+Full guide: `references/workspace-and-display.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Gateway / cron cwd | `terminal.cwd` (absolute path) |
+| Named projects | `hermes -p <slug> project create\|list\|add-folder\|use\|…` |
+| Desktop repo scan | `desktop.repo_scan_enabled` / `repo_scan_roots` / `repo_scan_exclude_paths` |
+| Fonts | `desktop.font_family`, `terminal.font_family` |
+| Progress / chrome | `display.tool_progress`, `show_reasoning`, `streaming`, `resume_display`, … |
+| Skin (look) | `display.skin` / `/skin` (voice stays in SOUL / personality) |
+| Computer-wide UI prefs | `$HERMES_HOME/ui-preferences.json` (root home, not profile folder) |
+
+Personality overlay remains `display.personality` (`soul-templates.md`).
 
 ## Gateway
 

@@ -14,7 +14,8 @@ Document the intended runtime stack. Values are guidance for whoever configures
 the bot; they do not auto-apply. For Hermes, map these into that profile's
 `config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
 `models-and-delegation.md`, `soul-templates.md`, `memory.md`,
-`browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`).
+`browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`,
+`workspace-and-display.md`).
 
 **Harness:** hermes | grok | claude | codex | noodle | cli | other
 **Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
@@ -69,6 +70,12 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - Messaging auth: allowlist | pairing | open (never put IDs/tokens here)
 - Checkpoints /rollback: off | on · backup cadence: none | quick | full pre-update
 - Notes: {YOLO allowed? disposable sandbox?}
+**Workspace / display:**
+- Gateway/cron cwd: {absolute path or .} · Named project: none | `{name}` (+ folders)
+- Repo scan: on|off · roots: default home | {paths} · exclude: {paths}
+- Skin: default | slate | mono | … · tool_progress: off|new|all|verbose
+- Reasoning shown: on|off · streaming: on|off · resume_display: full|minimal
+- UI language: en | … · Notes: {quiet Slack? Desktop fonts?}
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
 
 # {Name} – {Role}
@@ -212,6 +219,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Tools: {toolsets}; approvals {smart|manual|off}; terminal {backend}/{cwd}
 - Limits: max_turns {…}; tool_output {…}; compression {…}
 - Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
+- Workspace/display: project {…}; skin {…}; tool_progress {…}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.
