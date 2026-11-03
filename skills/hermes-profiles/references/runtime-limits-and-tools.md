@@ -62,8 +62,8 @@ hermes -p <slug> config set approvals.cron_mode deny
 
 ```yaml
 terminal:
-  backend: local           # local | docker | ssh | modal | daytona | vercel_sandbox | singularity (plugin)
-  cwd: .                   # absolute project path recommended for specialists
+  backend: cua             # preferred: cua (Cua Spaces plugin) | local | docker | ssh | modal | daytona | vercel_sandbox | singularity
+  cwd: .                   # absolute project path for host/local specialists; leave unset with cua (Space home)
   timeout: 180             # seconds per command
   temp_dir: ""             # empty = managed cache under HERMES_HOME
   home_mode: auto          # auto | real | profile
@@ -86,6 +86,11 @@ terminal:
 ```
 
 ```bash
+# Preferred default computer / sandboxed terminal: Cua Spaces
+hermes -p <slug> plugins install https://github.com/trycua/hermes-cua-spaces
+hermes -p <slug> config set terminal.backend cua
+# Leave terminal.cwd unset with cua (starts in Space home)
+
 hermes -p <slug> config set terminal.backend local
 hermes -p <slug> config set terminal.cwd /absolute/path/to/project
 hermes -p <slug> config set terminal.timeout 180
@@ -96,14 +101,14 @@ hermes -p <slug> config set terminal.container_memory 5120
 
 | Backend | Runs commands on | Notes |
 |---------|------------------|-------|
-| `local` | Host | Default; simplest |
+| `cua` | [Cua Space](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) | **Preferred default** for agents; install plugin `cua-spaces`; optional `desktop: true` for browser / `computer_use` in Linux Spaces |
+| `local` | Host | Simplest for host debugging; use when the agent must touch the real machine |
 | `docker` | Container | Isolation; optional shared key across profiles |
 | `ssh` | Remote host | Needs SSH config / keys |
 | `modal` / `daytona` / `vercel_sandbox` | Cloud sandbox | Provider credentials in `.env` |
 | `singularity` | Apptainer/SIF | Plugin; set image path |
 
-Bot Screen / `computer_use` follow `bot_desktop.placement` relative to this backend (see `browser-and-computer.md`). Prefer `local` when debugging tool failures, then switch back.
-
+Bot Screen / `computer_use` follow `bot_desktop.placement` relative to this backend (see `browser-and-computer.md`). With `cua` + Linux desktop stack, prefer `bot_desktop.placement: auto` so the screen follows the Space. Use `local` when debugging host tool failures, then switch back to `cua`.
 ## Output and read limits
 
 ```yaml
@@ -191,7 +196,18 @@ Interactive CLI stays warning-first by default; unattended surfaces hard-stop so
 
 ## Minimal recipes
 
-**Narrow coding specialist (local, bounded):**
+**Default: Cua Spaces terminal (preferred computer):**
+
+```bash
+hermes -p forge plugins install https://github.com/trycua/hermes-cua-spaces
+hermes -p forge config set terminal.backend cua
+hermes -p forge config set plugins.entries.cua-spaces.settings.desktop true
+hermes -p forge tools enable terminal file web
+hermes -p forge config set agent.max_turns 150
+hermes -p forge config set approvals.mode smart
+```
+
+**Narrow coding specialist (host local, bounded):**
 
 ```bash
 hermes -p forge tools enable terminal file web
@@ -210,7 +226,6 @@ hermes -p forge config set terminal.container_memory 5120
 hermes -p forge config set terminal.docker_network true
 hermes -p forge config set terminal.docker_mount_cwd_to_workspace true
 ```
-
 **Tight messaging bot:**
 
 ```bash

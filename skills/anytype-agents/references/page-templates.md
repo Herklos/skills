@@ -136,8 +136,8 @@ Follow **Agents → {Shared Rules title}** in full.
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
 - Browser: {none|source + identity}
-- Computer: {none|surface + dedicated|shared}
-- Tools: {toolsets}; approvals {smart|manual|off}; terminal {backend}/{cwd}
+- Computer: {none | Cua Spaces (default) | host desktop | Bot Screen} · dedicated|shared
+- Tools: {toolsets}; approvals {smart|manual|off}; terminal {cua (preferred)|local|…}/{cwd}
 - Limits: max_turns {…}; tool_output {…}; compression {…}
 - Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
 - Workspace/display: project {…}; skin {…}; tool_progress {…}

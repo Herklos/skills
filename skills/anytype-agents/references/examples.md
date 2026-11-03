@@ -100,13 +100,15 @@ Skills: Agent → Team → Project → Global
 - Identity: dedicated throwaway
 - Headed: no
 **Computer access:**
-- Needed: no
+- Needed: yes (sandboxed work surface)
+- Surface: Cua Spaces (default). Docs: https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces
+- Scope: dedicated (plugin `space: create` or named Space)
+- Permission mode: standard · desktop stack: on (Linux Space)
 **Tools access:**
 - Enabled toolsets: terminal, file, web, browser, cronjob
 - Approvals: smart · cron/unattended: deny
 **Terminal / execution:**
-- Backend: local · cwd: /absolute/path/to/repo · timeout: 180
-**Limits:**
+- Backend: cua · cwd: unset (Space home) · timeout: 180 · plugin cua-spaces installed**Limits:**
 - max_turns: 150 · tool_output: 50000/2000 · compression: on @ 0.50
 **Security / privacy / restoration:**
 - Approvals: smart · cron: deny · hard deny: none
@@ -147,21 +149,32 @@ A gated memory + Honcho example:
 - External provider: honcho (workspace shared; AI peer per profile)
 ```
 
-Ops agent with Bot Screen + shared team browser cookies:
+Ops agent on Cua Spaces (preferred) with headed takeover in the Space viewer:
 
 ```markdown
 **Browser access:**
 - Needed: yes
-- Source: local Chromium
-- Identity: team/shared persistent (path agreed for HQ ops bots)
-- Headed: yes on Bot Screen for human takeover
+- Source: local Chromium (inside Linux Space with desktop stack)
+- Identity: dedicated throwaway (or dedicated persistent inside a kept Space)
+- Headed: yes · human takeover via Cua Spaces viewer / Desktop Screen pane
 **Computer access:**
 - Needed: yes
-- Surface: Linux Bot Screen
+- Surface: Cua Spaces (default). Docs: https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces
+- Scope: dedicated (`space: hermes-default` or named Space; `delete_on_exit: false` to keep)
+- Permission mode: standard · `plugins.entries.cua-spaces.settings.desktop: true`
+**Terminal / execution:**
+- Backend: cua · cwd: unset (Space home)
+```
+
+Host Bot Screen exception (only when the operator needs the Linux gateway screen without a Space):
+
+```markdown
+**Computer access:**
+- Needed: yes
+- Surface: Linux Bot Screen (exception; prefer Cua Spaces)
 - Scope: dedicated (this profile's screen)
 - Permission mode: standard
 ```
-
 Blank Suggested runtime fields: `suggested-runtime.md`.  
 Apply Hermes runtime with `hermes-profiles`: `models.md`, `delegation.md` (advanced-delegation plugin), `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `cron.md`.
 

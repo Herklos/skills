@@ -4,6 +4,7 @@ Docs:
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/browser
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/bot-screen
+- **Default computer:** https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces
 
 Two different toolsets:
 
@@ -12,7 +13,7 @@ Two different toolsets:
 | **`browser`** | Web pages via CDP (`browser_exec`, vault, dialogs) | Click/fill/scrape sites; prefer `web_search` / `web_extract` for read-only facts |
 | **`computer_use`** | Desktop UI via cua-driver (AX tree, clicks, type) | Native apps, OS dialogs, anything outside a browser tab |
 
-Browser work uses the **browser** toolset, not computer_use. Computer use needs a display (local desktop or Linux Bot Screen). Browser needs the **terminal** toolset as well (`browser_exec` runs local Python).
+Browser work uses the **browser** toolset, not computer_use. Computer use needs a display. **Prefer a Cua Space** (plugin `cua-spaces`, `terminal.backend: cua`) so terminal, files, code, and (on Linux Spaces with the desktop stack) browser / `computer_use` / Bot Desktop all run in that isolated machine. Fall back to host desktop or Linux Bot Screen only when the operator needs the real host UI. Browser also needs the **terminal** toolset (`browser_exec` runs local Python unless the Space path is active).
 
 Enable per profile / platform:
 
@@ -23,6 +24,44 @@ hermes -p <slug> tools enable computer_use
 hermes -p <slug> tools list
 hermes -p <slug> tools --summary
 ```
+
+## Default computer: Cua Spaces
+
+**Default for agents that need a computer (or a sandboxed terminal):** use the **cua-spaces** plugin so Hermes runs terminal, files, and code inside a [Cua Space](https://cua.ai/spaces). Document that choice on the agent page as Surface **Cua Spaces**.
+
+Plugin docs: https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces  
+Install source: `https://github.com/trycua/hermes-cua-spaces`
+
+```bash
+# Once on the machine (Cua CLI; sign-in only for cloud / account Spaces)
+curl -fsSL https://cua.ai/install.sh | sh
+cua auth login   # skip for a local-only Space if you stay local
+
+hermes -p <slug> plugins install https://github.com/trycua/hermes-cua-spaces
+hermes -p <slug> config set terminal.backend cua
+```
+
+Optional plugin settings (`plugins.entries.cua-spaces.settings` via `hermes config set`):
+
+| Setting | Default | Role |
+|---------|---------|------|
+| `space` | `create` | Fresh Space per run, or name/id of an existing Space |
+| `on` | Cua default | `local`, `cloud`, `host:<machine>`, or a named machine |
+| `image` | `linux` | `linux` (Ubuntu + desktop image) or `windows` |
+| `desktop` | `false` | Set `true` so Linux Spaces get TigerVNC / Playwright / agent-browser / cua-driver for browser + `computer_use` + Bot Desktop |
+| `delete_on_exit` | `true` | Delete plugin-created Spaces when Hermes finishes |
+
+```bash
+hermes -p <slug> config set plugins.entries.cua-spaces.settings.desktop true
+hermes -p <slug> config set plugins.entries.cua-spaces.settings.delete_on_exit false   # keep hermes-default
+# hermes -p <slug> config set plugins.entries.cua-spaces.settings.space my-box
+```
+
+With `terminal.backend: cua` and a supported Hermes (newer than v0.22.2 / PR #142225), Linux Spaces that have the desktop stack put **terminal, files, code, browser, `computer_use`, and Bot Desktop** in the Space (`bot_desktop.placement: auto`). Windows / macOS Spaces take terminal and files; browser and `computer_use` stay on the host there. Leave `terminal.cwd` unset so the session starts in the Space home.
+
+Watch live with the Cua Spaces app, `cua spaces ls`, or `cua viewer`. Env overrides for one shell: `HERMES_CUA_SPACE`, `HERMES_CUA_ON`, `HERMES_CUA_IMAGE`, `HERMES_CUA_DESKTOP`.
+
+**When not to use Cua Spaces:** the task must drive the operator's real host desktop (Accessibility / Screen Recording on this Mac/PC), or a Linux gateway Bot Screen shared with Hermes Desktop takeover without a Space. Document that exception on the agent page.
 
 ## Shared vs dedicated (org language)
 
@@ -40,21 +79,21 @@ Use these labels on Anytype agent pages and map them to Hermes as follows.
 | **Cloud dedicated** | Managed cloud browser (Browserbase, Browser Use, Firecrawl, Nous, …) | `browser.cloud_provider: …` + provider keys in `.env` |
 | **Attach existing** | Drive a running Chrome via CDP | `browser.cdp_url: …` or `/browser connect` |
 
-Default local browsing is **dedicated throwaway** (one browser process per Hermes session name; omit `session` for the shared default session within that chat). Named `session` args give parallel browsers so subagents do not clobber each other.
+Default local browsing is **dedicated throwaway** (one browser process per Hermes session name; omit `session` for the shared default session within that chat). Named `session` args give parallel browsers so subagents do not clobber each other. With **Cua Spaces** + desktop stack on Linux, the browser runs in the Space (still a dedicated throwaway profile unless you configure persistence inside that Space).
 
 ### Computer / screen
 
 | Org label | Hermes meaning | Config sketch |
 |-----------|----------------|---------------|
 | **None** | No desktop driving | Leave `computer_use` disabled |
+| **Cua Spaces (default)** | Isolated Space for terminal/files/code; Linux + `desktop: true` also hosts browser / `computer_use` / Bot Desktop | Install cua-spaces; `terminal.backend: cua`; prefer `desktop: true` when the agent needs a screen |
 | **Dedicated host desktop** | Drive the gateway/local machine UI (macOS/Windows/Linux with a real display) | Enable `computer_use`; install cua-driver; grant OS permissions |
 | **Dedicated Bot Screen** | Per-profile Xfce screen on a **Linux** gateway (own display + browser cookies) | `hermes -p <slug> computer-use screen …` + `bot_desktop.*` |
 | **Team / shared host** | Multiple profiles' `computer_use` on the **same** OS user/host (not OS-isolated) | Separate Hermes profiles still share host files/network; document risk |
-| **Sandbox desktop** | Screen + computer_use inside docker/ssh sandbox | `bot_desktop.placement: auto` or `terminal`; image `hermes-sandbox:desktop` |
+| **Sandbox desktop** | Screen + computer_use inside docker/ssh sandbox (non-Cua) | `bot_desktop.placement: auto` or `terminal`; image `hermes-sandbox:desktop` |
 | **Host beside sandbox** | Terminal sandboxed, screen on gateway host | Explicit `bot_desktop.placement: gateway` |
 
-On Linux Bot Screen: **every Hermes profile gets its own screen and its own browser profile**. Screens are work surfaces, not security boundaries (same OS user).
-
+**Prefer Cua Spaces** for new agents. On Linux Bot Screen without Spaces: every Hermes profile gets its own screen and browser profile; screens are work surfaces, not security boundaries (same OS user).
 ## Browser configuration
 
 ```yaml
@@ -169,7 +208,17 @@ hermes -p forge config set browser.use_real_profile true
 # optional: hermes -p forge config set browser.real_profile_pin 'Profile 2'
 ```
 
-**Computer use on this Mac/PC:**
+**Default computer: Cua Spaces (terminal + optional desktop stack):**
+
+```bash
+hermes -p forge plugins install https://github.com/trycua/hermes-cua-spaces
+hermes -p forge config set terminal.backend cua
+hermes -p forge config set plugins.entries.cua-spaces.settings.desktop true
+hermes -p forge tools enable browser
+hermes -p forge tools enable computer_use
+```
+
+**Computer use on this Mac/PC (host exception):**
 
 ```bash
 hermes -p forge tools enable computer_use
@@ -177,7 +226,7 @@ hermes -p forge computer-use install
 hermes -p forge computer-use doctor
 ```
 
-**Linux Bot Screen + computer use:**
+**Linux Bot Screen + computer use (non-Space exception):**
 
 ```bash
 hermes -p forge tools enable computer_use
@@ -186,7 +235,6 @@ hermes -p forge computer-use install
 hermes -p forge computer-use screen install
 hermes -p forge computer-use screen start
 ```
-
 ## Safety
 
 1. Confirm before `use_real_profile`, shared `user_data_dir`, `close-profile`, or YOLO/`unrestricted` computer use.

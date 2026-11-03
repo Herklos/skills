@@ -64,19 +64,21 @@ Paste under the agent title (date the heading when you revise it).
 - Headed: no | yes · Notes: {vault logins? cron needs cookies?}
 **Computer access:**
 - Needed: no | yes (native desktop / OS UI; not for ordinary web)
-- Surface: host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
-- Scope: dedicated (this profile) | team/shared host (same OS user; not isolated)
-- Permission mode: standard | bounded (manifest) · Notes: {TCC / takeover for 2FA}
+- Surface: **Cua Spaces (default)** | host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
+- Docs: https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces
+- Scope: dedicated (this profile / Space) | team/shared host (same OS user; not isolated)
+- Permission mode: standard | bounded (manifest) · Notes: {desktop stack on Linux Space? TCC / takeover for 2FA?}
 **Tools access:**
 - Enabled toolsets: {web, terminal, file, browser, memory, delegation, cronjob, …}
 - Disabled / denied: {list or none}
 - Approvals: smart | manual | off · cron/unattended: deny | approve
 - Hard deny patterns: {none | globs}
 **Terminal / execution:**
-- Backend: local | docker | ssh | modal | daytona | vercel_sandbox | singularity
-- cwd: {absolute path or .}
+- Backend: **cua (preferred)** | local | docker | ssh | modal | daytona | vercel_sandbox | singularity
+- cwd: {absolute path for host/local; leave unset with cua (Space home)}
 - Timeout (s): {180} · Container CPU/RAM/disk/network: {…} if sandboxed
 - Env passthrough / forwarded secrets: {names only, never values}
+- Cua Spaces setup: `hermes plugins install https://github.com/trycua/hermes-cua-spaces` → `terminal.backend: cua` → optional `plugins.entries.cua-spaces.settings.desktop: true`
 **Limits:**
 - max_turns: unlimited | {n} · run_budget_seconds: off | {n} · gateway_timeout: {1800}
 - tool_output max_bytes/lines: {50000}/{2000} · file_read_max_chars: {100000}

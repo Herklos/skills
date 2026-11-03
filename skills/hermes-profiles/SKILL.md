@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.9.0
+version: 1.10.0
 license: MIT
 metadata:
   category: agents
@@ -31,7 +31,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/delegation.md` | Subagents, advanced-delegation, `model_map` / `profile_routes` |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
-| `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
+| `references/browser-and-computer.md` | Browser toolset, computer_use, **Cua Spaces default**, Bot Screen, shared vs dedicated |
 | `references/runtime-limits-and-tools.md` | Toolsets, terminal backend, output/turn/compression limits |
 | `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
 | `references/workspace.md` | `terminal.cwd`, projects, repo scan, worktrees |
@@ -52,6 +52,7 @@ Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/pers
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
 Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
 Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use  
+Cua Spaces (default computer): https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces  
 Cron: https://hermes-agent.nousresearch.com/docs/user-guide/features/cron  
 Delegation: https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation  
 Advanced delegation: https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation
@@ -90,9 +91,9 @@ Do not print `.env` secret values into chat.
 | Subagent | Child from `delegate_task` (fresh chat, not a separate profile) |
 | Personality | Named voice overlay (`display.personality` / `/personality`) on top of SOUL |
 | Memory | Per-profile curated `MEMORY.md` / `USER.md`, optional one external provider |
-| Browser | `browser` toolset (`browser_exec`); local / cloud / real-profile / CDP |
-| Computer use | `computer_use` toolset (cua-driver); optional Linux Bot Screen per profile |
-| Toolsets / limits | Enabled tools, approvals, terminal backend, output and turn caps |
+| Browser | `browser` toolset (`browser_exec`); local / cloud / real-profile / CDP; in Space when cua + desktop |
+| Computer | **Default: Cua Spaces** (`terminal.backend: cua`, plugin cua-spaces); `computer_use` / Bot Screen as host or Linux-gateway exceptions |
+| Toolsets / limits | Enabled tools, approvals, terminal backend (`cua` preferred), output and turn caps |
 | Security | Approvals/YOLO floor, privacy redaction, pairing, checkpoints, backup |
 | Workspace / display | `terminal.cwd`, projects, repo scan, skins, `display.*`, Desktop prefs |
 | Scheduled tasks | Per-profile `cron/` jobs (`cronjob_manage` / `/cron` / `hermes cron`); Bot routines |
@@ -255,12 +256,11 @@ Full guide: `references/memory.md`. Keys: `memory.*`, `hermes -p <slug> memory s
 
 ### Browser and computer use
 
-Full guide: `references/browser-and-computer.md`. Enable with `tools enable browser|computer_use`; configure `browser.*`, `computer_use.*`, `bot_desktop.*`.
+Full guide: `references/browser-and-computer.md`. **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
 
 ### Tools, terminal, limits
 
-Full guide: `references/runtime-limits-and-tools.md`. Toolsets via `hermes tools`; terminal via `terminal.*`; caps via `tool_output.*`, `agent.max_turns`, `compression.*`.
-
+Full guide: `references/runtime-limits-and-tools.md`. Toolsets via `hermes tools`; prefer `terminal.backend: cua`; caps via `tool_output.*`, `agent.max_turns`, `compression.*`.
 ### Security, privacy, restoration
 
 Full guide: `references/security.md`. Approvals/`cron_mode`, `security.*`, `privacy.redact_pii`, pairing, checkpoints/`/rollback`, `hermes backup`.
