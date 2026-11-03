@@ -84,6 +84,21 @@ Symptom: identity/memory drifts after two processes share one home.
 
 Fix: one writer per profile. Use separate profiles or an external memory provider for shared knowledge.
 
+## Browser or computer_use missing / failing
+
+```bash
+hermes -p <slug> tools list
+hermes -p <slug> tools enable browser          # needs terminal toolset too
+hermes pm install chromium                     # local browser
+hermes -p <slug> computer-use status
+hermes -p <slug> computer-use doctor           # TCC / AX / display checks
+hermes -p <slug> computer-use screen status    # Linux Bot Screen
+```
+
+Confirm `browser.cloud_provider` and keys if using cloud. Real-profile issues:
+check `use_real_profile`, pin, and (Windows) whether the browser must quit for
+the first cookie copy. See `browser-and-computer.md`.
+
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.

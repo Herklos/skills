@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.4.0
+version: 1.5.0
 license: MIT
 metadata:
   category: agents
@@ -30,12 +30,15 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/models-and-delegation.md` | Main, auxiliary, fallback, subagents, Mixture of Agents |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
+| `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles  
 Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
-Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory
+Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
+Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
+Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use
 
 ## Resolve home
 
@@ -71,6 +74,8 @@ Do not print `.env` secret values into chat.
 | Subagent | Child from `delegate_task` (fresh chat, not a separate profile) |
 | Personality | Named voice overlay (`display.personality` / `/personality`) on top of SOUL |
 | Memory | Per-profile curated `MEMORY.md` / `USER.md`, optional one external provider |
+| Browser | `browser` toolset (`browser_exec`); local / cloud / real-profile / CDP |
+| Computer use | `computer_use` toolset (cua-driver); optional Linux Bot Screen per profile |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the tool working directory.
 Profiles do not sandbox the filesystem. Never run two writers against the same profile.
@@ -227,6 +232,23 @@ Full guide: `references/memory.md`.
 `<profile>/memories/USER.md` and `MEMORY.md` freeze into the prompt at session start.
 Prefer in-chat memory tool saves. Mid-session disk edits apply on the next session.
 One external provider is additive; built-in stays unless you disable it.
+
+### Browser and computer use
+
+Full guide: `references/browser-and-computer.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Enable toolsets | `hermes -p <slug> tools enable browser\|computer_use` |
+| Browser source | `browser.cloud_provider` / `engine` / `cdp_url` / `use_real_profile` |
+| Persistent vs throwaway cookies | `browser.user_data_dir` (empty = throwaway) |
+| Visible browser | `browser.headed` |
+| Computer driver | `hermes -p <slug> computer-use install\|status\|doctor` |
+| Permission mode | `computer_use.permission_mode` (`standard` \| `bounded`) |
+| Linux Bot Screen | `bot_desktop.*` / `hermes -p <slug> computer-use screen …` |
+
+Browser ≠ computer use. Prefer `web_search` when pages need no interaction.
+Confirm before real-profile browsing or shared `user_data_dir`.
 
 ## Gateway
 

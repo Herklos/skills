@@ -148,6 +148,27 @@ hermes -p forge memory off            # external off; built-in remains
 # hermes -p forge memory reset --target all
 ```
 
+## 14. Browser and computer use
+
+See `browser-and-computer.md`. Minimal sequences:
+
+```bash
+# Local throwaway browser
+hermes -p forge tools enable browser
+hermes -p forge config set browser.cloud_provider local
+hermes -p forge config set browser.use_real_profile false
+hermes pm install chromium
+
+# Computer use on this machine
+hermes -p forge tools enable computer_use
+hermes -p forge computer-use install
+hermes -p forge computer-use doctor
+
+# Linux Bot Screen (gateway host)
+hermes -p forge computer-use screen install
+hermes -p forge computer-use screen start
+```
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -158,6 +179,7 @@ hermes -p forge memory off            # external off; built-in remains
 | Manual prompt when no personality name | `agent.system_prompt` |
 | User preferences / durable facts | memory tool → `USER.md` / `MEMORY.md` |
 | Memory limits, approval, provider | `memory.*` / `hermes -p <slug> memory …` (`memory.md`) |
+| Browser / computer / Bot Screen | `browser-and-computer.md` / `hermes tools` / `computer-use` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
 | API keys / bot tokens | profile `.env` (never echo values) |

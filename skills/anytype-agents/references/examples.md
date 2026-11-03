@@ -83,6 +83,13 @@ Skills: Agent → Team → Project → Global
 - Write approval: off
 - Notifications: on
 - External provider: none
+**Browser access:**
+- Needed: yes (PR checks on CI web UI)
+- Source: local Chromium
+- Identity: dedicated throwaway
+- Headed: no
+**Computer access:**
+- Needed: no
 **Gateway / messaging:** none
 ```
 
@@ -111,9 +118,25 @@ A gated memory + Honcho example:
 - External provider: honcho (workspace shared; AI peer per profile)
 ```
 
+Ops agent with Bot Screen + shared team browser cookies:
+
+```markdown
+**Browser access:**
+- Needed: yes
+- Source: local Chromium
+- Identity: team/shared persistent (path agreed for HQ ops bots)
+- Headed: yes on Bot Screen for human takeover
+**Computer access:**
+- Needed: yes
+- Surface: Linux Bot Screen
+- Scope: dedicated (this profile's screen)
+- Permission mode: standard
+```
+
 Apply Hermes model fields with skill `hermes-profiles` → `references/models-and-delegation.md`.  
 Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.  
-Apply memory with `hermes-profiles` → `references/memory.md`.
+Apply memory with `hermes-profiles` → `references/memory.md`.  
+Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

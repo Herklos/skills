@@ -13,7 +13,8 @@ Title: `{Name} – {Role}`
 Document the intended runtime stack. Values are guidance for whoever configures
 the bot; they do not auto-apply. For Hermes, map these into that profile's
 `config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
-`references/models-and-delegation.md`, `soul-templates.md`, and `memory.md`).
+`models-and-delegation.md`, `soul-templates.md`, `memory.md`,
+`browser-and-computer.md`).
 
 **Harness:** hermes | grok | claude | codex | noodle | cli | other
 **Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
@@ -37,6 +38,16 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - Notifications: off | on | verbose
 - External provider: none | retaindb | byterover | honcho | hindsight | … (one)
 - Notes: {shared across profiles via provider? / reset policy}
+**Browser access:**
+- Needed: no | yes (interactive pages; else prefer web_search / web_extract)
+- Source: local Chromium | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
+- Identity: dedicated throwaway | dedicated persistent | team/shared persistent | operator real profile
+- Headed: no | yes · Notes: {vault logins? cron needs cookies?}
+**Computer access:**
+- Needed: no | yes (native desktop / OS UI; not for ordinary web)
+- Surface: host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
+- Scope: dedicated (this profile) | team/shared host (same OS user; not isolated)
+- Permission mode: standard | bounded (manifest) · Notes: {TCC / takeover for 2FA}
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
 
 # {Name} – {Role}
@@ -175,6 +186,8 @@ Follow **Agents → {Shared Rules title}** in full.
 - Models: primary {…}; fallback {…}; aux {…}; subagents {…}; MoA {off|preset}
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
+- Browser: {none|source + identity}
+- Computer: {none|surface + dedicated|shared}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.
