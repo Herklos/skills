@@ -7,7 +7,7 @@ Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent or
 | Skill | Description |
 |-------|-------------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | Manage Hermes Agent profiles (create, clone, config, gateway) |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | Manage multi-agent org pages in Anytype via MCP (discover, create, route) |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | Manage multi-agent org in Anytype via MCP (typed Agent/Team/Project, discover, create, route) |
 
 ## Repository layout
 
@@ -31,6 +31,7 @@ Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent or
 │       ├── SKILL.md
 │       └── references/
 │           ├── structure.md
+│           ├── object-types.md
 │           ├── page-templates.md
 │           ├── shared-rules-starter.md
 │           ├── examples.md

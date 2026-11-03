@@ -39,21 +39,85 @@ Outline only:
 }
 ```
 
-## Create an agent page
+## Create an agent (typed)
 
 ```json
 {
   "space_id": "<spaceId>",
+  "create_missing_options": true,
   "body": {
-    "type": "page",
+    "type": "agent",
     "name": "Lee – Implementer",
     "icon": { "format": "emoji", "emoji": "🛠️" },
-    "markdown": "# Lee – Implementer\n\n**Short Description**\n…\n\n## Full System Prompt (copy into the bot)\n```\n# Role\nYou are Lee…\n```\n"
+    "properties": {
+      "role": "Implementer",
+      "lifecycle": "draft",
+      "harness": "hermes",
+      "autonomy": "change-with-gates",
+      "short_description": "Implements one Ready coding TODO…"
+    },
+    "markdown": "**Short Description**\n…\n\n## Full System Prompt (copy into the bot)\n```\n# Role\nYou are Lee…\n```\n"
   }
 }
 ```
 
-Then create memory children (Skills, …) the same way and patch the parent HQ to add a link.
+Omit `template` to use the type default (**Agent default**). Create memory
+children as `page`. Patch the parent Team / HQ to add a link. Full property
+tables: `object-types.md`.
+
+## Create a team / HQ
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "team",
+    "name": "Engineering HQ",
+    "properties": {
+      "kind": "HQ",
+      "lifecycle": "live",
+      "mission": "…"
+    },
+    "markdown": "## Mission\n…\n"
+  }
+}
+```
+
+## Create a project portfolio root
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "project",
+    "name": "Example Product",
+    "properties": {
+      "project_status": "Active",
+      "project_category": "Core Platform",
+      "one_liner": "…"
+    },
+    "markdown": "## Overview\n…\n"
+  }
+}
+```
+
+## Migrate page → typed object
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<objectId>",
+  "create_missing_options": true,
+  "ops": [
+    { "op": "set_type", "type": "agent" },
+    { "op": "set_properties", "set": { "lifecycle": "live", "harness": "grok" } }
+  ]
+}
+```
+
+`set_properties` values live under `set`. Keeps id and links.
 
 ## Patch with etag
 
@@ -72,7 +136,7 @@ Then create memory children (Skills, …) the same way and patch the parent HQ t
 }
 ```
 
-Or filter by type when useful: `"type": "page"`.
+Filter inventory with `"type": "agent"`, `"team"`, or `"project"` (support docs often stay `"page"`).
 
 ## Archive
 

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.8.0
+version: 1.9.0
 license: MIT
 metadata:
   category: agents
@@ -16,17 +16,19 @@ metadata:
 
 # Anytype Agents
 
-Org source of truth for a multi-agent roster lives in **Anytype** as linked
-**pages** (and optionally `project` objects). Runtime bots (chat harnesses, CLIs,
-local agents) are separate: editing Anytype does not by itself update a live bot
-prompt or messaging group. Verify runtime separately after doc changes.
+Org source of truth for a multi-agent roster lives in **Anytype** as typed
+objects (`agent`, `team`, `project`) plus supporting `page`s. Runtime bots (chat
+harnesses, CLIs, local agents) are separate: editing Anytype does not by itself
+update a live bot prompt or messaging group. Verify runtime separately after doc
+changes.
 
 ## References (load when needed)
 
 | File | When |
 |------|------|
 | `references/structure.md` | Hub discovery and typical tree |
-| `references/page-templates.md` | Agent / HQ / group / skill / project shapes |
+| `references/object-types.md` | Agent / Team / Project type keys, properties, templates, migration |
+| `references/page-templates.md` | Agent / HQ / group / skill / project body shapes |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
@@ -44,22 +46,24 @@ Do **not** hardcode space or object ids. Discover them each session:
 
 MCP tools (names may be prefixed by the server): `API-search-space`, `API-get-object`,
 `API-create-object`, `API-patch-object`, `API-delete-object`, `API-create-discussion`,
-`API-list-widgets`, `API-list-types`.
+`API-list-widgets`, `API-list-types`, `API-get-type`, `API-create-type`,
+`API-update-type`, `API-list-templates`, `API-create-template`.
 
 Read with `format: "md"` for body; `outline: true` for structure; full object form when patching.
+`format=md` and `outline` are mutually exclusive on get-object.
 
 ## Mental model
 
 | Term | Meaning |
 |------|---------|
 | Agents | Root hub: shared rules, skills index, Primary, HQ index |
-| HQ | Team page under Agents |
-| Agent page | One bot's home: role, system prompt, memory links, skills |
+| HQ / Team | Typed `team` object (Board / HQ / Sub-team / Group) under Agents |
+| Agent | Typed `agent` object: role, system prompt, memory links, skills |
 | Group | Messaging roster notes; membership text is not auto-synced to chat |
-| Shared Rules | Mandatory rules every agent must follow |
-| Skills | Procedures; resolve most-specific first: Agent → Team → Project → Global |
+| Shared Rules | Mandatory rules every agent must follow (`page`) |
+| Skills | Procedures (`page`); resolve most-specific first: Agent → Team → Project → Global |
 | Drafts | Agent designs not live until approved |
-| Projects | Portfolio/delivery hub agents execute against (backlog, TODO, design, policy) |
+| Projects | Portfolio roots as typed `project`; children often stay `page` |
 | Primary | Coordinator agent; usually the only path to the human for escalations |
 | Human | The operator |
 
@@ -89,13 +93,13 @@ Never invent roster membership, legal conclusions, or financial numbers. Prefer 
 
 ### Show an agent
 
-1. Search by display name / role title
+1. Prefer `API-search-space` with `"type": "agent"` (or search by display name / role)
 2. Read: short description, suggested runtime, full system prompt, memory links, skills
-3. Note autonomy and lifecycle/history sections when present
+3. Note featured properties (`role`, `lifecycle`, `harness`, `autonomy`, …) and body sections
 
 ### Show a project (agent context)
 
-1. Open Projects hub, then the project page
+1. Prefer `"type": "project"` search, or open Projects hub then the project
 2. Typical children: technical, business, project management, product, design, marketing
 3. Project management often links roadmap, backlog, TODO
 4. Agents pull execution policy, TODO contracts, and design-done evidence from here when the org uses those gates
@@ -104,23 +108,32 @@ Never invent roster membership, legal conclusions, or financial numbers. Prefer 
 
 Confirm with the user before creating chiefs, Board seats, shared-rule edits, archives, or live routing changes.
 
-### Create or update an agent page
+### Create or update an agent
 
 1. Confirm HQ, reporting line, runtime harness, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
-3. Create type `page` using `references/page-templates.md`
-4. Create memory children (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
-5. Link from the HQ map / sub-team page
-6. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
-7. Fill **Suggested runtime** with primary, fallback, auxiliary, subagents, MoA, **personality**, **memory**, **browser / computer**, **tools / terminal / limits**, **security / privacy / restoration**, and **workspace / display** fields when known (see `page-templates.md`)
-8. Tell the user Anytype is updated; **copy the Full System Prompt into the runtime bot** and verify groups/routines separately
-9. If the runtime is Hermes, use `hermes-profiles` for the profile home and apply Suggested runtime into `model` / `auxiliary` / `fallback_providers` / `delegation` / `moa` / `SOUL.md` / `display.*` / `agent.personalities` / `memory.*` / `browser.*` / `computer_use.*` / `bot_desktop.*` / `toolsets` / `approvals.*` / `terminal.*` / `desktop.*` / `tool_output.*` / `agent.max_turns` / `compression.*` / `security.*` / `privacy.*` / `checkpoints.*` / `hermes project …` (`hermes-profiles` → `models-and-delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace-and-display.md`)
+3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
+4. Set properties: `role`, `lifecycle`, `harness`, `team` / `reports_to` when known, `autonomy`, optional `hermes_profile` / `primary_model` / `short_description`
+5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
+6. Link from the HQ map / sub-team page
+7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
+8. Fill **Suggested runtime** with primary, fallback, auxiliary, subagents, MoA, **personality**, **memory**, **browser / computer**, **tools / terminal / limits**, **security / privacy / restoration**, and **workspace / display** fields when known (see `page-templates.md`)
+9. Tell the user Anytype is updated; **copy the Full System Prompt into the runtime bot** and verify groups/routines separately
+10. If the runtime is Hermes, use `hermes-profiles` for the profile home and apply Suggested runtime into `model` / `auxiliary` / `fallback_providers` / `delegation` / `moa` / `SOUL.md` / `display.*` / `agent.personalities` / `memory.*` / `browser.*` / `computer_use.*` / `bot_desktop.*` / `toolsets` / `approvals.*` / `terminal.*` / `desktop.*` / `tool_output.*` / `agent.max_turns` / `compression.*` / `security.*` / `privacy.*` / `checkpoints.*` / `hermes project …` (`hermes-profiles` → `models-and-delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace-and-display.md`)
 
-### Create or update an HQ
+### Create or update a Team / HQ
 
-1. Mirror an existing HQ's sections (mission, sub-teams, routing, rules, map)
-2. Link from Agents
-3. Update roster/routing and Board/group welcome text if membership changes
+1. Create type **`team`** with `kind` (`Board` / `HQ` / `Sub-team` / `Group`) and `lifecycle`
+2. Mirror an existing HQ's body sections (mission, sub-teams, routing, rules, map) from `page-templates.md` / **Team default** template
+3. Set `chief`, `parent_team`, `mission` when known
+4. Link from Agents
+5. Update roster/routing and Board/group welcome text if membership changes
+
+### Create or update a Project portfolio root
+
+1. Create (or migrate) type **`project`** with `project_status`, `project_category`, optional `owning_team` / `git_hub` / `public_url` / `one_liner`
+2. Use **Project default** template / `page-templates.md` for body
+3. Link from Projects hub; keep child docs as `page` unless the org types them too
 
 ### Edit Shared Rules
 
@@ -153,9 +166,11 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 ## Patch patterns
 
 - Prefer `API-patch-object` with `expected_etag` from a prior get
-- Small body edits via block ops; properties via `set_properties`
+- Small body edits via block ops; properties via `set_properties` with values under **`set`** (not `properties`)
+- Change type in place with `set_type` (keeps id and links); see `object-types.md` migration
 - Keep Agents link lists accurate when adding members
 - Use `dry_run: true` when unsure
+- Select option names need `create_missing_options: true` when minting new options
 
 ## Safety
 
@@ -168,9 +183,11 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ## Common recipes (summary)
 
-- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape)
-- **New specialist:** draft vs live → page from `page-templates.md` → memory children → link HQ → prompt copy reminder
-- **New HQ:** clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|project`
+- **New specialist:** draft vs live → create `agent` + properties (`object-types.md`) → body from `page-templates.md` → memory `page`s → link HQ → prompt copy reminder
+- **New HQ:** create `team` (`kind: HQ`) → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
+- **New portfolio project:** create/extend `project` + status/category → link Projects hub
+- **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)
 - **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
 - **MCP ops:** follow `mcp-recipes.md` with etags and dry-run when unsure
 

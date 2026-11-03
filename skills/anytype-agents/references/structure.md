@@ -6,7 +6,8 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `page-templates.md` | Creating/auditing page shapes |
+| `object-types.md` | Agent / Team / Project type keys, properties, templates |
+| `page-templates.md` | Creating/auditing body shapes |
 | `shared-rules-starter.md` | Bootstrapping Shared Rules |
 | `examples.md` | Fictional org / project walkthrough |
 | `handoff-templates.md` | Briefs, handoffs, welcome paste |
@@ -73,7 +74,11 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 
 ## Types
 
-Spaces often expose `page`, `project`, `task`, `note`, `collection`, `query`, `template`, media types. Org trees are usually **pages** joined by link blocks and markdown links.
+Org inventory uses custom keys **`agent`** and **`team`**, plus extended built-in
+**`project`**. Supporting docs (Shared Rules, Skills, memory children, hubs) stay
+**`page`**. Spaces also expose `task`, `note`, `collection`, `query`, `template`,
+media types. See `object-types.md` for property keys, default templates, create
+and `set_type` migration.
 
 ## Runtime vs docs
 

@@ -1,6 +1,9 @@
 # Page templates (generic)
 
-Use these shapes when creating or auditing pages. Prefer duplicating a live peer page in the same space over inventing a new layout.
+Use these shapes when creating or auditing **bodies**. Inventory objects use
+types `agent`, `team`, and `project` (see `object-types.md`); memory children,
+Shared Rules, and Skills stay `page`. Prefer duplicating a live peer in the same
+space over inventing a new layout.
 
 ## Agent page
 
@@ -256,12 +259,20 @@ For a starter ruleset, see `shared-rules-starter.md`.
 ```json
 {
   "space_id": "<discovered-space-id>",
+  "create_missing_options": true,
   "body": {
-    "type": "page",
+    "type": "agent",
     "name": "Name – Role",
-    "markdown": "# Name – Role\n…"
+    "properties": {
+      "role": "Implementer",
+      "lifecycle": "draft",
+      "harness": "hermes"
+    },
+    "markdown": "## Short Description\n…"
   }
 }
 ```
 
-Then patch the parent hub to add a link, create memory children, and return the object URL from the API response.
+Use `"type": "team"` / `"project"` for those objects. Then patch the parent hub to
+add a link, create memory children as `page`, and return the object URL.
+Property keys and default templates: `object-types.md`.
