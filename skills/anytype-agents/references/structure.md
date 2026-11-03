@@ -8,6 +8,7 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 |------|------|
 | `object-types.md` | Agent / Team / Project type keys, properties, templates |
 | `page-templates.md` | Creating/auditing body shapes |
+| `suggested-runtime.md` | Suggested runtime field list |
 | `shared-rules-starter.md` | Bootstrapping Shared Rules |
 | `examples.md` | Fictional org / project walkthrough |
 | `handoff-templates.md` | Briefs, handoffs, welcome paste |

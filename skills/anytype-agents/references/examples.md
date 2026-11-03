@@ -162,14 +162,8 @@ Ops agent with Bot Screen + shared team browser cookies:
 - Permission mode: standard
 ```
 
-Apply Hermes model / routing / task-specific subagent fields with skill `hermes-profiles` → `references/models-and-delegation.md` (plugin: https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation).  
-Apply SOUL / personality with `hermes-profiles` → `references/soul-templates.md`.  
-Apply memory with `hermes-profiles` → `references/memory.md`.  
-Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.  
-Apply tools / terminal / limits with `hermes-profiles` → `references/runtime-limits-and-tools.md`.  
-Apply security / privacy / restoration with `hermes-profiles` → `references/security.md`.  
-Apply workspace / display with `hermes-profiles` → `references/workspace-and-display.md`.  
-Apply scheduled tasks with `hermes-profiles` → `references/cron.md`.
+Blank Suggested runtime fields: `suggested-runtime.md`.  
+Apply Hermes runtime with `hermes-profiles`: `models.md`, `delegation.md` (advanced-delegation plugin), `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `cron.md`.
 
 ### Sample handoff (Primary → HQ chief)
 

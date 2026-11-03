@@ -204,4 +204,4 @@ to "that server issue" fail.
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
 - https://hermes-agent.nousresearch.com/docs/user-guide/messaging/webhooks#event-triggered-cron-jobs
 - Approvals: `security.md` / `runtime-limits-and-tools.md` (`approvals.cron_mode`)
-- cwd for gateway/cron: `workspace-and-display.md` (`terminal.cwd`)
+- cwd for gateway/cron: `workspace.md` (`terminal.cwd`)

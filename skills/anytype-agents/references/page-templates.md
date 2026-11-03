@@ -5,132 +5,30 @@ types `agent`, `team`, and `project` (see `object-types.md`); memory children,
 Shared Rules, and Skills stay `page`. Prefer duplicating a live peer in the same
 space over inventing a new layout.
 
+Suggested runtime field list: **`suggested-runtime.md`**.
+Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
+
 ## Agent page
 
 Title: `{Name} – {Role}`
 
-```markdown
-# {Name} – {Role}
+1. Heading + optional Autonomy line
+2. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading)
+3. **Short Description** (one paragraph: mission, HQ, reporting line, ownership)
+4. **Full System Prompt** fenced block (copy into the bot)
+5. **Your Memory Pages** (links)
+6. Map line: `Agents → {HQ} → [{Sub-team} →] {Agent}` and any `Projects → …` paths
 
-## Suggested runtime (YYYY-MM-DD)
-Document the intended runtime stack. Values are guidance for whoever configures
-the bot; they do not auto-apply. For Hermes, map these into that profile's
-`config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
-`models-and-delegation.md`, `soul-templates.md`, `memory.md`,
-`browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`,
-`workspace-and-display.md`, `cron.md`).
+Body outline (write as normal page markdown, not nested fences):
 
-**Harness:** hermes | grok | claude | codex | noodle | cli | other
-**Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
-**Fallback / backup:** {provider} · {model}  (ordered list if several)
-**Auxiliary (optional overrides; else auto = main):**
-- vision: …
-- compression: …
-- approval: …
-- title_generation: …
-- review (`/review`): …
-- other tasks: …
-**Subagents / delegation:**
-- Enabled: yes (`delegation` toolset) | no
-- **Routing model:** same as Primary (main) | {provider}·{model} · {reasoning} (parent plans and picks the route per task; there is no separate routing_model key)
-- **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
-- Plugin: **advanced-delegation** installed on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
-- **Task-specific models** (`model_map` options; name = what the agent picks):
-  - `{fast}` = {provider}·{model} · {reasoning?} · {tier?} — {one-line when to use}
-  - `{deep}` = {provider}·{model} · {reasoning?} — {when to use}
-  - default route for unrouted tasks: `{fast}` | parent main
-- Alternatives: single worker {provider}·{model} (`backend: default`) | `profile_routes` ({profile}: {description})
-- Concurrency: max_concurrent_children {n} · max_iterations {n}
-- Setup: `hermes plugins install advanced-delegation` → `hermes delegation config` → `/delegation model_map`
-- Docs: hermes-profiles → `models-and-delegation.md` / https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation / https://github.com/NousResearch/hermes-official-plugins/tree/main/advanced-delegation
-**Scheduled tasks:** none yet | list each intended job (docs do not auto-create live cron). For Hermes: enable `cronjob` toolset; gateway must run for agent jobs. Per job note: name · schedule · prompt intent · deliver · skills · workdir · model pin (`per-job` \| `cron.model` \| main) · no_agent/script if any · approvals.cron_mode. Apply with `/cron`, `hermes cron`, or `cronjob_manage`. Docs: hermes-profiles → `cron.md` / https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
-**Mixture of Agents (optional):** off | preset `{name}` (references: …; aggregator: …; fanout: user_turn|per_iteration|every_n:N)
-**Personality:**
-- SOUL / durable identity: {summary or "see Full System Prompt / SOUL.md"}
-- Overlay (`display.personality` / `/personality`): none | helpful | concise | technical | creative | teacher | … | custom `{name}`
-- Custom presets (`agent.personalities`): none | list names + one-line intent
-**Memory (Hermes profile):**
-- Built-in: MEMORY.md on|off · USER.md on|off · limits {2200}/{1375} or custom
-- Write approval: off | on (`/memory pending`)
-- Notifications: off | on | verbose
-- External provider: none | retaindb | byterover | honcho | hindsight | … (one)
-- Notes: {shared across profiles via provider? / reset policy}
-**Browser access:**
-- Needed: no | yes (interactive pages; else prefer web_search / web_extract)
-- Source: local Chromium | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
-- Identity: dedicated throwaway | dedicated persistent | team/shared persistent | operator real profile
-- Headed: no | yes · Notes: {vault logins? cron needs cookies?}
-**Computer access:**
-- Needed: no | yes (native desktop / OS UI; not for ordinary web)
-- Surface: host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
-- Scope: dedicated (this profile) | team/shared host (same OS user; not isolated)
-- Permission mode: standard | bounded (manifest) · Notes: {TCC / takeover for 2FA}
-**Tools access:**
-- Enabled toolsets: {web, terminal, file, browser, memory, delegation, cronjob, …}
-- Disabled / denied: {list or none}
-- Approvals: smart | manual | off · cron/unattended: deny | approve
-- Hard deny patterns: {none | globs}
-**Terminal / execution:**
-- Backend: local | docker | ssh | modal | daytona | vercel_sandbox | singularity
-- cwd: {absolute path or .}
-- Timeout (s): {180} · Container CPU/RAM/disk/network: {…} if sandboxed
-- Env passthrough / forwarded secrets: {names only, never values}
-**Limits:**
-- max_turns: unlimited | {n} · run_budget_seconds: off | {n} · gateway_timeout: {1800}
-- tool_output max_bytes/lines: {50000}/{2000} · file_read_max_chars: {100000}
-- compression: on|off · threshold {0.50} · loop hard-stop: interactive warn | unattended hard
-**Security / privacy / restoration:**
-- Approvals: smart | manual | off · cron/unattended: deny | approve · hard deny: {none|globs}
-- Redact secrets: on|off · redact PII: on|off · allow_private_urls: on|off
-- Protected instruction files: on|off · write safe root: unset | {policy label only}
-- Messaging auth: allowlist | pairing | open (never put IDs/tokens here)
-- Checkpoints /rollback: off | on · backup cadence: none | quick | full pre-update
-- Notes: {YOLO allowed? disposable sandbox?}
-**Workspace / display:**
-- Gateway/cron cwd: {absolute path or .} · Named project: none | `{name}` (+ folders)
-- Repo scan: on|off · roots: default home | {paths} · exclude: {paths}
-- Skin: default | slate | mono | … · tool_progress: off|new|all|verbose
-- Reasoning shown: on|off · streaming: on|off · resume_display: full|minimal
-- UI language: en | … · Notes: {quiet Slack? Desktop fonts?}
-**Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
+- `# {Name} – {Role}` then optional `**Autonomy:** …`
+- `## Suggested runtime (YYYY-MM-DD)` from `suggested-runtime.md`
+- `## Short Description` (one paragraph)
+- `## Full System Prompt (copy into the bot)` with a fenced prompt (skeleton below)
+- `## Your Memory Pages` (bullet links)
+- Map line naming `Agents → {HQ} → …` and any `Projects → …` paths
 
-Example **Scheduled tasks** list shape (under Suggested runtime or as its own section):
-
-```markdown
-**Scheduled tasks:**
-- `morning-brief` · `0 9 * * 1-5` · overnight CI + Sev-1 summary · deliver telegram · skill weekly-hq-brief · model: cron.model
-- `disk-watch` · every 5m · no_agent script disk-watch.sh · deliver telegram · silent on empty stdout
-- (none yet)
-```
-
-# {Name} – {Role}
-**Autonomy:** …
-**Short Description**
-One paragraph: mission, HQ, reporting line, ownership.
-
----
-## Full System Prompt (copy into the bot)
-```
-# Role
-You are {Name}, …
-
-# Shared rules
-Follow **Agents → Shared Rules** (or the exact linked title) in full.
-
-# …
-```
-
----
-## Your Memory Pages
-- Memory & Decisions (chiefs / Primary)
-- Operating Notes
-- Resources
-- Lessons Learned
-- Skills
-```
-
-Link memory children after create. Add a map section naming
-`Agents → {HQ} → [{Sub-team} →] {Agent}` and any `Projects → …` paths used.
+Link memory children after create.
 
 ## HQ page
 
@@ -165,9 +63,7 @@ Link: chief, group, skills, transition notes, sub-teams.
 …
 
 ## Welcome (copy-paste)
-```
 Membership and routing blurb for the live chat group.
-```
 ```
 
 Document membership here; applying it to a messaging platform is a separate runtime step.
@@ -258,16 +154,6 @@ Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.
 {chief → Primary → Human as documented}
 ```
 
-## Worked specialist example (fictional)
-
-Title: `Lee – Implementer`
-
-Short description: Implements one Ready coding TODO as a small PR for Engineering HQ. Reports to Remy. Does not set product scope.
-
-Prompt fence should include Role, Shared rules pointer, single-TODO rule, PR hygiene, and escalation to Remy.
-
-Memory children: Skills, Implementation Patterns, Lessons Learned, Resources.
-
 ## Shared Rules pointer
 
 Prefer a short pointer in each agent prompt:
@@ -275,27 +161,4 @@ Prefer a short pointer in each agent prompt:
 `Follow Agents → {Shared Rules page title} in full.`
 
 Avoid pasting the entire rules document into every prompt when a pointer suffices.
-For a starter ruleset, see `shared-rules-starter.md`.
-
-## Create via MCP (sketch)
-
-```json
-{
-  "space_id": "<discovered-space-id>",
-  "create_missing_options": true,
-  "body": {
-    "type": "agent",
-    "name": "Name – Role",
-    "properties": {
-      "role": "Implementer",
-      "lifecycle": "draft",
-      "harness": "hermes"
-    },
-    "markdown": "## Short Description\n…"
-  }
-}
-```
-
-Use `"type": "team"` / `"project"` for those objects. Then patch the parent hub to
-add a link, create memory children as `page`, and return the object URL.
-Property keys and default templates: `object-types.md`.
+Starter ruleset: `shared-rules-starter.md`. Worked org sample: `examples.md`.

@@ -50,32 +50,13 @@ Common toolsets: `web`, `search`, `terminal`, `file`, `browser`, `vision`, `imag
 
 ## Approvals (dangerous commands)
 
-Short form here. Full security stack (hardline blocklist, pairing, privacy,
-checkpoints, backup): `security.md`.
-
-```yaml
-approvals:
-  mode: smart              # manual | smart | off (= --yolo)
-  timeout: 300             # seconds before unanswered prompt fails closed
-  cron_mode: deny          # deny | approve (unattended cron)
-  single_query_mode: deny  # deny | approve (-q / -z)
-  unattended_mode: deny    # deny | approve (webhook / api_server)
-  deny: []                 # fnmatch globs always blocked (even under yolo)
-  smart_policy: ""         # extra guardian prompt text
-  denial_breaker_threshold: 3
-  mcp_reload_confirm: true
-  destructive_slash_confirm: true
-
-command_allowlist: []      # patterns permanently allowed via "always" approval
-```
+Canonical home: **`security.md`** (modes, YOLO floor, `approvals.deny`, pairing,
+privacy, checkpoints). For tool/terminal setup, typical interactive defaults:
 
 ```bash
 hermes -p <slug> config set approvals.mode smart
 hermes -p <slug> config set approvals.cron_mode deny
-# Session: --yolo / /yolo  (overrides to unrestricted for that session)
 ```
-
-Prefer `smart` or `manual` for interactive bots. Keep `deny` for cron/unattended unless the job is trusted. Put hard blocks in `approvals.deny` (e.g. `"git push --force*"`).
 
 ## Terminal backend
 
@@ -163,7 +144,7 @@ hermes -p <slug> config unset agent.max_turns    # back to unlimited
 hermes -p <slug> config set agent.run_budget_seconds 3600
 ```
 
-Default `max_turns` is unlimited so long tasks are not cut mid-work. Cap specialists that should stay bounded. Delegation children have their own `delegation.max_iterations` (see `models-and-delegation.md`).
+Default `max_turns` is unlimited so long tasks are not cut mid-work. Cap specialists that should stay bounded. Delegation children have their own `delegation.max_iterations` (see `delegation.md`).
 
 ## Compression (context window)
 

@@ -94,7 +94,7 @@ hermes -p <slug> doctor --ack <advisory-id>
 ```
 
 MoA advisor redaction (when using Mixture of Agents): `moa.privacy_filter`
-(`""` | `display` | `full`) — see `models-and-delegation.md`.
+(`""` | `display` | `full`) — see `models.md`.
 
 ## File write safety
 

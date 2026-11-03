@@ -152,7 +152,7 @@ hermes sessions list --workspace <path-or-basename>
 Gateway/cron use `terminal.cwd`; CLI uses the launch directory. Resume restores the
 session cwd unless `--no-restore-cwd`. Empty sidebar: enable scan or add folders via
 `hermes project add-folder`. Restrict roots with `desktop.repo_scan_roots`. See
-`workspace-and-display.md`.
+`workspace.md` / `display.md`.
 
 ## Skin / reasoning / progress not changing
 
@@ -166,7 +166,7 @@ hermes -p <slug> config get display.show_reasoning
 ```
 
 Skin ≠ personality. Desktop theme/density live in `$HERMES_HOME/ui-preferences.json`
-(root home), not under `profiles/<slug>/`. See `workspace-and-display.md`.
+(root home), not under `profiles/<slug>/`. See `workspace.md` / `display.md`.
 
 ## Secrets in chat
 

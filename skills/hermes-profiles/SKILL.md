@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.8.3
+version: 1.9.0
 license: MIT
 metadata:
   category: agents
@@ -27,16 +27,20 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | File | When |
 |------|------|
 | `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
-| `references/models-and-delegation.md` | Main/routing model, auxiliary, fallback, subagents (`advanced-delegation` model_map), MoA |
+| `references/models.md` | Main / routing model, auxiliary, fallback, MoA |
+| `references/delegation.md` | Subagents, advanced-delegation, `model_map` / `profile_routes` |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
 | `references/browser-and-computer.md` | Browser toolset, computer_use, Bot Screen, shared vs dedicated |
-| `references/runtime-limits-and-tools.md` | Toolsets, approvals, terminal backend, output/turn/compression limits |
+| `references/runtime-limits-and-tools.md` | Toolsets, terminal backend, output/turn/compression limits |
 | `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
-| `references/workspace-and-display.md` | Working directory, projects, repo scan, skins, display chrome, ui-preferences |
+| `references/workspace.md` | `terminal.cwd`, projects, repo scan, worktrees |
+| `references/display.md` | Fonts, `display.*`, skins, ui-preferences |
 | `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent |
-| `references/recipes.md` | End-to-end create/clone/gateway/export examples |
+| `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
+
+Stubs (redirect only): `models-and-delegation.md`, `workspace-and-display.md`.
 
 Docs: https://hermes-agent.nousresearch.com/docs/user-guide/profiles  
 Config: https://hermes-agent.nousresearch.com/docs/user-guide/configuration  
@@ -215,27 +219,30 @@ hermes -p <slug> skills list
 
 Prefer `hermes -p <slug> …` / setup over large hand-edits.
 
-### Models, auxiliary, fallback, subagents, MoA
+### Models, auxiliary, fallback, MoA
 
-Full guide: `references/models-and-delegation.md`. Short map:
+Full guide: `references/models.md`.
 
 | Concern | Config / CLI |
 |---------|----------------|
-| Main / **routing** model | `model.*` / `hermes -p <slug> model` / `/model` (picks per-task route when delegating) |
-| Side jobs (vision, compression, titles, approval, review, …) | `auxiliary.<task>.*` (default `auto` = main) |
-| Backup when primary fails | `fallback_providers` / `hermes -p <slug> fallback` |
-| `delegate_task` workers | `tools enable delegation` + `delegation.*` (concurrency, `backend`) |
-| **Task-specific models** | `plugins install advanced-delegation` + `delegation.backend: model_map` + named `options` (`hermes delegation config`) |
-| Child as another profile | `delegation.backend: profile_routes` (same plugin) |
-| Multi-model advice + one acting loop | `moa.presets` / `hermes -p <slug> moa configure` / provider `moa` |
+| Main / routing model | `model.*` / `hermes -p <slug> model` / `/model` |
+| Side jobs | `auxiliary.<task>.*` (default `auto` = main) |
+| Backup mid-turn | `fallback_providers` / `hermes -p <slug> fallback` |
+| MoA | `moa.presets` / `hermes -p <slug> moa configure` |
 
-Subagents are fresh child runs, not separate profiles (unless
-`profile_routes`). Enable `delegation`, install **`advanced-delegation`**
-(Hermes >= 0.22.5) on fan-out profiles, set a capable routing model (`model.*`),
-and define task-specific routes under `backends.model_map.options` (`fast` /
-`deep` / …). Chat: `/delegation model_map`. Docs:
-`models-and-delegation.md` + https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation.
-MoA presets appear as selectable models under provider `moa`.
+### Subagents / advanced-delegation
+
+Full guide: `references/delegation.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Enable | `tools enable delegation` |
+| Plugin (task routes) | `plugins install advanced-delegation` (Hermes >= 0.22.5) |
+| Task-specific models | `delegation.backend: model_map` + `hermes delegation config` |
+| Profile personas | `delegation.backend: profile_routes` |
+| Chat switch | `/delegation model_map\|profiles\|default [--now]` |
+
+Parent `model.*` is the routing model. Prefer named `model_map` routes when task cost/difficulty varies.
 
 ### .env
 
@@ -244,101 +251,27 @@ Never paste secret values into the conversation.
 
 ### Memory
 
-Full guide: `references/memory.md`.
-
-| Concern | Config / CLI |
-|---------|----------------|
-| Built-in stores | `memory.memory_enabled` / `user_profile_enabled` + char limits |
-| Gate saves | `memory.write_approval` + `/memory pending\|approve\|reject` |
-| External provider (one) | `memory.provider` / `hermes -p <slug> memory setup\|status\|off` |
-| Notifications | `display.memory_notifications` (`off` \| `on` \| `verbose`) |
-| Wipe built-in files | `hermes -p <slug> memory reset` (confirm first) |
-
-`<profile>/memories/USER.md` and `MEMORY.md` freeze into the prompt at session start.
-Prefer in-chat memory tool saves. Mid-session disk edits apply on the next session.
-One external provider is additive; built-in stays unless you disable it.
+Full guide: `references/memory.md`. Keys: `memory.*`, `hermes -p <slug> memory setup|status|off|reset`, `display.memory_notifications`.
 
 ### Browser and computer use
 
-Full guide: `references/browser-and-computer.md`.
-
-| Concern | Config / CLI |
-|---------|----------------|
-| Enable toolsets | `hermes -p <slug> tools enable browser\|computer_use` |
-| Browser source | `browser.cloud_provider` / `engine` / `cdp_url` / `use_real_profile` |
-| Persistent vs throwaway cookies | `browser.user_data_dir` (empty = throwaway) |
-| Visible browser | `browser.headed` |
-| Computer driver | `hermes -p <slug> computer-use install\|status\|doctor` |
-| Permission mode | `computer_use.permission_mode` (`standard` \| `bounded`) |
-| Linux Bot Screen | `bot_desktop.*` / `hermes -p <slug> computer-use screen …` |
-
-Browser ≠ computer use. Prefer `web_search` when pages need no interaction.
-Confirm before real-profile browsing or shared `user_data_dir`.
+Full guide: `references/browser-and-computer.md`. Enable with `tools enable browser|computer_use`; configure `browser.*`, `computer_use.*`, `bot_desktop.*`.
 
 ### Tools, terminal, limits
 
-Full guide: `references/runtime-limits-and-tools.md`.
-
-| Concern | Config / CLI |
-|---------|----------------|
-| Toolsets | `hermes -p <slug> tools enable\|disable\|list` / `toolsets` / `agent.disabled_toolsets` |
-| Approvals | `approvals.mode` (`smart` \| `manual` \| `off`) + `deny` / `command_allowlist` |
-| Terminal backend | `terminal.backend` (`local` \| `docker` \| `ssh` \| cloud sandboxes) + `cwd` / timeout |
-| Output caps | `tool_output.max_bytes` / `max_lines`, `file_read_max_chars` |
-| Turn / time | `agent.max_turns`, `run_budget_seconds`, `gateway_timeout` |
-| Compression | `compression.threshold` (+ `auxiliary.compression` model) |
-| Loop caps | `tool_loop_guardrails.*` |
+Full guide: `references/runtime-limits-and-tools.md`. Toolsets via `hermes tools`; terminal via `terminal.*`; caps via `tool_output.*`, `agent.max_turns`, `compression.*`.
 
 ### Security, privacy, restoration
 
-Full guide: `references/security.md`.
-
-| Concern | Config / CLI |
-|---------|----------------|
-| Approvals / YOLO | `approvals.*`, `command_allowlist`, `/yolo`, `hermes approvals suggest` |
-| Redaction / URL guards | `security.redact_secrets`, `allow_private_urls`, `privacy.redact_pii` |
-| Instruction-file gate | `security.protected_instruction_files` |
-| Write sandbox | Protected paths + `HERMES_WRITE_SAFE_ROOT` |
-| Messaging who | Allowlists in `.env` / `hermes pairing approve\|revoke` |
-| Filesystem rollback | `checkpoints.enabled` + `/rollback` / `hermes checkpoints …` |
-| Backup / restore | `hermes backup`, `hermes import`, `updates.pre_update_backup` |
-
-Confirm before `approvals.mode: off`, open gateway allow-all, or destructive restore.
+Full guide: `references/security.md`. Approvals/`cron_mode`, `security.*`, `privacy.redact_pii`, pairing, checkpoints/`/rollback`, `hermes backup`.
 
 ### Workspace and display
 
-Full guide: `references/workspace-and-display.md`.
-
-| Concern | Config / CLI |
-|---------|----------------|
-| Gateway / cron cwd | `terminal.cwd` (absolute path) |
-| Named projects | `hermes -p <slug> project create\|list\|add-folder\|use\|…` |
-| Desktop repo scan | `desktop.repo_scan_enabled` / `repo_scan_roots` / `repo_scan_exclude_paths` |
-| Fonts | `desktop.font_family`, `terminal.font_family` |
-| Progress / chrome | `display.tool_progress`, `show_reasoning`, `streaming`, `resume_display`, … |
-| Skin (look) | `display.skin` / `/skin` (voice stays in SOUL / personality) |
-| Computer-wide UI prefs | `$HERMES_HOME/ui-preferences.json` (root home, not profile folder) |
-
-Personality overlay remains `display.personality` (`soul-templates.md`).
+Full guides: `references/workspace.md` (`terminal.cwd`, projects, repo scan) and `references/display.md` (skins, `display.*`, fonts, ui-preferences). Personality overlay remains in `soul-templates.md`.
 
 ### Scheduled tasks (cron)
 
-Full guide: `references/cron.md`.
-
-| Concern | Config / CLI |
-|---------|----------------|
-| Enable management tool | `hermes -p <slug> tools enable cronjob` |
-| Create / list / lifecycle | `hermes -p <slug> cron create\|list\|edit\|pause\|resume\|run\|cancel\|remove` |
-| Chat | `/cron …` or natural language → `cronjob_manage` |
-| Fleet model default | `cron.model` / `cron.model_provider` (unpinned jobs) |
-| Per-job model | `cron edit <id> --pin` or `--model` / `--provider` |
-| Unattended approvals | `approvals.cron_mode` (`deny` \| `approve`) |
-| Script-only jobs | `cron create … --no-agent --script …` |
-| Health | `cron status` / `cron doctor` (gateway must tick agent jobs) |
-
-Document each intended job on the agent page (schedule, prompt intent, deliver,
-skills, workdir, model pin). Docs alone do not create live jobs; apply with CLI
-or chat. Clone skips `cron/` by default.
+Full guide: `references/cron.md`. Enable `cronjob`; manage with `hermes cron` / `/cron`; document intended jobs on the agent page before applying.
 
 ## Gateway
 

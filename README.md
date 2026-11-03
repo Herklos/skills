@@ -21,22 +21,15 @@ Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent or
 ├── skills/
 │   ├── hermes-profiles/
 │   │   ├── SKILL.md
-│   │   └── references/
-│   │       ├── profile-map.md
-│   │       ├── models-and-delegation.md
-│   │       ├── soul-templates.md
-│   │       ├── recipes.md
-│   │       └── troubleshooting.md
+│   │   └── references/   # models, delegation, soul, memory, browser,
+│   │                     # runtime-limits, security, workspace, display,
+│   │                     # cron, profile-map, recipes, troubleshooting
+│   │                     # (+ thin stubs: models-and-delegation, workspace-and-display)
 │   └── anytype-agents/
 │       ├── SKILL.md
-│       └── references/
-│           ├── structure.md
-│           ├── object-types.md
-│           ├── page-templates.md
-│           ├── shared-rules-starter.md
-│           ├── examples.md
-│           ├── handoff-templates.md
-│           └── mcp-recipes.md
+│       └── references/   # structure, object-types, page-templates,
+│                         # suggested-runtime, examples, shared-rules,
+│                         # handoff-templates, mcp-recipes
 ├── LICENSE
 └── README.md
 ```

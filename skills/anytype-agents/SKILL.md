@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.9.3
+version: 1.10.0
 license: MIT
 metadata:
   category: agents
@@ -29,6 +29,7 @@ changes.
 | `references/structure.md` | Hub discovery and typical tree |
 | `references/object-types.md` | Agent / Team / Project type keys, properties, templates, migration |
 | `references/page-templates.md` | Agent / HQ / group / skill / project body shapes |
+| `references/suggested-runtime.md` | Suggested runtime field list (Hermes mapping pointers) |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
@@ -117,9 +118,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
 6. Link from the HQ map / sub-team page
 7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
-8. Fill **Suggested runtime** with primary, fallback, auxiliary, subagents, MoA, **personality**, **memory**, **browser / computer**, **tools / terminal / limits**, **security / privacy / restoration**, **workspace / display**, and **Scheduled tasks** fields when known (see `page-templates.md`)
+8. Fill **Suggested runtime** from `suggested-runtime.md` (and a filled sample in `examples.md` when helpful)
 9. Tell the user Anytype is updated; **copy the Full System Prompt into the runtime bot** and verify groups/routines separately
-10. If the runtime is Hermes, use `hermes-profiles` for the profile home and apply Suggested runtime into `model` / `auxiliary` / `fallback_providers` / `delegation` / `moa` / `SOUL.md` / `display.*` / `agent.personalities` / `memory.*` / `browser.*` / `computer_use.*` / `bot_desktop.*` / `toolsets` / `approvals.*` / `terminal.*` / `desktop.*` / `tool_output.*` / `agent.max_turns` / `compression.*` / `security.*` / `privacy.*` / `checkpoints.*` / `hermes project …` / `cron.*` + `hermes cron …` (`hermes-profiles` → `models-and-delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace-and-display.md`, `cron.md`)
+10. If the runtime is Hermes, continue with skill `hermes-profiles` and apply Suggested runtime using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `cron.md`)
 
 ### Create or update a Team / HQ
 
@@ -184,7 +185,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 ## Common recipes (summary)
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|project`
-- **New specialist:** draft vs live → create `agent` + properties (`object-types.md`) → body from `page-templates.md` → memory `page`s → link HQ → prompt copy reminder
+- **New specialist:** draft vs live → create `agent` + properties (`object-types.md`) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ → prompt copy reminder
 - **New HQ:** create `team` (`kind: HQ`) → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub
 - **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)

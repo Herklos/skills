@@ -104,173 +104,41 @@ hermes profile delete old-bot
 | Near-full copy of source | `--clone-all` (+ optional `--clone-from`) |
 | Also copy messaging tokens | add `--clone-channels` (confirm first) |
 
-## 11. Wire main (routing model), aux, fallback, task-specific subagents
+## Config topics (one home each)
 
-See `models-and-delegation.md` for full YAML. Preferred sequence (routing model
-+ named task routes via **advanced-delegation**):
+Lifecycle recipes stay above. Topic recipes live in the matching reference
+(Minimal recipes / Recipe sections). Do not duplicate bash here.
 
-```bash
-hermes -p forge model                                   # strong routing / main model
-hermes -p forge fallback add
-hermes -p forge config set auxiliary.compression.provider openrouter
-hermes -p forge config set auxiliary.compression.model google/gemini-2.5-flash
-hermes -p forge tools enable delegation
-hermes -p forge plugins install advanced-delegation     # needs Hermes >= 0.22.5
-hermes -p forge delegation config                       # Model routes: add fast/deep/… + default
-# Or: hermes -p forge config set delegation.backend model_map
-# then edit delegation.backends.model_map.options (see models-and-delegation.md)
-# In chat later: /delegation model_map   or   /delegation model_map --now
-hermes -p forge delegation config --show
-hermes -p forge moa configure deep_review               # optional
-```
-
-Single cheap worker for every child (no plugin):
-
-```bash
-hermes -p forge tools enable delegation
-hermes -p forge config set delegation.backend default
-hermes -p forge config set delegation.model google/gemini-2.5-flash
-hermes -p forge config set delegation.provider openrouter
-```
-
-## 12. Personality (SOUL + overlay)
-
-See `soul-templates.md`. Minimal sequence:
-
-```bash
-# Edit $HERMES_HOME/profiles/forge/SOUL.md for durable identity
-hermes -p forge config set display.personality concise   # sticky overlay, or ''
-# Optional custom preset: edit agent.personalities in config.yaml, then:
-hermes -p forge config set display.personality codereviewer
-# In a live session you can also /personality teacher | /personality none
-hermes sessions refresh-prompts   # after SOUL edits
-```
-
-## 13. Memory settings
-
-See `memory.md`. Minimal sequence:
-
-```bash
-hermes -p forge memory status
-hermes -p forge config set memory.memory_enabled true
-hermes -p forge config set memory.user_profile_enabled true
-hermes -p forge config set memory.write_approval false    # true to gate saves
-hermes -p forge config set display.memory_notifications on
-# Optional external provider (one at a time):
-hermes -p forge memory setup          # or: config set memory.provider retaindb
-hermes -p forge memory off            # external off; built-in remains
-# Destructive — confirm first:
-# hermes -p forge memory reset --target all
-```
-
-## 14. Browser and computer use
-
-See `browser-and-computer.md`. Minimal sequences:
-
-```bash
-# Local throwaway browser
-hermes -p forge tools enable browser
-hermes -p forge config set browser.cloud_provider local
-hermes -p forge config set browser.use_real_profile false
-hermes pm install chromium
-
-# Computer use on this machine
-hermes -p forge tools enable computer_use
-hermes -p forge computer-use install
-hermes -p forge computer-use doctor
-
-# Linux Bot Screen (gateway host)
-hermes -p forge computer-use screen install
-hermes -p forge computer-use screen start
-```
-
-## 15. Tools, terminal, limits
-
-See `runtime-limits-and-tools.md`. Minimal sequence:
-
-```bash
-hermes -p forge tools enable terminal file web
-hermes -p forge config set terminal.backend local
-hermes -p forge config set terminal.cwd /absolute/path/to/repo
-hermes -p forge config set terminal.timeout 180
-hermes -p forge config set approvals.mode smart
-hermes -p forge config set agent.max_turns 150          # or unset for unlimited
-hermes -p forge config set tool_output.max_bytes 50000
-hermes -p forge config set compression.threshold 0.50
-```
-
-## 16. Security, privacy, restoration
-
-See `security.md`. Minimal sequence:
-
-```bash
-hermes -p forge config set approvals.mode smart
-hermes -p forge config set approvals.cron_mode deny
-hermes -p forge config set security.redact_secrets true
-hermes -p forge config set security.protected_instruction_files true
-hermes -p forge config set privacy.redact_pii false
-hermes -p forge config set checkpoints.enabled false    # true + /rollback if wanted
-hermes -p forge backup --quick                          # optional snapshot
-# Messaging: set allowlists in .env, or hermes -p forge pairing approve …
-```
-
-## 17. Workspace and display
-
-See `workspace-and-display.md`. Minimal sequence:
-
-```bash
-hermes -p forge config set terminal.cwd /absolute/path/to/repo
-hermes -p forge project create forge-app
-hermes -p forge project add-folder forge-app /absolute/path/to/repo
-hermes -p forge project use forge-app
-hermes -p forge config set desktop.repo_scan_enabled true
-hermes -p forge config set display.skin slate
-hermes -p forge config set display.tool_progress all
-hermes -p forge config set display.show_reasoning true
-hermes -p forge config set display.resume_display full
-# Optional Desktop fonts:
-# hermes -p forge config set desktop.font_family "Atkinson Hyperlegible"
-# hermes -p forge config set terminal.font_family "MesloLGS NF"
-```
-
-## 18. Scheduled tasks (cron)
-
-See `cron.md`. Minimal sequence:
-
-```bash
-hermes -p forge tools enable cronjob
-hermes -p forge gateway start
-hermes -p forge cron create "0 9 * * 1-5" \
-  "Summarize overnight CI and open Sev-1s. Be concise." \
-  --name morning-brief --deliver telegram
-hermes -p forge config set cron.model google/gemini-2.5-flash   # optional fleet default
-hermes -p forge config set approvals.cron_mode deny
-# Script watchdog (no LLM): empty stdout = silent
-# hermes -p forge cron create "every 5m" --script /path/disk-watch.sh --no-agent --deliver telegram --name disk-watch
-hermes -p forge cron list
-hermes -p forge cron status
-```
-
-Document intended jobs on the agent **Scheduled tasks** list before or after
-applying them. Clone skips `cron/`; recreate on twins from that list.
+| Topic | Reference |
+|-------|-----------|
+| Main / aux / fallback / MoA | `models.md` |
+| Subagents / advanced-delegation / model_map | `delegation.md` (see its Recipe) |
+| Personality / SOUL | `soul-templates.md` |
+| Memory | `memory.md` |
+| Browser / computer / Bot Screen | `browser-and-computer.md` |
+| Tools / terminal / limits | `runtime-limits-and-tools.md` |
+| Approvals / privacy / checkpoints / backup | `security.md` |
+| cwd / projects / repo scan | `workspace.md` |
+| Skins / display chrome / fonts | `display.md` |
+| Scheduled tasks / Bot routines | `cron.md` |
 
 ## Decision guide: what to edit where
 
 | Change | Where |
 |--------|--------|
-| Durable voice / role | `SOUL.md` |
-| Named mode overlay (built-in or custom) | `display.personality` / `/personality` |
-| Custom personality definitions | `agent.personalities` in `config.yaml` |
-| Manual prompt when no personality name | `agent.system_prompt` |
+| Durable voice / role | `SOUL.md` (`soul-templates.md`) |
+| Named mode overlay | `display.personality` / `/personality` |
+| Custom personality definitions | `agent.personalities` |
 | User preferences / durable facts | memory tool → `USER.md` / `MEMORY.md` |
-| Memory limits, approval, provider | `memory.*` / `hermes -p <slug> memory …` (`memory.md`) |
-| Browser / computer / Bot Screen | `browser-and-computer.md` / `hermes tools` / `computer-use` |
+| Memory limits, approval, provider | `memory.md` |
+| Browser / computer / Bot Screen | `browser-and-computer.md` |
 | Toolsets, terminal, output/turn caps | `runtime-limits-and-tools.md` |
 | Approvals, privacy, pairing, checkpoints, backup | `security.md` |
-| cwd, projects, repo scan, skins, display chrome | `workspace-and-display.md` |
-| Scheduled tasks / Bot routines | `cron.md` / `hermes -p <slug> cron …` / `/cron` |
-| Model / cwd / tools | `hermes -p <slug> config set …` |
-| Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
+| cwd, projects, repo scan | `workspace.md` |
+| Skins, display chrome, fonts | `display.md` |
+| Scheduled tasks / Bot routines | `cron.md` |
+| Main / aux / fallback / MoA | `models.md` |
+| Task-specific subagent routes | `delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |
 | Kanban one-liner | `hermes profile describe` |
 | Bot roster avatar/section | Desktop Bot Mode / `ui_meta` |
