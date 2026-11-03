@@ -44,6 +44,34 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Marketing"
+    },
+    {
+      "name": "hermes-profiles",
+      "description": "Manage Hermes Agent profiles: create, clone, configure, describe, gateway lifecycle.",
+      "source": {
+        "source": "github",
+        "repo": "Herklos/skills",
+        "path": "skills/hermes-profiles"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "anytype-agents",
+      "description": "Manage multi-agent organization pages in Anytype via MCP.",
+      "source": {
+        "source": "github",
+        "repo": "Herklos/skills",
+        "path": "skills/anytype-agents"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     }
   ]
 }

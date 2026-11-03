@@ -24,6 +24,18 @@
       "description": "Rédiger des articles de blog SEO en français, voix fondateur-ingénieur, Markdown simple.",
       "source": "./skills/generate-seo-blog-article-fr",
       "category": "marketing"
+    },
+    {
+      "name": "hermes-profiles",
+      "description": "Manage Hermes Agent profiles: create, clone, configure, describe, gateway lifecycle.",
+      "source": "./skills/hermes-profiles",
+      "category": "productivity"
+    },
+    {
+      "name": "anytype-agents",
+      "description": "Manage multi-agent organization pages in Anytype via MCP (discover hubs, create agents, route work).",
+      "source": "./skills/anytype-agents",
+      "category": "productivity"
     }
   ]
 }
