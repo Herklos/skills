@@ -23,7 +23,7 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 | `memories/MEMORY.md` | Agent notes (agent-written; `memory.memory_*`) |
 | `skills/` | Per-profile skills and curator state |
 | `state.db` (+ `-shm`/`-wal`) | Sessions and history |
-| `cron/` | Scheduled jobs; Bot routines are namespaced cron |
+| `cron/` | Scheduled jobs (`jobs.json`, `output/`); Bot routines are namespaced cron (see `cron.md`) |
 | `plugins/` | Profile-local plugins |
 | `mcp-tokens/` | MCP OAuth token cache |
 | `platforms/`, `pairing/` | Messaging adapter / pairing state |
@@ -88,8 +88,12 @@ hermes -p <slug> pairing list|approve|revoke|clear-pending
 hermes -p <slug> approvals suggest [--apply …]
 hermes -p <slug> checkpoints status|prune|clear
 hermes -p <slug> backup [--quick]
+hermes -p <slug> tools enable cronjob
+hermes -p <slug> cron create|list|edit|pause|resume|run|cancel|remove|status|tick|doctor
+hermes -p <slug> config set cron.model <name>
+hermes -p <slug> config set approvals.cron_mode deny|approve
 hermes -p <slug> gateway start|stop|restart|install
-# In session: /personality [name|none] ; /skin <name> ; /verbose ; /focus ;
+# In session: /cron … ; /personality [name|none] ; /skin <name> ; /verbose ; /focus ;
 #   /reasoning show|hide ; /memory pending|approve|reject ; /rollback …
 ```
 
@@ -144,6 +148,7 @@ ui_meta:
 - https://hermes-agent.nousresearch.com/docs/user-guide/session-storage-recovery
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/tools
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/skins
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
 - https://hermes-agent.nousresearch.com/docs/user-guide/git-worktrees
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files
 - https://hermes-agent.nousresearch.com/docs/reference/toolsets-reference

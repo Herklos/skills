@@ -222,6 +222,27 @@ hermes -p forge config set display.resume_display full
 # hermes -p forge config set terminal.font_family "MesloLGS NF"
 ```
 
+## 18. Scheduled tasks (cron)
+
+See `cron.md`. Minimal sequence:
+
+```bash
+hermes -p forge tools enable cronjob
+hermes -p forge gateway start
+hermes -p forge cron create "0 9 * * 1-5" \
+  "Summarize overnight CI and open Sev-1s. Be concise." \
+  --name morning-brief --deliver telegram
+hermes -p forge config set cron.model google/gemini-2.5-flash   # optional fleet default
+hermes -p forge config set approvals.cron_mode deny
+# Script watchdog (no LLM): empty stdout = silent
+# hermes -p forge cron create "every 5m" --script /path/disk-watch.sh --no-agent --deliver telegram --name disk-watch
+hermes -p forge cron list
+hermes -p forge cron status
+```
+
+Document intended jobs on the agent **Scheduled tasks** list before or after
+applying them. Clone skips `cron/`; recreate on twins from that list.
+
 ## Decision guide: what to edit where
 
 | Change | Where |
@@ -236,6 +257,7 @@ hermes -p forge config set display.resume_display full
 | Toolsets, terminal, output/turn caps | `runtime-limits-and-tools.md` |
 | Approvals, privacy, pairing, checkpoints, backup | `security.md` |
 | cwd, projects, repo scan, skins, display chrome | `workspace-and-display.md` |
+| Scheduled tasks / Bot routines | `cron.md` / `hermes -p <slug> cron …` / `/cron` |
 | Model / cwd / tools | `hermes -p <slug> config set …` |
 | Auxiliary / fallback / MoA / delegation | `models-and-delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |

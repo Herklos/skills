@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.8.1
+version: 1.8.2
 license: MIT
 metadata:
   category: agents
@@ -34,6 +34,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/runtime-limits-and-tools.md` | Toolsets, approvals, terminal backend, output/turn/compression limits |
 | `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
 | `references/workspace-and-display.md` | Working directory, projects, repo scan, skins, display chrome, ui-preferences |
+| `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent |
 | `references/recipes.md` | End-to-end create/clone/gateway/export examples |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
@@ -46,7 +47,8 @@ Skins: https://hermes-agent.nousresearch.com/docs/user-guide/features/skins
 Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
 Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
-Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use
+Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use  
+Cron: https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
 
 ## Resolve home
 
@@ -87,6 +89,7 @@ Do not print `.env` secret values into chat.
 | Toolsets / limits | Enabled tools, approvals, terminal backend, output and turn caps |
 | Security | Approvals/YOLO floor, privacy redaction, pairing, checkpoints, backup |
 | Workspace / display | `terminal.cwd`, projects, repo scan, skins, `display.*`, Desktop prefs |
+| Scheduled tasks | Per-profile `cron/` jobs (`cronjob_manage` / `/cron` / `hermes cron`); Bot routines |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the gateway/cron working directory
 (CLI uses the launch dir). Profiles do not sandbox the filesystem. Never run two writers
@@ -312,6 +315,25 @@ Full guide: `references/workspace-and-display.md`.
 | Computer-wide UI prefs | `$HERMES_HOME/ui-preferences.json` (root home, not profile folder) |
 
 Personality overlay remains `display.personality` (`soul-templates.md`).
+
+### Scheduled tasks (cron)
+
+Full guide: `references/cron.md`.
+
+| Concern | Config / CLI |
+|---------|----------------|
+| Enable management tool | `hermes -p <slug> tools enable cronjob` |
+| Create / list / lifecycle | `hermes -p <slug> cron create\|list\|edit\|pause\|resume\|run\|cancel\|remove` |
+| Chat | `/cron …` or natural language → `cronjob_manage` |
+| Fleet model default | `cron.model` / `cron.model_provider` (unpinned jobs) |
+| Per-job model | `cron edit <id> --pin` or `--model` / `--provider` |
+| Unattended approvals | `approvals.cron_mode` (`deny` \| `approve`) |
+| Script-only jobs | `cron create … --no-agent --script …` |
+| Health | `cron status` / `cron doctor` (gateway must tick agent jobs) |
+
+Document each intended job on the agent page (schedule, prompt intent, deliver,
+skills, workdir, model pin). Docs alone do not create live jobs; apply with CLI
+or chat. Clone skips `cron/` by default.
 
 ## Gateway
 

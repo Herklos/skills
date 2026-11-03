@@ -41,9 +41,9 @@ Other properties:
 
 Also includes shared `tag`, `links`, `backlinks`.
 
-**Default template name:** `Agent default` (sections: Suggested runtime, Autonomy,
-Short Description, Full System Prompt fence, Memory Pages). Body detail lives in
-`page-templates.md`.
+**Default template name:** `Agent default` (sections: Suggested runtime including
+Subagents and Scheduled tasks, Autonomy, Short Description, Full System Prompt
+fence, Memory Pages). Body detail lives in `page-templates.md`.
 
 ## Team (`api_key`: `team`)
 

@@ -18,7 +18,7 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 `config.yaml` / `SOUL.md` (see skill `hermes-profiles` →
 `models-and-delegation.md`, `soul-templates.md`, `memory.md`,
 `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`,
-`workspace-and-display.md`).
+`workspace-and-display.md`, `cron.md`).
 
 **Harness:** hermes | grok | claude | codex | noodle | cli | other
 **Primary (main):** {provider} · {model} · {reasoning effort} · {speed tier if any}
@@ -31,6 +31,7 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - review (`/review`): …
 - other tasks: …
 **Subagents / delegation:** enabled (`delegation` toolset). Prefer **model_map** so each `delegate_task` can pick a named route (e.g. `fast` = {provider}·{model}; `deep` = {provider}·{model} · {reasoning}). Alternatives: single cheaper worker {provider}·{model} (`backend` default) | `profile_routes` ({profile names}). Also note max_concurrent_children / max_iterations when non-default. Docs: hermes-profiles → `models-and-delegation.md` / https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation#configuration
+**Scheduled tasks:** none yet | list each intended job (docs do not auto-create live cron). For Hermes: enable `cronjob` toolset; gateway must run for agent jobs. Per job note: name · schedule · prompt intent · deliver · skills · workdir · model pin (`per-job` \| `cron.model` \| main) · no_agent/script if any · approvals.cron_mode. Apply with `/cron`, `hermes cron`, or `cronjob_manage`. Docs: hermes-profiles → `cron.md` / https://hermes-agent.nousresearch.com/docs/user-guide/features/cron
 **Mixture of Agents (optional):** off | preset `{name}` (references: …; aggregator: …; fanout: user_turn|per_iteration|every_n:N)
 **Personality:**
 - SOUL / durable identity: {summary or "see Full System Prompt / SOUL.md"}
@@ -53,7 +54,7 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - Scope: dedicated (this profile) | team/shared host (same OS user; not isolated)
 - Permission mode: standard | bounded (manifest) · Notes: {TCC / takeover for 2FA}
 **Tools access:**
-- Enabled toolsets: {web, terminal, file, browser, memory, delegation, …}
+- Enabled toolsets: {web, terminal, file, browser, memory, delegation, cronjob, …}
 - Disabled / denied: {list or none}
 - Approvals: smart | manual | off · cron/unattended: deny | approve
 - Hard deny patterns: {none | globs}
@@ -80,6 +81,15 @@ the bot; they do not auto-apply. For Hermes, map these into that profile's
 - Reasoning shown: on|off · streaming: on|off · resume_display: full|minimal
 - UI language: en | … · Notes: {quiet Slack? Desktop fonts?}
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
+
+Example **Scheduled tasks** list shape (under Suggested runtime or as its own section):
+
+```markdown
+**Scheduled tasks:**
+- `morning-brief` · `0 9 * * 1-5` · overnight CI + Sev-1 summary · deliver telegram · skill weekly-hq-brief · model: cron.model
+- `disk-watch` · every 5m · no_agent script disk-watch.sh · deliver telegram · silent on empty stdout
+- (none yet)
+```
 
 # {Name} – {Role}
 **Autonomy:** …
@@ -223,6 +233,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Limits: max_turns {…}; tool_output {…}; compression {…}
 - Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
 - Workspace/display: project {…}; skin {…}; tool_progress {…}
+- Scheduled tasks: {none | names + cadence summary}
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.

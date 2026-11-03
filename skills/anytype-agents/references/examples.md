@@ -73,6 +73,9 @@ Skills: Agent → Team → Project → Global
 - approval: auto (main)
 - review: openrouter · anthropic/claude-opus-4
 **Subagents / delegation:** enabled. backend `model_map` (default `fast`): `fast` = openrouter · google/gemini-2.5-flash; `deep` = openrouter · anthropic/claude-sonnet-4 · high. max_concurrent_children 8; max_iterations 250
+**Scheduled tasks:**
+- `pr-hygiene` · `0 8 * * 1-5` · list stale draft PRs in cwd repo and open Ready follow-ups · deliver origin · workdir /absolute/path/to/repo · model: cron.model · cronjob toolset on · approvals.cron_mode deny
+- (no no_agent watchdogs on this implementer)
 **Mixture of Agents:** off
 **Personality:**
 - SOUL: pragmatic implementer; short status; ask before destructive git
@@ -91,7 +94,7 @@ Skills: Agent → Team → Project → Global
 **Computer access:**
 - Needed: no
 **Tools access:**
-- Enabled toolsets: terminal, file, web, browser
+- Enabled toolsets: terminal, file, web, browser, cronjob
 - Approvals: smart · cron/unattended: deny
 **Terminal / execution:**
 - Backend: local · cwd: /absolute/path/to/repo · timeout: 180
@@ -157,7 +160,8 @@ Apply memory with `hermes-profiles` → `references/memory.md`.
 Apply browser / computer with `hermes-profiles` → `references/browser-and-computer.md`.  
 Apply tools / terminal / limits with `hermes-profiles` → `references/runtime-limits-and-tools.md`.  
 Apply security / privacy / restoration with `hermes-profiles` → `references/security.md`.  
-Apply workspace / display with `hermes-profiles` → `references/workspace-and-display.md`.
+Apply workspace / display with `hermes-profiles` → `references/workspace-and-display.md`.  
+Apply scheduled tasks with `hermes-profiles` → `references/cron.md`.
 
 ### Sample handoff (Primary → HQ chief)
 
