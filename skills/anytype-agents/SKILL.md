@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.31.2
+version: 1.31.3
 license: MIT
 metadata:
   category: agents
@@ -56,7 +56,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Hermes Chromium Browser create, link, migrate |
 | `references/cua-hq-spaces.md` | Create live Cua Space per HQ Computer; store full id in Computer.`cua_space` |
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
-| `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, Group `welcome_prompt`, migrate |
+| `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, optional Team/Subteam/Subagent.`system_prompt`, Group `welcome_prompt`, body cleanup, migrate |
 | `references/memory-and-skills.md` | Memory + Skill + Log types, Agent.`memory_pages` / `skills_page` / `logs_page`, Skills / Logs Queries, migrate |
 | `references/agenda-and-schedules.md` | Schedule type, Agent.`agenda_page` Agenda Query (Calendar on `next_run`), migrate + Hermes cron bind |
 | `references/hq-standing-instructions.md` | Team.`standing_instructions` → Prompt library; slim HQ bodies; short system Prompt + Shared Rules pointer |
@@ -167,9 +167,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 1. Create type **`team`** with `kind` (`Board` / `HQ`) and `lifecycle`. Do **not** use `kind: Group` (deprecated; use typed **`group`**)
 2. Set `chief`, `members`, `subteams`, `mission`, `routing_summary`, optional `messaging_group` (→ typed Group) / `skills_page`, plus optional `browser` / `computer` / `tool_profile` team defaults
-3. Create a **Standing instructions** Prompt (`prompt_kind=library`, `audience=org`) with gates / principles / routing; set Team.`standing_instructions` (`hq-standing-instructions.md`)
+3. Create a **Standing instructions** Prompt (`prompt_kind=library`, `audience=org`) with gates / principles / routing; set Team.`standing_instructions` (`hq-standing-instructions.md`). Prefer that over Team.`system_prompt` for HQ gates; leave `system_prompt` empty unless the HQ needs bot-facing system text
 4. Create `{HQ short} – Subteams` Query (`type: subteam`, `filter: parent_team IN ("<hqId>")`); set Team.`subteams_page`
-5. Body from `page-templates.md` / **Team default**: Subteams Query pointer + Standing instructions pointer + HQ coordination (no static Sub-teams / Domains / Notion-map tables; no second Rules dump)
+5. Body from `page-templates.md` / **Team default**: Subteams Query pointer + Standing instructions pointer + HQ coordination (no static Sub-teams / Domains / Notion-map tables; no Full System Prompt fence; no second Rules dump)
 6. Link from Agents
 7. Update roster/routing and the linked Group welcome Prompt if membership changes
 
@@ -186,18 +186,20 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 1. Prefer type **`subteam`** (do not create new Sub-teams as `team` with `kind: Sub-team`)
 2. Set `parent_team` to the owning HQ, plus `lifecycle`, `members`, `routing_summary`, optional `chief` / `mission` / `messaging_group` / `skills_page`, plus optional `browser` / `computer` / `tool_profile` domain defaults
-3. Body from `page-templates.md` / **Subteam default** template (properties first)
-4. Link from the HQ `subteams` property and map; point member agents' `team` at this Subteam when they sit under it
-5. Migrate legacy `team` + `kind: Sub-team` with `set_type` → `subteam` (`object-types.md`)
+3. Optional `system_prompt` only when the domain needs its own bot-facing system text (else inherit HQ standing + agent prompts)
+4. Body from `page-templates.md` / **Subteam default** template (properties first; no Full System Prompt fence)
+5. Link from the HQ `subteams` property and map; point member agents' `team` at this Subteam when they sit under it
+6. Migrate legacy `team` + `kind: Sub-team` with `set_type` → `subteam` (`object-types.md`)
 
 ### Create or update a Subagent
 
 1. Create type **`subagent`** with `parent_agent`, `task_key`, `harness_profile`,
    `intent`, optional `scope` / `toolsets` / `spawn_effort` / `model_override` / `deliver_back`
-2. Body from `type-templates.md` / **Subagent default**
-3. Add the Subagent id to the parent's Agent.`subagents` (keep both links)
-4. Document the route under the parent's Suggested runtime Subagents section
-5. If Hermes: decline into `model_map` via `hermes-profiles` `delegation.md`
+2. Optional `system_prompt` when the spawn needs its own system text (else inherit parent agent)
+3. Body from `type-templates.md` / **Subagent default** (no Full System Prompt fence)
+4. Add the Subagent id to the parent's Agent.`subagents` (keep both links)
+5. Document the route under the parent's Suggested runtime Subagents section
+6. If Hermes: decline into `model_map` via `hermes-profiles` `delegation.md`
 
 ### Create or update a Harness / Harness profile
 

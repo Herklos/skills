@@ -29,8 +29,10 @@ Team `kind: Group` deprecated. HQ standing **2026-11-04** (v1.31.0): Team
 section. HQ Subteams Query **2026-11-04** (v1.31.1): Team.`subteams_page` →
 Query filtered by `parent_team` (replace static Sub-teams / Domains tables).
 Agent.`primary_model` removed **2026-11-04** (v1.31.2): models live on
-Harness profile only. Prefer properties for mission / members / routing /
-short description /
+Harness profile only. Agent default template + live stubs cleaned
+**2026-11-04** (v1.31.3): no Full System Prompt fence; Team/Subteam/Subagent
+gain optional `system_prompt`. Prefer properties for mission / members /
+routing / short description /
 autonomy / map path / browser / computer / tool_profile / `system_prompt` /
 `memory_pages` / `skills_page` / `logs_page` / `agenda_page` /
 `messaging_group` / `standing_instructions` / `subteams_page`; template bodies

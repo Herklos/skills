@@ -37,11 +37,18 @@ Also `tag`, `links`, `backlinks`. Put the full prompt text in the **body**
 | `agent` | `system_prompt` | objects | One Prompt (`prompt_kind=system`, usually) |
 | `group` | `welcome_prompt` | objects | One Prompt (`prompt_kind=welcome`) |
 | `team` | `standing_instructions` | objects | One Prompt (`prompt_kind=library`) for HQ/Board gates |
+| `team` | `system_prompt` | objects | Optional system Prompt (prefer `standing_instructions` for HQ gates) |
+| `subteam` | `system_prompt` | objects | Optional; domains usually inherit HQ standing + agent prompts |
+| `subagent` | `system_prompt` | objects | Optional child system Prompt (else inherit parent agent) |
 
 Shared Rules and Mission/library pages are themselves type `prompt`. HQ standing
 libraries also use `prompt_kind=library` and are linked from
 Team.`standing_instructions` (`hq-standing-instructions.md`). Agents still
 short-point at Shared Rules and HQ standing inside their system prompt body.
+
+**Cleanup:** Agent pages must not keep `## Full System Prompt` / `## Full SOUL.md`
+fences once `system_prompt` is set. Agent default template uses a short pointer
+only. Teams / Subteams / Subagents normally have no system-prompt body section.
 
 ## Naming
 
@@ -184,7 +191,8 @@ Filter agents that still need a link:
    (`create_missing_options: true` for selects)
 2. `API-create-template` `template_for: prompt` from `type-templates.md`
 3. `API-update-type` `{ "default_template": "<templateId>" }`
-4. On Agent: `add_property` **System prompt** (`system_prompt`, objects, featured)
+4. On Agent / Team / Subteam / Subagent: `add_property` **System prompt**
+   (`system_prompt`, objects, featured) when missing (reuse the same property key)
 5. On Group: `welcome_prompt` is part of the Group type (featured objects)
 6. Migrate live agents / groups / Shared Rules as above
 

@@ -156,6 +156,7 @@ use type **`group`** (do not create new `team` with `kind: Group`).
 | `routing_summary` | text | One-line routing |
 | `standing_instructions` | objects | HQ/Board **Standing instructions** Prompt (`prompt_kind=library`) (featured). Full playbook: `hq-standing-instructions.md` |
 | `subteams_page` | objects | HQ **Subteams** Query filtered by `parent_team` (featured). Prefer this over a static Sub-teams / Domains body table |
+| `system_prompt` | objects | Optional link to a **Prompt** (`prompt_kind=system`). Prefer `standing_instructions` for HQ gates; use `system_prompt` only when an HQ/Board needs bot-facing system text |
 | `browser` | objects | Optional team-default **Browser** catalog link |
 | `computer` | objects | Optional team-default **Computer** catalog link |
 | `tool_profile` | objects | Optional team-default **Tool profile** catalog link |
@@ -192,6 +193,7 @@ sub-teams on the `team` type.
 | `routing_summary` | text | One-line routing |
 | `messaging_group` | objects | Typed **Group** when present |
 | `skills_page` | objects | Domain Skills **Query** when present |
+| `system_prompt` | objects | Optional **Prompt** link (rarely used; domains usually inherit HQ standing + agent system prompts) |
 | `browser` | objects | Optional domain-default **Browser** catalog link |
 | `computer` | objects | Optional domain-default **Computer** catalog link |
 | `tool_profile` | objects | Optional domain-default **Tool profile** catalog link |
@@ -222,6 +224,7 @@ Subagents. Distinct from **`subteam`** (org domain).
 | `spawn_effort` | select | Optional override: `low` \| `medium` \| `high` (else use profile primary effort). Display name **Spawn effort** (avoids clash with a numeric Effort property) |
 | `model_override` | text | Optional pin over the linked Harness profile primary |
 | `deliver_back` | text | What the child must return to the parent (summary shape) |
+| `system_prompt` | objects | Optional child **Prompt** when the spawn needs its own system text (else inherit parent) |
 | `notes` | text | Extra apply notes |
 
 Also `tag`, `links`, `backlinks`.
@@ -692,18 +695,20 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    `computer_surface`, …) so keys stay clean aliases rather than colliding
    opaque ids. Name new selects carefully (`Browser source`, `Tool approvals`)
    when a shorter name already exists with a different format.
-2. On existing Agent / Team / Subteam types: `add_property` for org/runtime
-   fields above including featured `browser`, `computer`, `tool_profile`,
-   Agent `system_prompt`, and Agent voice fields (`voice_enabled`,
-   `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` /
-   `tts_*`); also `board_member`, `linked_projects`, `memory_pages`,
-   `skills_page`, `logs_page`, `agenda_page`, `messaging_group`, `map_path`,
+2. On existing Agent / Team / Subteam / Subagent types: `add_property` for
+   org/runtime fields above including featured `browser`, `computer`,
+   `tool_profile`, shared `system_prompt` (Agent required; Team/Subteam/Subagent
+   optional), and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
+   `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
+   `board_member`, `linked_projects`, `memory_pages`, `skills_page`,
+   `logs_page`, `agenda_page`, `messaging_group`, `map_path`,
    `delegation_enabled`, `terminal_backend`, `computer_surface`; keep
    `harness_profile` / `subagents`; `remove_property` legacy `harness` select
-   when ready. On Group: `welcome_prompt` is a Group property (not Page). On
-   Harness profile: add STT/TTS stack fields above. Prompt / Memory / Skill /
-   Log / Schedule / Group bootstrap detail: `prompts.md` +
-   `memory-and-skills.md` + `agenda-and-schedules.md` + Group section below.
+   and unused `primary_model` when ready. On Group: `welcome_prompt` is a Group
+   property (not Page). On Harness profile: add STT/TTS stack fields above.
+   Prompt / Memory / Skill / Log / Schedule / Group bootstrap detail:
+   `prompts.md` + `memory-and-skills.md` + `agenda-and-schedules.md` + Group
+   section below.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
    `skills_page`, `subteams_page`, `routing_summary`, `standing_instructions`
    (+ runtime catalog links). Create `{HQ} – Subteams` Query
