@@ -52,6 +52,19 @@ property; see `memory-and-skills.md` out of scope). Old Skills index `page`s are
 superseded by `skills_page` Queries. Routine pages belong as `schedule` rows on
 the Agenda.
 
+**Do not** leave dated org/routing **quote** blocks (or “Board member. Current
+Board: …” paragraphs) on Agent bodies. Migrate:
+
+- Dated announcements / restores / archives → type `log` (`logged_at`, `summary`)
+- Durable cross-HQ routing (“X → Y via René”) → owning HQ
+  `standing_instructions` (and optionally a dated Memory & Decisions entry)
+- Role voice / standing preferences → Memory & Decisions (keep
+  `short_description` as the one-liner)
+- Hard pipelines already documented on HQ standing → Log only, then delete body
+  quote
+
+Fill properties / standing / memory first; delete the body quote.
+
 Link Memory objects via `memory_pages`, the Skills Query via `skills_page`, the
 Logs Query via `logs_page`, and the Agenda Query via `agenda_page` after create
 (`memory-and-skills.md` + `agenda-and-schedules.md`). Create the Prompt object
