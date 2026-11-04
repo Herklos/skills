@@ -4,8 +4,8 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.23.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.33.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.25.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.35.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 

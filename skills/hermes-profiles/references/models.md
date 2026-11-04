@@ -34,6 +34,11 @@ When declining from Anytype **Harness profile** (Hermes-shaped keys):
 | `aux_<task>_provider` / `aux_<task>_model` (+ effort) for `vision`, `compression`, `web_extract`, `skills_hub`, `title_generation`, **`approval`** | `auxiliary.<task>.*` (`auto` + empty model = inherit main) |
 | `model_harness` / `fallback_*_harness` | catalog UX only |
 
+Anytype often stores **display labels** (`Grok 4.5`, `Claude Code Sonnet 5.5`,
+`Codex Sol 6.1`). Resolve to runtime provider + model id via
+`~/.hermes/provider_models_cache.json` before writing config. Label map and
+full apply order: `anytype-apply.md`.
+
 If provider is `llamacpp`, also enable `local_runtime` (see Local parent).
 
 **When to apply:** write live `model.*` / `auxiliary.*` / `fallback_providers`

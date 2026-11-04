@@ -136,6 +136,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
 | Multi-bot Telegram / Discord groups | `messaging-groups.md` |
+| Anytype Agent → live Hermes apply | `anytype-apply.md` |
 
 ## Decision guide: what to edit where
 

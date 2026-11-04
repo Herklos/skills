@@ -237,24 +237,24 @@ Objects). Editing Anytype does not create `cron/` jobs.
 hermes -p <slug> tools enable cronjob
 hermes -p <slug> gateway start   # agent jobs need the gateway
 
-# Example from a live recurring Schedule:
+# Prefer prompt files (nested heredocs inside multi-job bash one-liners break):
+printf '%s\n' '<Schedule body Prompt text>' > /tmp/hermes-cron-<schedule_key>.txt
 hermes -p <slug> cron create "<schedule_expr>" \
-  "$(cat <<'EOF'
-<Schedule body Prompt text>
-EOF
-)" \
+  "$(cat /tmp/hermes-cron-<schedule_key>.txt)" \
   --name <schedule_key> \
   --timezone <timezone> \
   --deliver <deliver> \
-  --skill <skill1> \
+  --skill org/<skill1> \
   # optional: --workdir … --model … --provider … --paused …
 
 hermes -p <slug> cron list
 ```
 
-Then `API-patch-object` the Schedule: set `hermes_job_name` to `schedule_key`
-(or the name Hermes stored) and `hermes_job_id` from `cron list` when available.
-Keep Agenda Calendar `next_run` in sync when you know the next fire.
+Then `API-patch-object` the Schedule with `set_properties` **`set`** (values
+under `set`, not `properties`): `hermes_job_name` = `schedule_key` (or the name
+Hermes stored) and `hermes_job_id` from `cron list`. Keep Agenda Calendar
+`next_run` in sync when you know the next fire. If Schedule.`skills` names an
+Anytype procedure synced under `skills/org/`, pass `--skill org/<skill_key>`.
 
 ### Clone note
 

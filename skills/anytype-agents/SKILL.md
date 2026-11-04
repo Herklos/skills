@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.33.0
+version: 1.35.0
 license: MIT
 metadata:
   category: agents
@@ -51,7 +51,7 @@ profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
 | `references/object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Browser / Computer / Tool profile / Group / Project type keys, properties, migration |
 | `references/type-templates.md` | Dumped default template bodies (incl. Subagent / Harness / Group / runtime catalogs) for bootstrap and drift |
 | `references/page-templates.md` | Agent / HQ / Subteam / Group / skill / project body shapes |
-| `references/suggested-runtime.md` | Hermes apply checklist (not Agent page body); prefer properties + Browser / Computer / Tool profile links |
+| `references/suggested-runtime.md` | Hermes apply property worksheet (not Agent page body); execution order in hermes-profiles `anytype-apply.md` |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
@@ -166,7 +166,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 8. Inside the Prompt body, point at Shared Rules (short pointer, not a full paste, when token economy matters) and include `# HQ standing instructions (mandatory)` + `# Agenda (mandatory)` short sections (`hq-standing-instructions.md`, `agenda-and-schedules.md`)
 9. Fill runtime facts as **properties** + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields, `short_description`, `autonomy`, `team`, `reports_to`, `map_path`, Agenda). Use `suggested-runtime.md` only as an apply checklist when configuring Hermes, not as agent-page markdown
 10. Tell the user Anytype is updated; **copy the linked Prompt into the runtime bot** and verify groups/routines separately
-11. If the runtime is Hermes, continue with skill `hermes-profiles` and apply from properties using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`). Recurring Schedules on the Agenda decline via `cron.md` only when the user asks to apply. Do **not** paste HQ standing libraries into SOUL; keep the short pointer
+11. If the runtime is Hermes, continue with skill `hermes-profiles` → **`anytype-apply.md`** (Primary → Hermes id `default`; SOUL from Prompt; Local parent; Subagents → `model_map` **including route `fallback_providers` from harness `fallback_*`**; tools; Agenda→cron + `hermes_job_*` writeback; active procedure Skills → `skills/org/<key>` additive; voice modes even when off). Topic refs: `models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `memory-and-skills.md` (Hermes skills sync), `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`, `messaging-groups.md`. Recurring Schedules decline only when the user asks. Do **not** paste HQ standing libraries into SOUL; keep the short pointer. After apply, set Agent.`hermes_profile` when empty and report Anytype gaps (`platform_chat_id` empty blocks allowlists)
 
 ### Create or update a Team / HQ
 

@@ -286,8 +286,25 @@ index page (not permanent unless approved).
 4. Migrate live memory pages + procedures; convert indexes to Queries; create
    Logs Query per live agent and set `logs_page`
 
+## Hermes skills sync (when asked)
+
+Anytype remains the procedure source of truth. When the user asks to apply /
+full-sync an Agent into Hermes:
+
+1. List active procedures on Agent.`skills_page` (`skill_kind=procedure`,
+   `skill_status=active`, matching `owner_agent`).
+2. Write `$HERMES_HOME/skills/org/<skill_key>/SKILL.md` (front matter + steps
+   from the Anytype body). Optional `skills/org/DESCRIPTION.md` naming the
+   folder as Anytype-synced.
+3. Put Anytype `skill` object id + `skill_key` in Hermes skill metadata.
+4. Do **not** delete Hermes builtin / hub skills. Additive only.
+5. Schedule.`skills` comma list → Hermes cron `--skill org/<skill_key>` after
+   the copy exists.
+6. Playbook: `hermes-profiles` → `anytype-apply.md` (Org skills step).
+
 ## Out of scope
 
 - Backup / restore / snapshot / Mémoire dump pages stay `page`
 - Usage counters on skills
-- Live Hermes apply until the user says the redesign is done
+- Auto-pushing Anytype skill edits into Hermes without an apply ask
+- Replacing Hermes builtin skill trees with Anytype copies

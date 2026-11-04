@@ -5,6 +5,12 @@ pointers only. Fill runtime facts as Agent / Harness profile / catalog
 **properties**, then use this checklist when applying into Hermes (or another
 harness). Values guide whoever configures the bot; they do **not** auto-apply.
 
+**Ordered apply playbook (faster):** skill `hermes-profiles` →
+`references/anytype-apply.md` (slug resolve including Primary→`default`, SOUL
+copy, Local parent, model label map, `model_map` from Subagents, tools,
+Agenda→cron, write discipline, verify + gaps report). Use this file as the
+property worksheet; use `anytype-apply.md` as the execution order.
+
 **Properties are the source of truth:** Agent.`harness_profile`,
 `hermes_profile`, `delegation_enabled`, `browser`, `computer`, `tool_profile`,
 `terminal_backend`, `computer_surface`, `subagents`, `short_description`,

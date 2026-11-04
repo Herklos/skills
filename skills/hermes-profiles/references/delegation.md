@@ -294,6 +294,7 @@ routes on the Anytype Subagent objects. Loop docs: `anytype-agents` →
 | `intent` | `description` |
 | `harness_profile` `model_*` (or `model_override`) | `provider` + `model` (resolve labels to runtime ids) |
 | `spawn_effort` (else profile `model_effort`) | `reasoning_effort` when the provider supports it |
+| harness `fallback_1_*` then `fallback_2_*` | ordered `fallback_providers` on **that route** (not parent top-level) |
 | `scope`, `toolsets`, `deliver_back` | Child brief / parent prompt notes (Hermes children inherit parent tools unless you use `profile_routes`) |
 
 Steps:
@@ -306,16 +307,18 @@ Steps:
    `aux_approval_*` (`llamacpp` / `d1-2b-q4_k_m`); see `models.md`
    **Local parent**. Also map `fallback_*` and other `aux_*` when filled.
 3. For each live Subagent, open its `harness_profile` and take `model_*` /
-   effort (honor `model_override` / `spawn_effort` when set).
+   effort (honor `model_override` / `spawn_effort` when set) plus `fallback_1_*`
+   / `fallback_2_*` → that option's `fallback_providers`.
 4. `hermes -p <slug> tools enable delegation`
 5. `hermes -p <slug> plugins install advanced-delegation`
 6. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
-   one option per Subagent `task_key`
+   one option per Subagent `task_key` (include route `fallback_providers`)
 7. Prefer leaving unrouted / no-spawn work on the **parent local decision model**.
    Only set `model_map.default` if you want a child fallback when the parent still
-   calls `delegate_task` without an option.
-8. `hermes -p <slug> delegation config --show` and note the routes on the Agent
-   Suggested runtime section
+   calls `delegate_task` without an option. Keep parent top-level
+   `fallback_providers` empty on Local parent.
+8. `hermes -p <slug> delegation config --show` and confirm each route's
+   fallbacks match the Subagent harness order
 
 Example declined from three Subagents (Coding + Data fetching profiles):
 

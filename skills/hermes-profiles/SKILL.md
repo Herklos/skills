@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.23.0
+version: 1.25.0
 license: MIT
 metadata:
   category: agents
@@ -40,6 +40,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent; **Anytype Agenda → Hermes** bind |
 | `references/messaging-groups.md` | Multi-bot Telegram/Discord rooms; Anytype typed **Group** → Hermes decline (tokens, allowlists, mention gates) |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
+| `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (ordered fast path, model label map, write discipline, gaps) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Stubs (redirect only): `models-and-delegation.md`, `workspace-and-display.md`.
@@ -314,11 +315,17 @@ Apply harness / Subagent / model / SOUL / cron / messaging changes into live
 
 1. the related suggestion is **`accepted`** (or the user explicitly asks to
    apply), and
-2. you follow the matching ref (`models.md`, `delegation.md`,
-   `soul-templates.md`, `cron.md`, `messaging-groups.md`, …).
+2. you follow **`anytype-apply.md`** (ordered playbook) plus the matching topic
+   refs (`models.md`, `delegation.md`, `soul-templates.md`, `cron.md`,
+   `messaging-groups.md`, …).
 
 Never auto-apply from a `draft` / `proposed` suggestion. Mark the suggestion
 `done` after a successful apply when you are tracking that object.
+
+**Primary maps to Hermes id `default`** (not `profiles/p`). After apply, set
+Agent.`hermes_profile` when empty. Prefer `hermes config set` / `tools` over
+full-file `yaml.safe_dump`. Resolve Harness display labels via
+`provider_models_cache.json` before writing `model_map` routes.
 
 ## Gateway
 
@@ -348,6 +355,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
 - **Multi-bot group:** `messaging-groups.md` (tokens + allowlist + mention gates + welcome paste)
 - **Share package:** `export` / `import` or `profile install <git-url>`
+- **Anytype → Hermes apply:** `anytype-apply.md` (SOUL + Local parent + model_map route fallbacks + tools + cron + org skills + voice modes + describe)
 
 ## Workflow checklist
 
