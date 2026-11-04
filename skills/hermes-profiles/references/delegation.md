@@ -207,10 +207,13 @@ hermes -p <slug> delegation config --show
 ```
 
 ```yaml
+local_runtime:
+  enabled: true
+  backend: auto                           # cuda / metal / vulkan / cpu
+
 model:
-  provider: custom                        # or your local provider key
-  default: local-model                    # Local router (picks option per task; answers alone when no spawn)
-  # base_url: http://localhost:8080/v1    # when using a local OpenAI-compatible server
+  provider: llamacpp                      # Local router decision model
+  default: d1-2b-q4_k_m                   # or exact name after Add model file (models.md)
 
 fallback_providers:
   - provider: openrouter
@@ -295,16 +298,19 @@ Steps:
 
 1. Read the parent Agent in Anytype (`format: md`) and list linked Subagents
    (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
-2. Decline parent Agent.`harness_profile` (usually **Local router**) into `model.*`.
+2. Decline parent Agent.`harness_profile` (usually **Local router**) into
+   `local_runtime` + `model.*`: prefer profile `decision_provider` /
+   `decision_model` (org: `llamacpp` / `d1-2b-q4_k_m`); see `models.md`
+   **Local decision model**.
 3. For each live Subagent, open its `harness_profile` and take primary model /
    effort (honor `model_override` / `spawn_effort` when set).
 4. `hermes -p <slug> tools enable delegation`
 5. `hermes -p <slug> plugins install advanced-delegation`
 6. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
    one option per Subagent `task_key`
-7. Prefer leaving unrouted / no-spawn work on the **parent local model**. Only set
-   `model_map.default` if you want a child fallback when the parent still calls
-   `delegate_task` without an option.
+7. Prefer leaving unrouted / no-spawn work on the **parent local decision model**.
+   Only set `model_map.default` if you want a child fallback when the parent still
+   calls `delegate_task` without an option.
 8. `hermes -p <slug> delegation config --show` and note the routes on the Agent
    Suggested runtime section
 

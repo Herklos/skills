@@ -175,11 +175,13 @@ every linked agent's intended primary / backups.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `intent` | text | e.g. `coding`, `data-fetching`, `ops`, `research` |
+| `intent` | text | e.g. `coding`, `data-fetching`, `ops`, `research`, `local-router` |
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
 | `primary_harness` | objects | Link to one **Harness** |
-| `primary_model` | text | Model id / label (e.g. `Claude Code Sonnet 5.5`, `Codex Terra 6.1`) |
+| `primary_model` | text | Display label (e.g. `d1-2B-GGUF Q4_K_M`, `Claude Code Sonnet 5.5`) |
 | `primary_effort` | select | `low` \| `medium` \| `high` |
+| `decision_provider` | text | Hermes `model.provider` for the decision/routing slot when this profile is a **parent** stack (e.g. `llamacpp`). Leave empty on Subagent-only stacks |
+| `decision_model` | text | Hermes `model.default` id for that slot (e.g. `d1-2b-q4_k_m`). Prefer over guessing from `primary_model` when set |
 | `backup_1_harness` | objects | First backup Harness |
 | `backup_1_model` | text | First backup model |
 | `backup_1_effort` | select | `low` \| `medium` \| `high` |
@@ -190,13 +192,18 @@ every linked agent's intended primary / backups.
 
 Also `tag`, `links`, `backlinks`. Put longer rationale and apply notes in the body.
 
+**Decision model:** for parent/router profiles, Hermes main brain =
+`decision_provider` + `decision_model` (falls back to resolving
+`primary_harness` + `primary_model`). Apply with skill `hermes-profiles`
+`models.md` (**Local decision model**). Do not invent values; read the profile.
+
 **Example profiles:**
 
-| Profile | Primary | Backup 1 | Backup 2 | Typical use |
-|---------|---------|----------|-----------|-------------|
-| **Local router** | Local model · medium | Grok · 4.5 · medium | Claude · Haiku 5.5 · medium | **Most Agents** (parent routing brain + quick peer answers) |
-| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high | Subagent routes (`deep`, `fast`, …) |
-| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium | Subagent routes (`fetch`, …) |
+| Profile | Primary / decision | Backup 1 | Backup 2 | Typical use |
+|---------|--------------------|----------|-----------|-------------|
+| **Local router** | Local model · `llamacpp` / `d1-2b-q4_k_m` · medium | Grok · 4.5 · medium | Claude · Haiku 5.5 · medium | **Most Agents** (parent decision brain + quick peer answers) |
+| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high | Subagent routes (`deep`, `fast`, …); leave `decision_*` empty |
+| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium | Subagent routes (`fetch`, …); leave `decision_*` empty |
 
 Parent Agents usually link **Local router**. Subagents link Coding / Data fetching
 (or other specialized stacks). The local parent picks a Subagent `task_key` when

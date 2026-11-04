@@ -9,19 +9,23 @@ Official docs:
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/fallback-providers
 - https://hermes-agent.nousresearch.com/docs/user-guide/features/mixture-of-agents
 
-Related: `delegation.md` (subagents / advanced-delegation). Parent `model.*` is also the **routing model** when delegating.
+Related: `delegation.md` (subagents / advanced-delegation). Parent `model.*` is also the **routing / decision model** when delegating.
+
+Official local models: https://hermes-agent.nousresearch.com/docs/user-guide/local-models
 
 ## Slot map
 
 | Slot | Role |
 |------|------|
-| **Main / routing model** (`model.*`) | Thinks, tools, streamed replies; when delegating, **picks** the per-task route |
+| **Main / decision / routing model** (`model.*`) | Thinks, tools, streamed replies; when delegating, **picks** the per-task route |
 | **Auxiliary** (`auxiliary.<task>.*`) | Side jobs: compression, vision, titles, approval, … |
 | **Fallback** (`fallback_providers`) | Backup provider:model when main fails mid-turn |
 | **Subagents** | See `delegation.md` |
 | **MoA** (`moa.presets`) | Virtual provider: reference advisors + acting aggregator |
 
 All of the above are **per profile**. Cloning a profile copies them unless you override afterward.
+
+When declining from Anytype **Harness profile**: use `decision_provider` + `decision_model` for parent `model.*` when set; else resolve `primary_harness` + `primary_model`. Backups map to `fallback_providers`.
 
 ## Main model
 
@@ -39,6 +43,57 @@ model:
 ```
 
 Mid-session: `/model` in chat. New sessions pick up `config.yaml` changes; open chats keep their start model until switched.
+
+## Local decision model (llamacpp / managed runtime)
+
+**Org default for Local router parents:** Hermes main/decision model is the
+downloaded **d1-2B-GGUF Q4_K_M** via Hermes' built-in llama.cpp managed runtime
+(`provider: llamacpp`). That parent answers peers / light asks itself and picks
+Subagent routes when needed (`delegation.md`).
+
+Anytype **Local router** stores this as `decision_provider: llamacpp` and
+`decision_model: d1-2b-q4_k_m` (plus `primary_model` label). Prefer those fields
+when applying; if Hermes assigns a slightly different local name after **Add
+model file**, use the exact id Hermes shows.
+
+### Managed runtime (recommended)
+
+In `~/.hermes/profiles/<slug>/config.yaml`:
+
+```yaml
+local_runtime:
+  enabled: true
+  backend: auto          # or cuda / metal / vulkan / cpu
+
+model:
+  provider: llamacpp
+  default: "d1-2b-q4_k_m"   # or the exact name Hermes assigns after adding the file
+```
+
+Or via CLI (targets the profile):
+
+```bash
+hermes -p <slug> config set local_runtime.enabled true
+hermes -p <slug> config set model.provider llamacpp
+hermes -p <slug> config set model.default "d1-2b-q4_k_m"
+```
+
+Add the local GGUF via the desktop UI **Add model file** (links it without
+copying). Hermes manages the llama-server, context (≥64K), and GPU layers
+automatically.
+
+Also: Desktop **Settings → Providers → Local Models** (Install runtime →
+Download / Add model file → Use), or `hermes -p <slug> model` → **Local models**.
+
+Notes:
+
+- `local_runtime.backend: auto` picks CUDA / Metal / Vulkan / CPU for the machine.
+- With no managed server, Hermes can still use a llama-server you already run
+  (`detect_ports`, default probe `:8080`) or an explicit `providers.llamacpp`
+  endpoint.
+- Do not hand-tune context / n-gpu-layers for the managed path; Hermes sizes them.
+- Cloning a profile with default clone flags excludes local model trees; re-link
+  or re-download the GGUF on the new profile if needed.
 
 ## Auxiliary models
 
@@ -158,7 +213,8 @@ Configure also via Dashboard / Desktop → Model → Mixture of Agents.
 
 | Need | Configure |
 |------|-----------|
-| Default chat brain / routing model | `model.*` |
+| Default chat brain / decision / routing model | `model.*` |
+| **Local router decision model (org default)** | `local_runtime` + `model.provider: llamacpp` + `d1-2b-q4_k_m` (section above) |
 | Cheaper summaries / vision / approvals | `auxiliary.<task>.*` |
 | Survive primary outages | `fallback_providers` |
 | Multi-model advice, one acting loop | `moa` preset as main via provider `moa` |

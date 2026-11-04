@@ -114,6 +114,18 @@ Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | 
 }
 ```
 
+For **Local router** (parent decision stack), also set Hermes ids:
+
+```json
+"decision_provider": "llamacpp",
+"decision_model": "d1-2b-q4_k_m",
+"primary_model": "d1-2B-GGUF Q4_K_M",
+"primary_effort": "medium"
+```
+
+Decline via hermes-profiles `models.md` (Local decision model). Leave `decision_*`
+empty on Coding / Data fetching (Subagent stacks).
+
 Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 
 ## Create a Subagent (spawn route)

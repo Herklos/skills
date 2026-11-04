@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.12.0
+version: 1.13.0
 license: MIT
 metadata:
   category: agents
@@ -27,7 +27,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | File | When |
 |------|------|
 | `references/profile-map.md` | File layout, clone flags, CLI cheat sheet |
-| `references/models.md` | Main / routing model, auxiliary, fallback, MoA |
+| `references/models.md` | Main / decision / routing model (incl. local llamacpp), auxiliary, fallback, MoA |
 | `references/delegation.md` | Subagents, advanced-delegation, `model_map` / `profile_routes` |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
@@ -226,7 +226,8 @@ Full guide: `references/models.md`.
 
 | Concern | Config / CLI |
 |---------|----------------|
-| Main / routing model | `model.*` / `hermes -p <slug> model` / `/model` |
+| Main / decision / routing model | `model.*` / `hermes -p <slug> model` / `/model` |
+| Local decision (Local router) | `local_runtime` + `provider: llamacpp` + `d1-2b-q4_k_m` (`models.md`) |
 | Side jobs | `auxiliary.<task>.*` (default `auto` = main) |
 | Backup mid-turn | `fallback_providers` / `hermes -p <slug> fallback` |
 | MoA | `moa.presets` / `hermes -p <slug> moa configure` |

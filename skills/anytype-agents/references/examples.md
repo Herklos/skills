@@ -49,7 +49,7 @@ Central home for teams and shared rules.
 - Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model
 
 ## Harness profiles (type `harness_profile`)
-- **Local router** → Local model medium; backups Grok 4.5 medium, Haiku 5.5 medium (**most Agents**)
+- **Local router** → decision `llamacpp` / `d1-2b-q4_k_m` medium; backups Grok 4.5 medium, Haiku 5.5 medium (**most Agents**)
 - Coding → Claude Sonnet 5.5 high; backups Codex Sol 6.1 high, Grok 4.5 high (**Subagent routes**)
 - Data fetching → Codex Terra 6.1 high; backups Claude Haiku 5.5 medium, Grok 4.5 medium (**Subagent routes**)
 - Agents link `harness_profile` (not a harness select)
@@ -83,7 +83,8 @@ Skills: Agent → Subteam → Team → Project → Global
 ```markdown
 ## Suggested runtime (2026-11-04)
 **Harness profile:** Local router (Agent.`harness_profile` → Local router)
-**Primary (from profile):** Local model · medium (routing brain + quick peer answers)
+**Primary (from profile):** Local model · d1-2B-GGUF Q4_K_M · medium (decision brain + quick peer answers)
+**Decision (Hermes):** llamacpp · d1-2b-q4_k_m
 **Fallback / backup (from profile):**
 - 1: Grok · Grok 4.5 · medium
 - 2: Claude · Claude Haiku 5.5 · medium
@@ -96,7 +97,7 @@ Skills: Agent → Subteam → Team → Project → Global
 - Enabled: yes (`delegation` toolset)
 - Pattern: parent Local router answers peers / light asks; spawn Subagent only when specialized
 - Anytype Subagents: Quick edit (`fast`, Coding), Deep code (`deep`, Coding), Fast fetch (`fetch`, Data fetching)
-- Routing model: Local model · medium (parent main; picks `option` per task)
+- Decision / routing model: llamacpp · d1-2b-q4_k_m (parent main; picks `option` per task)
 - Mode: `model_map` · plugin advanced-delegation installed
 - Task-specific models (declined from Subagent objects; unrouted work stays on parent):
   - `fast` ← Quick edit · Coding · medium — small edits, simple tests

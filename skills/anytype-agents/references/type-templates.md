@@ -137,17 +137,21 @@ Intent and agent roles this stack fits.
 
 ## Stack summary
 - Primary: {Harness} · {model} · {effort}
+- Decision (Hermes main, when parent): {provider} · {model id}
 - Backup 1: {Harness} · {model} · {effort}
 - Backup 2: {Harness} · {model} · {effort}
 
 ## Apply notes
 Editing this profile updates the intended models for every Agent linked via
 `harness_profile`. Re-apply into each live runtime (Claude / Codex / Grok / …)
-separately. Anytype does not push configs automatically.
+separately. Anytype does not push configs automatically. For Local router,
+decline `decision_provider` / `decision_model` via hermes-profiles `models.md`
+(Local decision model / llamacpp).
 ```
 
-Example stacks: **Local router** (Local model medium → Grok 4.5 medium → Haiku
-5.5 medium) for most Agents; Coding / Data fetching for Subagent routes.
+Example stacks: **Local router** (`llamacpp` / `d1-2b-q4_k_m` medium → Grok 4.5
+medium → Haiku 5.5 medium) for most Agents; Coding / Data fetching for Subagent
+routes.
 
 ---
 

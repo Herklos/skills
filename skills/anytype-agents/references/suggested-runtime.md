@@ -6,7 +6,7 @@ skill `hermes-profiles`:
 
 | Area | Reference |
 |------|-----------|
-| Primary / aux / fallback / MoA | `models.md` |
+| Primary / decision / aux / fallback / MoA | `models.md` (Local decision model for Local router) |
 | Subagents / task-specific routes | `delegation.md` |
 | Personality / SOUL | `soul-templates.md` |
 | Memory | `memory.md` |
@@ -22,7 +22,8 @@ Paste under the agent title (date the heading when you revise it).
 ```markdown
 ## Suggested runtime (YYYY-MM-DD)
 **Harness profile:** {Local router (default for most agents) | Coding | Data fetching | …}  (link Agent.`harness_profile`)
-**Primary (from profile):** {Harness} · {model} · {low|medium|high}  (Local router → Local model · medium)
+**Primary (from profile):** {Harness} · {model} · {low|medium|high}  (Local router → Local model · d1-2B-GGUF Q4_K_M · medium)
+**Decision (Hermes main, from profile when set):** {decision_provider} · {decision_model}  (Local router → llamacpp · d1-2b-q4_k_m)
 **Fallback / backup (from profile, ordered):**
 - 1: {Harness} · {model} · {effort}
 - 2: {Harness} · {model} · {effort}
@@ -39,7 +40,7 @@ Paste under the agent title (date the heading when you revise it).
 - Enabled: yes (`delegation` toolset) | no
 - **Pattern:** parent Local router answers peers / light asks itself; spawn a Subagent only when a specialized route fits
 - **Anytype Subagents:** none | list linked Agent.`subagents` (type `subagent`; each has task_key + harness_profile + scope/tools)
-- **Routing model:** same as Primary (Local model) | {provider}·{model} · {reasoning}
+- **Decision / routing model:** same as Decision fields (Local router → llamacpp · d1-2b-q4_k_m) | {provider}·{model} · {reasoning}
 - **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
 - Plugin: **advanced-delegation** on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
 - **Task-specific models** (prefer decline from Subagent objects; else hand-list):
