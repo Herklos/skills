@@ -29,10 +29,11 @@ Set Autonomy / Short description / Memory pages / Map path as **properties**
 ````markdown
 ## Suggested runtime (YYYY-MM-DD)
 **Harness profile:** {Local router (default) | Coding | Data fetching | …}  (Agent.`harness_profile`)
-**Primary (from profile):** {Local model · medium | …}
-**Fallback / backup (from profile):**
-- 1: {Harness} · {model} · {effort}
-- 2: {Harness} · {model} · {effort}
+**model.* (from profile):** {provider} · {model_default} · {effort}
+**fallback_providers (from profile):**
+- 1: {provider} · {model} · {effort}
+- 2: {provider} · {model} · {effort}
+**auxiliary (from profile):** vision / compression / web_extract / skills_hub / title_generation (auto unless set)
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
 **Subagents / delegation:** Agent.`delegation_enabled` + Agent.`subagents`. Parent Local router answers light/peer asks itself; model_map routes when specialized work is needed.
 **Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults None / Cua Spaces dedicated / Standard interactive).
@@ -49,7 +50,7 @@ You are {Name}, …
 Follow **Agents → Agent Template – Shared Rules** in full.
 
 # Tools and systems
-- Harness profile: {name} (primary + backups from that object)
+- Harness profile: {name} (model.* + fallbacks + aux from that object)
 - Browser / Computer / Tool profile: {linked catalog names}
 - Models / personality / memory / security / workspace: see Suggested runtime + Agent properties
 
@@ -115,23 +116,24 @@ Set `slug` to one of: `claude`, `codex`, `grok`, `github-copilot`, `muse`,
 Intent and agent roles this stack fits.
 
 ## Stack summary
-- Primary: {Harness} · {model} · {effort}
-- Decision (Hermes main, when parent): {provider} · {model id}
-- Backup 1: {Harness} · {model} · {effort}
-- Backup 2: {Harness} · {model} · {effort}
+- model.*: {provider} · {model_default} · {effort} · harness {catalog}
+- fallback_1: {provider} · {model} · {effort}
+- fallback_2: {provider} · {model} · {effort}
+- auxiliary: vision / compression / web_extract / skills_hub / title_generation
+  (provider/model/effort; auto = inherit main)
 - Voice: STT {provider}/{model} · TTS {provider}/{voice} · speed {1} (or none)
 
 ## Apply notes
 Editing this profile updates the intended models (and voice stack) for every
 Agent linked via `harness_profile`. Re-apply into each live runtime (Claude /
 Codex / Grok / Hermes / …) separately. Anytype does not push configs
-automatically. For Local router, decline `decision_provider` / `decision_model`
-via hermes-profiles `models.md` (Local decision model / llamacpp) and voice via
-`voice.md` (default local+edge).
+automatically. Decline `model_*` / `fallback_*` / `aux_*` via hermes-profiles
+`models.md` (Local router: llamacpp + local_runtime) and voice via `voice.md`
+(default local+edge).
 ```
 
-Example stacks: **Local router** (`llamacpp` / `d1-2b-q4_k_m` medium → Grok 4.5
-medium → Haiku 5.5 medium) for most Agents; Coding / Data fetching for Subagent
+Example stacks: **Local router** (`llamacpp` / `d1-2b-q4_k_m` medium → xai Grok
+4.5 → anthropic Haiku 5.5) for most Agents; Coding / Data fetching for Subagent
 routes.
 
 ---

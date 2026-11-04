@@ -25,7 +25,16 @@ Official local models: https://hermes-agent.nousresearch.com/docs/user-guide/loc
 
 All of the above are **per profile**. Cloning a profile copies them unless you override afterward.
 
-When declining from Anytype **Harness profile**: use `decision_provider` + `decision_model` for parent `model.*` when set; else resolve `primary_harness` + `primary_model`. Backups map to `fallback_providers`.
+When declining from Anytype **Harness profile** (Hermes-shaped keys):
+
+| Anytype | Hermes |
+|---------|--------|
+| `model_provider` + `model_default` (+ `model_effort`) | `model.*` (main / decision / routing) |
+| `fallback_1_*` / `fallback_2_*` (`provider`, `model`, optional `effort` / `harness`) | ordered `fallback_providers` |
+| `aux_<task>_provider` / `aux_<task>_model` (+ effort) for `vision`, `compression`, `web_extract`, `skills_hub`, `title_generation` | `auxiliary.<task>.*` (`auto` + empty model = inherit main) |
+| `model_harness` / `fallback_*_harness` | catalog UX only |
+
+If provider is `llamacpp`, also enable `local_runtime` (see Local decision model).
 
 ## Main model
 
@@ -51,10 +60,10 @@ downloaded **d1-2B-GGUF Q4_K_M** via Hermes' built-in llama.cpp managed runtime
 (`provider: llamacpp`). That parent answers peers / light asks itself and picks
 Subagent routes when needed (`delegation.md`).
 
-Anytype **Local router** stores this as `decision_provider: llamacpp` and
-`decision_model: d1-2b-q4_k_m` (plus `primary_model` label). Prefer those fields
-when applying; if Hermes assigns a slightly different local name after **Add
-model file**, use the exact id Hermes shows.
+Anytype **Local router** stores this as `model_provider: llamacpp` and
+`model_default: d1-2b-q4_k_m` (plus `model_effort` / `model_harness`). Prefer
+those fields when applying; if Hermes assigns a slightly different local name
+after **Add model file**, use the exact id Hermes shows.
 
 ### Managed runtime (recommended)
 

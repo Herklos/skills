@@ -16,7 +16,7 @@ Skills, Shared Rules, Groups, memory children, and other hub pages stay type
 | `subteam` | Subteams | Domains / pods under an HQ (**preferred**; do not model these as `team` with `kind: Sub-team`) |
 | `subagent` | Subagents | Spawn configs an Agent may start (task, harness profile, scope, tools). Not the same as `subteam` |
 | `harness` | Harnesses | Product catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
-| `harness_profile` | Harness profiles | Reusable model stacks (primary + backups). Agents and Subagents link here |
+| `harness_profile` | Harness profiles | Reusable Hermes-shaped model / fallback / aux stacks. Agents and Subagents link here |
 | `browser` | Browsers | Reusable browser access catalog (source + identity). Agents / Teams / Subteams link here |
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
@@ -49,7 +49,7 @@ Featured properties (API keys):
 | `team` | objects | Link to owning Team or Subteam |
 | `reports_to` | objects | Link to chief / Primary agent |
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
-| `harness_profile` | objects | Link to one **Harness profile** (source of primary + backup models). **Default for most agents: Local router** |
+| `harness_profile` | objects | Link to one **Harness profile** (source of `model.*` / fallbacks / aux). **Default for most agents: Local router** |
 | `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
 | `browser` | objects | Link to one **Browser** catalog object |
 | `computer` | objects | Link to one **Computer** catalog object |
@@ -232,24 +232,31 @@ Muse, NVIDIA NIM, Local model (matching slugs above).
 
 ## Harness profile (`api_key`: `harness_profile`)
 
-Reusable model stack. Many agents share one profile; edit the profile to refresh
-every linked agent's intended primary / backups.
+Reusable Hermes-shaped model stack. Many agents share one profile; edit the
+profile to refresh every linked agent's intended `model.*`,
+`fallback_providers`, and `auxiliary.<task>.*`.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `intent` | text | e.g. `coding`, `data-fetching`, `ops`, `research`, `local-router` |
-| `lifecycle` | select | `draft` \| `live` \| `archived` |
-| `primary_harness` | objects | Link to one **Harness** |
-| `primary_model` | text | Display label (e.g. `d1-2B-GGUF Q4_K_M`, `Claude Code Sonnet 5.5`) |
-| `primary_effort` | select | `low` \| `medium` \| `high` |
-| `decision_provider` | text | Hermes `model.provider` for the decision/routing slot when this profile is a **parent** stack (e.g. `llamacpp`). Leave empty on Subagent-only stacks |
-| `decision_model` | text | Hermes `model.default` id for that slot (e.g. `d1-2b-q4_k_m`). Prefer over guessing from `primary_model` when set |
-| `backup_1_harness` | objects | First backup Harness |
-| `backup_1_model` | text | First backup model |
-| `backup_1_effort` | select | `low` \| `medium` \| `high` |
-| `backup_2_harness` | objects | Second backup Harness |
-| `backup_2_model` | text | Second backup model |
-| `backup_2_effort` | select | `low` \| `medium` \| `high` |
+| `intent` | text | e.g. `coding`, `data-fetching`, `ops`, `research`, `local-router` (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `model_provider` | text | Hermes `model.provider` (featured). e.g. `llamacpp`, `anthropic`, `openai-codex`, `xai`, `openrouter` |
+| `model_default` | text | Hermes `model.default` id (featured). e.g. `d1-2b-q4_k_m`, or a display label until the exact id is known |
+| `model_effort` | select | `low` \| `medium` \| `high` (featured). Reasoning / effort for main |
+| `model_harness` | objects | Optional catalog **Harness** link for org UX (featured). Do not invent provider from this when `model_provider` is set |
+| `fallback_1_provider` | text | Hermes `fallback_providers[0].provider` |
+| `fallback_1_model` | text | Hermes `fallback_providers[0].model` |
+| `fallback_1_effort` | select | `low` \| `medium` \| `high` |
+| `fallback_1_harness` | objects | Optional catalog Harness for fallback 1 |
+| `fallback_2_provider` | text | Hermes `fallback_providers[1].provider` |
+| `fallback_2_model` | text | Hermes `fallback_providers[1].model` |
+| `fallback_2_effort` | select | `low` \| `medium` \| `high` |
+| `fallback_2_harness` | objects | Optional catalog Harness for fallback 2 |
+| `aux_vision_provider` / `aux_vision_model` / `aux_vision_effort` | text / text / select | Hermes `auxiliary.vision.*`. Use `auto` + empty model to inherit main |
+| `aux_compression_*` | same | Hermes `auxiliary.compression.*` |
+| `aux_web_extract_*` | same | Hermes `auxiliary.web_extract.*` |
+| `aux_skills_hub_*` | same | Hermes `auxiliary.skills_hub.*` |
+| `aux_title_generation_*` | same | Hermes `auxiliary.title_generation.*` |
 | `notes` | text | When to use this profile |
 | `stt_provider` | select | `local` \| `groq` \| `openai` \| `mistral` \| `xai` \| `elevenlabs` \| `deepinfra` \| `none` (featured). Display name **STT provider** |
 | `stt_model` | text | e.g. `base`, `whisper-large-v3-turbo` |
@@ -260,10 +267,13 @@ every linked agent's intended primary / backups.
 
 Also `tag`, `links`, `backlinks`. Put longer rationale and apply notes in the body.
 
-**Decision model:** for parent/router profiles, Hermes main brain =
-`decision_provider` + `decision_model` (falls back to resolving
-`primary_harness` + `primary_model`). Apply with skill `hermes-profiles`
-`models.md` (**Local decision model**). Do not invent values; read the profile.
+**Hermes decline** (skill `hermes-profiles` → `models.md`):
+1. `model_provider` + `model_default` (+ `model_effort`) → `model.*`. When
+   provider is `llamacpp`, also enable `local_runtime`.
+2. `fallback_1_*` / `fallback_2_*` → ordered `fallback_providers`.
+3. Each filled `aux_<task>_*` → `auxiliary.<task>.provider` / `.model` (effort
+   when Hermes accepts it on that task).
+4. `model_harness` / `fallback_*_harness` are catalog UX only.
 
 **Voice stack:** parent profiles (Local router) set STT/TTS defaults agents
 inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as `none`.
@@ -271,11 +281,11 @@ Apply with `hermes-profiles` → `voice.md`.
 
 **Example profiles:**
 
-| Profile | Primary / decision | Backup 1 | Backup 2 | Voice | Typical use |
-|---------|--------------------|----------|-----------|-------|-------------|
-| **Local router** | Local model · `llamacpp` / `d1-2b-q4_k_m` · medium | Grok · 4.5 · medium | Claude · Haiku 5.5 · medium | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent decision brain + quick peer answers) |
-| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high | STT/TTS `none` | Subagent routes (`deep`, `fast`, …); leave `decision_*` empty |
-| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium | STT/TTS `none` | Subagent routes (`fetch`, …); leave `decision_*` empty |
+| Profile | model.* | fallback_1 | fallback_2 | Aux | Voice | Typical use |
+|---------|---------|------------|------------|-----|-------|-------------|
+| **Local router** | `llamacpp` / `d1-2b-q4_k_m` · medium · Local model | `xai` · Grok 4.5 · medium | `anthropic` · Haiku 5.5 · medium | `auto` | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent brain) |
+| Coding | `anthropic` · Claude Code Sonnet 5.5 · high · Claude | `openai-codex` · Sol 6.1 · high | `xai` · Grok 4.5 · high | `auto` | STT/TTS `none` | Subagent routes (`deep`, `fast`, …) |
+| Data fetching | `openai-codex` · Terra 6.1 · high · Codex | `anthropic` · Haiku 5.5 · medium | `xai` · Grok 4.5 · medium | `auto` | STT/TTS `none` | Subagent routes (`fetch`, …) |
 
 Parent Agents usually link **Local router**. Subagents link Coding / Data fetching
 (or other specialized stacks). The local parent picks a Subagent `task_key` when
@@ -286,6 +296,9 @@ needed and answers directly otherwise.
 Apply: when an agent's Suggested runtime or live bot models / voice change,
 update the **Harness profile** object, then re-apply to each linked agent's
 runtime (Anytype does not auto-push into Claude/Codex/Grok/Hermes/…).
+
+**Legacy keys (removed):** `primary_*`, `decision_*`, `backup_*`. Migrate any
+old docs/recipes to `model_*` / `fallback_*` / `aux_*`.
 
 ## Browser (`api_key`: `browser`)
 

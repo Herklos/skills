@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.20.0
+version: 1.21.0
 license: MIT
 metadata:
   category: agents
@@ -76,7 +76,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Subteam | Typed `subteam` object: domain / pod under an HQ (preferred over `team` + `kind: Sub-team`) |
 | Subagent | Typed `subagent` object: spawn/route config (task_key, harness_profile, scope, tools) under an Agent |
 | Harness | Typed `harness` catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
-| Harness profile | Typed `harness_profile`: reusable primary + backup model stack; agents and subagents link here |
+| Harness profile | Typed `harness_profile`: Hermes-shaped model / fallback / aux stack; agents and subagents link here |
 | Browser | Typed `browser` catalog: source + identity + headed; agents / teams / subteams link here |
 | Computer | Typed `computer` catalog: surface + scope + desktop; agents / teams / subteams link here |
 | Tool profile | Typed `tool_profile` catalog: toolsets + approvals + terminal; agents / teams / subteams link here |
@@ -172,11 +172,13 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 1. **Harness** (catalog): type `harness` with `slug` in
    `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | `local-model`
-2. **Harness profile** (stack): type `harness_profile` with `intent`, `primary_harness` +
-   `primary_model` + `primary_effort`, ordered backups (`backup_1_*`, `backup_2_*`), and
-   optional voice stack (`stt_provider` / `stt_model` / `tts_provider` / `tts_voice` /
-   `tts_speed` / `voice_notes`). **Local router** org default: STT `local`/`base` + TTS
-   `edge`/`en-US-AriaNeural`. Subagent-only stacks leave STT/TTS as `none`
+2. **Harness profile** (stack): type `harness_profile` with Hermes-shaped fields:
+   `model_provider` / `model_default` / `model_effort` / `model_harness`,
+   `fallback_1_*` / `fallback_2_*`, `aux_<task>_*` for vision / compression /
+   web_extract / skills_hub / title_generation, and optional voice stack
+   (`stt_*` / `tts_*` / `voice_notes`). **Local router** org default:
+   `llamacpp` / `d1-2b-q4_k_m` + STT `local`/`base` + TTS `edge`/`en-US-AriaNeural`.
+   Subagent-only stacks leave STT/TTS as `none` and aux at `auto`
 3. Bodies from `type-templates.md`; link profiles from Agents → Shared
 4. Point agents (and Subagents) at a profile via `harness_profile` (no Agent `harness` select)
 5. After editing a shared profile, re-apply models **and voice** into each linked agent's

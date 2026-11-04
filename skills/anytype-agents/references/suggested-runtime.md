@@ -7,8 +7,8 @@ configures the bot; they do **not** auto-apply.
 `hermes_profile`, `delegation_enabled`, `browser`, `computer`, `tool_profile`,
 `terminal_backend`, `computer_surface`, `subagents`, voice fields
 (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`,
-optional `stt_*` / `tts_*`), plus Harness profile `decision_*` / primary /
-backups / voice stack. Keep this body section for narrative apply notes and
+optional `stt_*` / `tts_*`), plus Harness profile `model_*` / `fallback_*` /
+`aux_*` / voice stack. Keep this body section for narrative apply notes and
 fields that do not yet have a property. Do not treat markdown bullets as the
 only source of truth for Browser / Computer / Tools / Terminal / Voice when the
 matching properties or catalog links are set.
@@ -34,25 +34,24 @@ Paste under the agent title (date the heading when you revise it).
 ```markdown
 ## Suggested runtime (YYYY-MM-DD)
 **Harness profile:** {Local router (default for most agents) | Coding | Data fetching | …}  (link Agent.`harness_profile`)
-**Primary (from profile):** {Harness} · {model} · {low|medium|high}  (Local router → Local model · d1-2B-GGUF Q4_K_M · medium)
-**Decision (Hermes main, from profile when set):** {decision_provider} · {decision_model}  (Local router → llamacpp · d1-2b-q4_k_m)
-**Fallback / backup (from profile, ordered):**
-- 1: {Harness} · {model} · {effort}
-- 2: {Harness} · {model} · {effort}
+**model.* (from profile):** {model_provider} · {model_default} · {model_effort} · harness {catalog}  (Local router → llamacpp · d1-2b-q4_k_m · medium)
+**fallback_providers (from profile, ordered):**
+- 1: {fallback_1_provider} · {fallback_1_model} · {effort}
+- 2: {fallback_2_provider} · {fallback_2_model} · {effort}
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
 **Optional agent overrides:** none | note local exceptions (prefer changing the shared profile)
-**Auxiliary (optional overrides; else auto = main):**
-- vision: …
+**auxiliary (from profile `aux_*`; else auto = main):**
+- vision: {provider} · {model} · {effort}
 - compression: …
-- approval: …
+- web_extract: …
+- skills_hub: …
 - title_generation: …
-- review (`/review`): …
-- other tasks: …
+- other Hermes aux (approval, review, …): document only if needed
 **Subagents / delegation:**
 - Enabled: yes (`delegation` toolset) | no
 - **Pattern:** parent Local router answers peers / light asks itself; spawn a Subagent only when a specialized route fits
 - **Anytype Subagents:** none | list linked Agent.`subagents` (type `subagent`; each has task_key + harness_profile + scope/tools)
-- **Decision / routing model:** same as Decision fields (Local router → llamacpp · d1-2b-q4_k_m) | {provider}·{model} · {reasoning}
+- **Decision / routing model:** same as profile `model.*` (Local router → llamacpp · d1-2b-q4_k_m) | {provider}·{model} · {reasoning}
 - **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
 - Plugin: **advanced-delegation** on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
 - **Task-specific models** (prefer decline from Subagent objects; else hand-list):

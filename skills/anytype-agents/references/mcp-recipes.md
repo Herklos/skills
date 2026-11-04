@@ -106,6 +106,9 @@ Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | 
 
 ## Create a Harness profile
 
+Hermes-shaped fields: `model_*` → `model.*`, `fallback_*` →
+`fallback_providers`, `aux_<task>_*` → `auxiliary.<task>.*`.
+
 ```json
 {
   "space_id": "<spaceId>",
@@ -116,15 +119,23 @@ Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | 
     "properties": {
       "intent": "coding",
       "lifecycle": "live",
-      "primary_harness": ["<claudeObjectId>"],
-      "primary_model": "Claude Code Sonnet 5.5",
-      "primary_effort": "high",
-      "backup_1_harness": ["<codexObjectId>"],
-      "backup_1_model": "Codex Sol 6.1",
-      "backup_1_effort": "high",
-      "backup_2_harness": ["<grokObjectId>"],
-      "backup_2_model": "Grok 4.5",
-      "backup_2_effort": "high",
+      "model_provider": "anthropic",
+      "model_default": "Claude Code Sonnet 5.5",
+      "model_effort": "high",
+      "model_harness": ["<claudeObjectId>"],
+      "fallback_1_provider": "openai-codex",
+      "fallback_1_model": "Codex Sol 6.1",
+      "fallback_1_effort": "high",
+      "fallback_1_harness": ["<codexObjectId>"],
+      "fallback_2_provider": "xai",
+      "fallback_2_model": "Grok 4.5",
+      "fallback_2_effort": "high",
+      "fallback_2_harness": ["<grokObjectId>"],
+      "aux_vision_provider": "auto",
+      "aux_compression_provider": "auto",
+      "aux_web_extract_provider": "auto",
+      "aux_skills_hub_provider": "auto",
+      "aux_title_generation_provider": "auto",
       "stt_provider": "none",
       "tts_provider": "none"
     },
@@ -133,13 +144,21 @@ Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | 
 }
 ```
 
-For **Local router** (parent decision stack), also set Hermes ids + voice stack:
+For **Local router** (parent stack):
 
 ```json
-"decision_provider": "llamacpp",
-"decision_model": "d1-2b-q4_k_m",
-"primary_model": "d1-2B-GGUF Q4_K_M",
-"primary_effort": "medium",
+"model_provider": "llamacpp",
+"model_default": "d1-2b-q4_k_m",
+"model_effort": "medium",
+"model_harness": ["<localModelHarnessObjectId>"],
+"fallback_1_provider": "xai",
+"fallback_1_model": "Grok 4.5",
+"fallback_1_effort": "medium",
+"fallback_1_harness": ["<grokObjectId>"],
+"fallback_2_provider": "anthropic",
+"fallback_2_model": "Claude Haiku 5.5",
+"fallback_2_effort": "medium",
+"fallback_2_harness": ["<claudeObjectId>"],
 "stt_provider": "local",
 "stt_model": "base",
 "tts_provider": "edge",
@@ -147,9 +166,9 @@ For **Local router** (parent decision stack), also set Hermes ids + voice stack:
 "tts_speed": 1
 ```
 
-Decline via hermes-profiles `models.md` (Local decision model) and `voice.md`.
-Leave `decision_*` empty on Coding / Data fetching (Subagent stacks); set their
-STT/TTS providers to `none`.
+Decline via hermes-profiles `models.md` (incl. Local decision / llamacpp) and
+`voice.md`. Subagent stacks (Coding / Data fetching) usually keep aux at `auto`
+and STT/TTS at `none`.
 
 Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 

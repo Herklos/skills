@@ -290,8 +290,8 @@ local parent.
 |------------------------|---------------------------|
 | `task_key` | `name` |
 | `intent` | `description` |
-| `harness_profile` primary (or `model_override`) | `provider` + `model` (resolve labels to runtime ids) |
-| `spawn_effort` (else profile `primary_effort`) | `reasoning_effort` when the provider supports it |
+| `harness_profile` `model_*` (or `model_override`) | `provider` + `model` (resolve labels to runtime ids) |
+| `spawn_effort` (else profile `model_effort`) | `reasoning_effort` when the provider supports it |
 | `scope`, `toolsets`, `deliver_back` | Child brief / parent prompt notes (Hermes children inherit parent tools unless you use `profile_routes`) |
 
 Steps:
@@ -299,10 +299,10 @@ Steps:
 1. Read the parent Agent in Anytype (`format: md`) and list linked Subagents
    (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
 2. Decline parent Agent.`harness_profile` (usually **Local router**) into
-   `local_runtime` + `model.*`: prefer profile `decision_provider` /
-   `decision_model` (org: `llamacpp` / `d1-2b-q4_k_m`); see `models.md`
-   **Local decision model**.
-3. For each live Subagent, open its `harness_profile` and take primary model /
+   `local_runtime` + `model.*`: prefer profile `model_provider` /
+   `model_default` (org: `llamacpp` / `d1-2b-q4_k_m`); see `models.md`
+   **Local decision model**. Also map `fallback_*` and `aux_*` when filled.
+3. For each live Subagent, open its `harness_profile` and take `model_*` /
    effort (honor `model_override` / `spawn_effort` when set).
 4. `hermes -p <slug> tools enable delegation`
 5. `hermes -p <slug> plugins install advanced-delegation`
