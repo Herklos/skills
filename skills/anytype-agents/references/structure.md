@@ -6,7 +6,8 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Project type keys |
+| `object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Project / Epic / User story / Task type keys |
+| `project-pm.md` | PM Epics / User stories / Tasks + filtered Roadmap/Backlog/TODO Queries |
 | `type-templates.md` | Dumped default template bodies (bootstrap / drift) |
 | `page-templates.md` | Creating/auditing body shapes |
 | `suggested-runtime.md` | Suggested runtime field list |
@@ -59,7 +60,7 @@ Agents
 Projects
 ├── {Product / repo}
 │   ├── Technical / Business / …
-│   ├── Project Management → Roadmap / Backlog / TODO
+│   ├── Project Management → Roadmap / Backlog / TODO (Queries of epic / user_story / task)
 │   ├── Product / Design / Marketing
 │   └── Skills (project) optional
 └── …
@@ -83,12 +84,14 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 ## Types
 
 Org inventory uses custom keys **`agent`**, **`team`**, **`subteam`**,
-**`subagent`**, **`harness`**, **`harness_profile`**, plus extended built-in
-**`project`**. Prefer **`subteam`** for domains under an HQ. Prefer
-**`harness_profile`** on agents (not a harness select). Prefer **`subagent`**
-objects linked via Agent.`subagents` for spawn routes (decline to Hermes
-`model_map`). Supporting docs (Shared Rules, Skills, memory children, hubs) stay
-**`page`**. Spaces also expose `task`, `note`, `collection`, `query`,
+**`subagent`**, **`harness`**, **`harness_profile`**, **`epic`**,
+**`user_story`**, plus extended built-ins **`project`** and **`task`**. Prefer
+**`subteam`** for domains under an HQ. Prefer **`harness_profile`** on agents
+(not a harness select). Prefer **`subagent`** objects linked via Agent.`subagents`
+for spawn routes (decline to Hermes `model_map`). Project PM uses **`epic`** /
+**`user_story`** / **`task`** with per-project Queries named Roadmap / Backlog /
+TODO (`project-pm.md`). Supporting docs (Shared Rules, Skills, memory children,
+hubs) stay **`page`**. Spaces also expose `note`, `collection`, `query`,
 `template`, media types. See `object-types.md` for property keys, default
 templates, create and `set_type` migration.
 

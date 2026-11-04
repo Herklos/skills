@@ -234,7 +234,51 @@ Set `one_liner`, `overview`, `execution_policy`, `lead_agent`,
 ```
 
 Common children: Technical, Business, Project Management (Roadmap / Backlog /
-TODO), Product, Design, Marketing (also link via `technical_page` / …).
+TODO Queries), Product, Design, Marketing (also link via `technical_page` / …).
+PM playbook: `project-pm.md`.
+
+---
+
+## Epic default (`template_for`: `epic`)
+
+Set `linked_projects`, `status`, `pm_priority`, optional `user_stories` as
+properties. Template body:
+
+```markdown
+## Goal
+(What outcome this epic delivers.)
+
+## Scope
+(In scope.)
+
+## Out of scope
+(Explicitly excluded.)
+
+## Notes
+(Links, decisions, constraints.)
+```
+
+---
+
+## User story default (`template_for`: `user_story`)
+
+Set `linked_projects`, `parent_epic`, `status`, `pm_priority`, optional
+`child_tasks` as properties. Template body:
+
+```markdown
+## Story
+As a … I want … so that …
+
+## Acceptance
+- [ ] …
+
+## Notes
+(Context, links, refine output.)
+```
+
+Task keeps the built-in todo default. Set `kind` (`bugfix` | `implementation` |
+`doc` | `design` | `review` | `chore` | `spike`), `linked_projects`, and optional
+parents as properties. See `project-pm.md`.
 
 ---
 
@@ -242,8 +286,8 @@ TODO), Product, Design, Marketing (also link via `technical_page` / …).
 
 1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `project`, name `{Type} default`, and body blocks from the
-   matching section above (`heading_2` + `paragraph`).
+   `tool_profile` | `project` | `epic` | `user_story`, name `{Type} default`,
+   and body blocks from the matching section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -252,7 +296,8 @@ TODO), Product, Design, Marketing (also link via `technical_page` / …).
 ## Drift check
 
 1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `browser`, `computer`, `tool_profile`, `project`.
+   `harness_profile`, `browser`, `computer`, `tool_profile`, `project`, `epic`,
+   `user_story`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of

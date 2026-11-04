@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.23.0
+version: 1.24.0
 license: MIT
 metadata:
   category: agents
@@ -18,7 +18,8 @@ metadata:
 
 Org source of truth for a multi-agent roster lives in **Anytype** as typed
 objects (`agent`, `team`, `subteam`, `subagent`, `harness`, `harness_profile`,
-`browser`, `computer`, `tool_profile`, `project`) plus supporting `page`s.
+`browser`, `computer`, `tool_profile`, `project`, plus PM `epic` / `user_story`
+/ extended `task`) plus supporting `page`s.
 Runtime bots are separate: editing Anytype does not by itself update a live bot
 prompt or messaging group. Verify runtime separately after doc changes. Model
 stacks live on **Harness profile** objects; agents link `harness_profile` so one
@@ -52,6 +53,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
 | `references/mcp-recipes.md` | MCP search/create/patch/archive patterns |
 | `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Cua Chromium Browser create, link, migrate |
+| `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
 
 ## Resolve space and roots
 
@@ -90,6 +92,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Skills | Procedures (`page`); resolve most-specific first: Agent → Subteam → Team → Project → Global |
 | Drafts | Agent designs not live until approved |
 | Projects | Portfolio roots as typed `project`; children often stay `page` |
+| Epic / User story / Task | PM work items; Roadmap / Backlog / TODO Queries filter by `linked_projects` (`project-pm.md`; Task `kind` includes `spike`) |
 | Primary | Coordinator agent; usually the only path to the human for escalations |
 | Human | The operator |
 
@@ -127,7 +130,7 @@ Never invent roster membership, legal conclusions, or financial numbers. Prefer 
 
 1. Prefer `"type": "project"` search, or open Projects hub then the project
 2. Typical children: technical, business, project management, product, design, marketing
-3. Project management often links roadmap, backlog, TODO
+3. Project management links **Roadmap / Backlog / TODO** Queries (Epic / User story / Task filtered by `linked_projects`); see `project-pm.md`
 4. Agents pull execution policy, TODO contracts, and design-done evidence from here when the org uses those gates
 
 ## Write playbooks
@@ -223,6 +226,15 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Create (or migrate) type **`project`** with `project_status`, `project_category`, `owning_team`, `one_liner`, `overview`, `execution_policy`, optional `lead_agent` / `related_projects` / `git_hub` / `public_url`, and child hub links (`technical_page`, `product_page`, `pm_page`, …)
 2. Use **Project default** template / `page-templates.md` for long body sections only
 3. Link from Projects hub; keep child docs as `page` unless the org types them too
+4. Under `pm_page`, use filtered Queries named Roadmap / Backlog / TODO (Epic / User story / Task). Full create / migrate: `project-pm.md`
+
+### Create Epic / User story / Task
+
+1. Set `linked_projects` to the project so the item appears in that project's Query
+2. Task: set `kind` (`bugfix` | `implementation` | `doc` | `design` | `review` | `chore` | `spike`)
+3. Optional hierarchy: Epic ← User story (`parent_epic`) ← Task (`parent_user_story`)
+4. Bodies from Epic / User story defaults in `type-templates.md`; Task uses built-in todo layout
+5. Recipes: `mcp-recipes.md` + `project-pm.md`
 
 ### Edit Shared Rules
 
@@ -279,8 +291,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
 - **New Browser / Computer:** for a new HQ, follow `hq-runtime-pair.md`; for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
-- **New portfolio project:** create/extend `project` + status/category → link Projects hub
-- **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)
+- **New portfolio project:** create/extend `project` + status/category → link Projects hub → PM Queries (`project-pm.md`)
+- **New PM item:** create `epic` / `user_story` / `task` with `linked_projects` (+ Task `kind`, incl. `spike`)
+- **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`); PM collections → typed + Queries (`project-pm.md`)
 - **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
 - **MCP ops:** follow `mcp-recipes.md` with etags and dry-run when unsure
 

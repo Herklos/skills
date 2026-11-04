@@ -21,6 +21,9 @@ Skills, Shared Rules, Groups, memory children, and other hub pages stay type
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
+| `epic` | Epics | Large delivery themes under a project (Roadmap Query) |
+| `user_story` | User stories | Backlog stories under a project (Backlog Query) |
+| `task` | Tasks | Built-in todo type extended with `kind` + project links (TODO Query) |
 
 Hub roots named **Agents** / **Projects** may remain `page`; their inventory
 children use the keys above. Keep Harness + Harness profile + Browser + Computer
@@ -444,6 +447,58 @@ live in properties; long narrative stays in the body.
 **Default template name:** `Project default`. Full dumped body:
 `type-templates.md`.
 
+PM children under `pm_page` are **Queries** named Roadmap / Backlog / TODO
+(filtered by `linked_projects`), not bare collections. Full playbook:
+`project-pm.md`.
+
+## Epic (`api_key`: `epic`)
+
+Large theme on a project's Roadmap Query.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `linked_projects` | objects | Owning project(s) (featured; Query filter) |
+| `status` | select | `Backlog` \| `Ready` \| `In progress` \| `Done` \| `Cancelled` (featured) |
+| `pm_priority` | select | `P0` \| `P1` \| `P2` \| `P3` (featured; display **PM priority**) |
+| `user_stories` | objects | Optional child User stories |
+
+Also `tag`, `links`, `backlinks`. **Default template:** Epic default (Goal /
+Scope / Out of scope / Notes).
+
+## User story (`api_key`: `user_story`)
+
+Backlog item on a project's Backlog Query.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `linked_projects` | objects | Owning project(s) (featured) |
+| `parent_epic` | objects | Optional parent Epic (featured) |
+| `status` | select | Same as Epic (featured) |
+| `pm_priority` | select | Same P0–P3 vocabulary (featured; key may be `pm_priority_2` if Priority number already existed) |
+| `child_tasks` | objects | Optional child Tasks |
+
+Also `tag`, `links`, `backlinks`. **Default template:** User story default
+(Story / Acceptance / Notes). Plural display: User stories.
+
+## Task (`api_key`: `task`, built-in extended)
+
+TODO Query items. Layout stays **todo** (`done` checkbox).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `kind` | select | `bugfix` \| `implementation` \| `doc` \| `design` \| `review` \| `chore` \| `spike` (featured) |
+| `linked_projects` | objects | Owning project(s) (featured; Query filter) |
+| `parent_epic` | objects | Optional parent Epic (featured) |
+| `parent_user_story` | objects | Optional parent User story (featured) |
+| `pm_priority` | select | P0–P3 when present (featured) |
+| `status` | select | Shared status vocabulary |
+| `done` | checkbox | Built-in |
+| `assignee` | objects | Built-in (participants) |
+| `due_date` | date | Built-in |
+
+Default migrate kind from old TODO pages: **`implementation`**. Keep built-in
+Task default template. See `project-pm.md` for Query create + collection migrate.
+
 ## Create with type + template
 
 Prefer typed creates. Omit `template` when the type has a default; pass a
@@ -582,7 +637,9 @@ object; re-set only what is missing after the type change.
    hub page links.
 4. `API-create-template` with `template_for`: `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `project` and body markdown from **`type-templates.md`**.
+   `tool_profile` | `project` | `epic` | `user_story` and body markdown from
+   **`type-templates.md`**. Extend built-in `task` with Kind (+ `spike`) and
+   project links (`project-pm.md`); keep Task's built-in default template.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (**Local
    router**, Coding, Data fetching, …); create Tool profile catalogs (table
@@ -592,7 +649,8 @@ object; re-set only what is missing after the type change.
    `subagents` (and Subagent.`parent_agent`).
 7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
    `team` objects → `subteam`). Fill properties from the org map; leave unknown
-   urls / people empty.
+   urls / people empty. For PM: migrate Roadmap/Backlog/TODO collections per
+   `project-pm.md`.
 
 Do not hardcode space or template ids in skill text; resolve them via list/get
 each session.

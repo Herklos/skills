@@ -385,6 +385,43 @@ parent HQ `subteams` property. Prefer this over `team` + `kind: Sub-team`.
 }
 ```
 
+## Create Epic / User story / Task + PM Queries
+
+Full playbook: `project-pm.md`. Task `kind` options: `bugfix` |
+`implementation` | `doc` | `design` | `review` | `chore` | `spike`.
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "task",
+    "name": "Spike auth provider options",
+    "properties": {
+      "linked_projects": ["<projectObjectId>"],
+      "kind": "spike",
+      "status": "Ready"
+    },
+    "markdown": "## Acceptance\n- [ ] Time-box 2h\n- [ ] Write recommendation\n"
+  }
+}
+```
+
+Same shape with `"type": "epic"` / `"user_story"`. Per-project filtered Query:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "name": "TODO",
+  "type": "task",
+  "filter": "linked_projects IN (\"<projectObjectId>\")",
+  "sorts": [{ "property": "last_modified_date", "direction": "desc" }]
+}
+```
+
+Repeat for Roadmap (`epic`) and Backlog (`user_story`). Migrate old collection
+pages with `set_type` + `linked_projects` (and `kind: implementation` for TODO).
+
 ## Migrate page → typed object
 
 ```json

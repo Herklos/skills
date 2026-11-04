@@ -223,15 +223,17 @@ Projects
       ├── Technical
       ├── Business
       ├── Project Management
-      │    ├── Roadmap
-      │    ├── Backlog
-      │    └── TODO
+      │    ├── Roadmap   (Query → epic where linked_projects contains Harbor)
+      │    ├── Backlog  (Query → user_story …)
+      │    └── TODO     (Query → task …; kind includes spike)
       ├── Product
       ├── Design
       └── Marketing
 ```
 
-Agents reference `Projects → Harbor → Project Management → TODO` for Ready work and `Design` for design-done evidence when that gate exists.
+Agents reference `Projects → Harbor → Project Management → TODO` for Ready work
+and `Design` for design-done evidence when that gate exists. File new work as
+typed `epic` / `user_story` / `task` with `linked_projects` set (`project-pm.md`).
 
 ## Sample skill index entry
 

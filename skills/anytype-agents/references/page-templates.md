@@ -132,8 +132,9 @@ optional `git_hub` / `public_url`, and child hub links (`technical_page`,
 
 Skip duplicating one-liner / overview / related-projects / execution policy in
 markdown when properties are set. Common children: Technical, Business, Project
-Management (Roadmap / Backlog / TODO), Product, Design, Marketing (also link via
-the matching `*_page` properties).
+Management (links to **Roadmap / Backlog / TODO** Queries filtered by
+`linked_projects` over Epic / User story / Task; see `project-pm.md`), Product,
+Design, Marketing (also link via the matching `*_page` properties).
 
 ## Full System Prompt skeleton (inside the fence)
 
