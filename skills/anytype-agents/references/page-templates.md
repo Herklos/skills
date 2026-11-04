@@ -2,10 +2,11 @@
 
 Use these shapes when creating or auditing **bodies**. Inventory objects use
 types `agent`, `team`, `subteam`, `group`, `prompt`, `memory`, `skill`, `log`,
-`schedule`, and `project` (see `object-types.md` + `prompts.md` +
-`memory-and-skills.md` + `agenda-and-schedules.md`). Skills, Logs, and Agenda
-indexes are Queries. Shared Rules is type `prompt`. Prefer duplicating a live
-peer in the same space over inventing a new layout.
+`suggestion`, `schedule`, and `project` (see `object-types.md` + `prompts.md` +
+`memory-and-skills.md` + `suggestions.md` + `agenda-and-schedules.md`). Skills,
+Logs, Suggestions, and Agenda indexes are Queries. Shared Rules is type
+`prompt`. Prefer duplicating a live peer in the same space over inventing a new
+layout.
 
 Hermes apply checklist (not Agent body): **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
@@ -19,10 +20,10 @@ Title: `{Name} – {Role}`
 `reports_to`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`,
 `browser`, `computer`, `tool_profile`, `voice_enabled`, `autonomy`,
 `short_description`, `hermes_profile`, `board_member`,
-`memory_pages`, `skills_page`, `logs_page`, `agenda_page`, `messaging_group`,
+`memory_pages`, `skills_page`, `logs_page`, `agenda_page`, `suggestions_page`, `messaging_group`,
 `map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`, voice
 modes / optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
-`memory-and-skills.md` + `agenda-and-schedules.md`.
+`memory-and-skills.md` + `suggestions.md` + `agenda-and-schedules.md`.
 
 Body (pointers + unique narrative only):
 
@@ -46,7 +47,7 @@ markdown.
 **Do not** keep `## Sub-pages to create`, `## Sub-pages`, `## Your Memory Pages`,
 `## Memory pages`, or “(Sub-pages below.)” / “already created as sub-pages”
 inventories. Create Memory objects + Skills / Logs / Agenda Queries, wire
-`memory_pages` / `skills_page` / `logs_page` / `agenda_page`, then delete those
+`memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `suggestions_page`, then delete those
 body sections. Legacy Full backup / restore dumps stay type `page` (no Agent
 property; see `memory-and-skills.md` out of scope). Old Skills index `page`s are
 superseded by `skills_page` Queries. Routine pages belong as `schedule` rows on
@@ -66,8 +67,9 @@ Board: …” paragraphs) on Agent bodies. Migrate:
 Fill properties / standing / memory first; delete the body quote.
 
 Link Memory objects via `memory_pages`, the Skills Query via `skills_page`, the
-Logs Query via `logs_page`, and the Agenda Query via `agenda_page` after create
-(`memory-and-skills.md` + `agenda-and-schedules.md`). Create the Prompt object
+Logs Query via `logs_page`, the Agenda Query via `agenda_page`, and the
+Suggestions Query via `suggestions_page` after create (`memory-and-skills.md` +
+`agenda-and-schedules.md` + `suggestions.md`). Create the Prompt object
 first (`prompts.md`); do not keep a Full System Prompt / SOUL fence on the
 Agent. Replace old Automations / Noodle / Hermes schedule prose with the Agenda
 pointer.
@@ -180,6 +182,29 @@ Name the object after the short summary. Body:
 
 Owner Logs **Query** (`logs_page`) lists the entry automatically. One Log per
 discrete action.
+
+## Suggestion (type `suggestion`)
+
+Set as properties: `owner_agent`, `proposed_by`, `suggestion_kind`,
+`suggestion_status`, `proposed_at`, `summary` (`suggestions.md`). Body:
+
+```markdown
+## Summary
+One or two sentences: what should change and why.
+
+## Evidence
+What task, failure, or observation triggered this.
+
+## Proposed action
+Concrete next step (harness / Subagent / Skill / Prompt / tool / other).
+
+## Approval path
+Owning agent → chief. Org-wide / harness / Shared Rules → P. No Hermes auto-apply.
+
+## Notes
+```
+
+Owner Suggestions **Query** (`suggestions_page`) lists the entry automatically.
 
 ## Schedule (type `schedule`)
 

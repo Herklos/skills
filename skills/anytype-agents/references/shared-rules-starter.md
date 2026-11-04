@@ -61,6 +61,9 @@ When you need to schedule recurring work, a one-shot timer, or an event wake: cr
 
 14) HQ standing instructions (mandatory)
 Before delivery, routing, merge, design, legal, finance, or cross-HQ work: open your HQ Team → Standing instructions (Prompt library via Team.standing_instructions). Follow those gates/rules/routing. Do not invent HQ policy. Shared Rules still apply org-wide. Do not paste the full standing library into every system Prompt.
+
+15) Improvement suggestions (mandatory; type `suggestion`)
+When a model, Subagent route, Skill, harness profile, tool profile, Memory, or Prompt does not fit the task, file an Anytype **suggestion** (or ask the Memory Keeper): owner_agent, proposed_by, suggestion_kind (model_fit|new_subagent|new_skill|harness|tool|memory|prompt|other), suggestion_status draft|proposed, summary + Evidence/Proposed action body. It appears under Agent → Suggestions Query (`suggestions_page`). Approval: owning agent + chief; org-wide/harness/Shared Rules → Primary. Do not auto-apply into Hermes.
 ```
 
 ## Rollout checklist (Primary)

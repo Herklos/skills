@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.32.0
+version: 1.33.0
 license: MIT
 metadata:
   category: agents
@@ -19,8 +19,9 @@ metadata:
 Org source of truth for a multi-agent roster lives in **Anytype** as typed
 objects (`agent`, `team`, `subteam`, `subagent`, `harness`, `harness_profile`,
 `browser`, `computer`, `tool_profile`, `prompt`, `memory`, `skill`, `log`,
-`schedule`, `group`, `project`, plus PM `epic` / `user_story` / extended `task`)
-plus supporting `page`s and Skills / Logs / Agenda **Queries**.
+`suggestion`, `schedule`, `group`, `project`, plus PM `epic` / `user_story` /
+extended `task`) plus supporting `page`s and Skills / Logs / Agenda /
+Suggestions **Queries**.
 Runtime bots are separate: editing Anytype does not by itself update a live bot
 prompt or messaging group. Verify runtime separately after doc changes. Model
 stacks live on **Harness profile** objects; agents link `harness_profile` so one
@@ -60,6 +61,7 @@ profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
 | `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, optional Team/Subteam/Subagent.`system_prompt`, Group `welcome_prompt`, body cleanup, migrate |
 | `references/memory-and-skills.md` | Memory + Skill + Log types, Agent.`memory_pages` / `skills_page` / `logs_page`, Skills / Logs Queries, migrate |
+| `references/suggestions.md` | Suggestion type, Agent.`suggestions_page`, Agathe weekly + ad-hoc feedback loop, approval path |
 | `references/agenda-and-schedules.md` | Schedule type, Agent.`agenda_page` Agenda Query (Calendar on `next_run`), migrate + Hermes cron bind |
 | `references/hq-standing-instructions.md` | Team.`standing_instructions` → Prompt library; slim HQ bodies; short system Prompt + Shared Rules pointer |
 
@@ -99,6 +101,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Memory | Typed `memory` object: decisions, lessons, resources, operating notes, playbooks (`memory-and-skills.md`) |
 | Skill | Typed `skill` object: procedures / template / guides; indexes are Queries via `skills_page` |
 | Log | Typed `log` object: small per-action summary; indexes are Queries via `logs_page` (Calendar on `logged_at`) |
+| Suggestion | Typed `suggestion` object: improvement feedback (model/subagent/skill/harness/…); indexes via `suggestions_page` (`suggestions.md`) |
 | Schedule | Typed `schedule` object: recurring / oneshot / event job; Agenda indexes are Queries via `agenda_page` |
 | Agenda | Query of Schedules filtered by `owner_agent` (Calendar on `next_run`; no Agenda type) |
 | Group | Typed `group` object: messaging roster + `welcome_prompt` → Prompt + platform fields; Agent/Team/Subteam link via `messaging_group`. Not auto-synced to chat |
@@ -156,9 +159,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local parent**; Foyer → **Foyer**; Arnold → **CLASQUIN**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local parent), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local parent), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `suggestions_page` / `messaging_group`
 5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps a short System prompt pointer + Agenda pointer only (no Suggested runtime section, no Full System Prompt fence, no Short description / Autonomy / Home / Chief / Team / HQ prose that duplicates properties)
-6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, a Logs **Query**, and an Agenda **Query**; link via `memory_pages` + `skills_page` + `logs_page` + `agenda_page` (`memory-and-skills.md` + `agenda-and-schedules.md`)
+6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, a Logs **Query**, an Agenda **Query**, and a Suggestions **Query**; link via `memory_pages` + `skills_page` + `logs_page` + `agenda_page` + `suggestions_page` (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 8. Inside the Prompt body, point at Shared Rules (short pointer, not a full paste, when token economy matters) and include `# HQ standing instructions (mandatory)` + `# Agenda (mandatory)` short sections (`hq-standing-instructions.md`, `agenda-and-schedules.md`)
 9. Fill runtime facts as **properties** + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields, `short_description`, `autonomy`, `team`, `reports_to`, `map_path`, Agenda). Use `suggested-runtime.md` only as an apply checklist when configuring Hermes, not as agent-page markdown
@@ -311,6 +314,14 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 4. Optional Calendar view on the Agenda Query (`next_run`)
 5. Recurring → Hermes only via `hermes-profiles` `cron.md` when the user asks to apply
 
+### File an improvement suggestion
+
+1. Ensure Agent.`suggestions_page` → `{OwnerShort} – Suggestions` Query (`suggestions.md`)
+2. Create type **`suggestion`** with `owner_agent`, `proposed_by`, `suggestion_kind`, `suggestion_status` (`draft` or `proposed`), `proposed_at`, `summary`
+3. Body: Evidence / Proposed action / Approval path (Suggestion default)
+4. Approval: owning agent + chief; Solange for non-trivial skills; P for org-wide / harness / Shared Rules. No Hermes auto-apply
+5. Agathe Sunday hygiene also asks for and files suggestions; triage via **Suggestions – Inbox**
+
 ### Link agent work to a Project
 
 1. Find the project under Projects
@@ -344,9 +355,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ## Common recipes (summary)
 
-- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|schedule|group|project`
-- **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query (`memory-and-skills.md` + `agenda-and-schedules.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|suggestion|schedule|group|project`
+- **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query + Suggestions Query (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
+- **New Suggestion:** create `suggestion` with `owner_agent` + kind/status → appears on Suggestions Query / Inbox → approve agent+chief (P org-wide); no Hermes auto-apply (`suggestions.md`)
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Group:** create `group` + welcome Prompt → set `members` / platform fields → link Agent/HQ `messaging_group` → Hermes apply via `messaging-groups.md` when asked
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents

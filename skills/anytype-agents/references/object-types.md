@@ -8,8 +8,9 @@ Messaging rooms use typed **`group`** (welcome Prompt + platform fields). Hub
 scaffolding (Agents / Projects roots, drafts) may stay `page`. **Shared Rules**,
 system/welcome prompts, and prompt libraries use type **`prompt`** (see
 `prompts.md`). Agent support notes use type **`memory`**; procedures use type
-**`skill`**; per-action summaries use type **`log`**; Skills and Logs indexes
-are **Queries** (see `memory-and-skills.md`). Scheduled jobs use type
+**`skill`**; per-action summaries use type **`log`**; improvement feedback uses
+type **`suggestion`**; Skills, Logs, and Suggestions indexes are **Queries**
+(see `memory-and-skills.md` + `suggestions.md`). Scheduled jobs use type
 **`schedule`**; each Agent's **Agenda** is a Query filtered by `owner_agent`
 via `agenda_page` (see `agenda-and-schedules.md`).
 
@@ -31,6 +32,7 @@ via `agenda_page` (see `agenda-and-schedules.md`).
 | `memory` | Memories | Durable agent notes (`memory-and-skills.md`) |
 | `skill` | Skills | Procedures / templates / guides (`memory-and-skills.md`) |
 | `log` | Logs | Per-action activity summaries (`memory-and-skills.md`) |
+| `suggestion` | Suggestions | Improvement feedback (model/subagent/skill/harness/…); Queries via Agent.`suggestions_page` (`suggestions.md`) |
 | `schedule` | Schedules | Recurring / oneshot / event jobs; Agenda Queries via Agent.`agenda_page` (`agenda-and-schedules.md`) |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 | `epic` | Epics | Large delivery themes under a project (Roadmap Query) |
@@ -87,6 +89,7 @@ Other properties:
 | `skills_page` | objects | Skills **Query** for this agent |
 | `logs_page` | objects | Logs **Query** for this agent (per-action summaries; Calendar on `logged_at`) |
 | `agenda_page` | objects | Agenda **Query** for this agent (Schedules filtered by `owner_agent`; Calendar on `next_run`) |
+| `suggestions_page` | objects | Suggestions **Query** for this agent (improvement feedback; Shared Rule 25) |
 | `memory_review_off` | checkbox | When true, Memory Keeper (Agathe) skips this agent in Sunday hygiene (featured) |
 | `messaging_group` | objects | Typed **Group** (chat roster) |
 | `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
@@ -704,8 +707,8 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
 
 1. `API-create-type` for `agent`, `team`, `group`, `subteam`, `subagent`,
    `harness`, `harness_profile`, `browser`, `computer`, `tool_profile`,
-   `prompt`, `memory`, `skill`, `log`, and `schedule` with the property
-   definitions above (`create_missing_options: true` for selects).
+   `prompt`, `memory`, `skill`, `log`, `suggestion`, and `schedule` with the
+   property definitions above (`create_missing_options: true` for selects).
    On `team`, define `kind` options `Board` / `HQ` only (no `Sub-team`, no new
    `Group` option). Prefer **sequential** creates when several types share new
    property names (`members`, `skills_page`, `access_needed`,
@@ -718,16 +721,16 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    optional), and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
    `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
    `board_member`, `memory_pages`, `skills_page`,
-   `logs_page`, `agenda_page`, `messaging_group`, `map_path`,
+   `logs_page`, `agenda_page`, `suggestions_page`, `messaging_group`, `map_path`,
    `delegation_enabled`, `terminal_backend`, `computer_surface`; keep
    `harness_profile` / `subagents`; `remove_property` legacy `harness` select,
    unused `primary_model`, and unused Agent `linked_projects` when ready
    (Project.`lead_agent` / `owning_team` + map_path cover agent↔project;
    keep `linked_projects` on epic / user_story / task). On Group: `welcome_prompt` is a Group
    property (not Page). On Harness profile: add STT/TTS stack fields above.
-   Prompt / Memory / Skill / Log / Schedule / Group bootstrap detail:
-   `prompts.md` + `memory-and-skills.md` + `agenda-and-schedules.md` + Group
-   section below.
+   Prompt / Memory / Skill / Log / Suggestion / Schedule / Group bootstrap detail:
+   `prompts.md` + `memory-and-skills.md` + `suggestions.md` +
+   `agenda-and-schedules.md` + Group section below.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
    `skills_page`, `subteams_page`, `routing_summary`, `standing_instructions`
    (+ runtime catalog links). Create `{HQ} – Subteams` Query
@@ -738,9 +741,10 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
 4. `API-create-template` with `template_for`: `agent` | `team` | `group` |
    `subteam` | `subagent` | `harness` | `harness_profile` | `browser` |
    `computer` | `tool_profile` | `prompt` | `memory` | `skill` | `log` |
-   `schedule` | `project` | `epic` | `user_story` and body markdown from
-   **`type-templates.md`**. Extend built-in `task` with Kind (+ `spike`) and
-   project links (`project-pm.md`); keep Task's built-in default template.
+   `suggestion` | `schedule` | `project` | `epic` | `user_story` and body
+   markdown from **`type-templates.md`** / `suggestions.md`. Extend built-in
+   `task` with Kind (+ `spike`) and project links (`project-pm.md`); keep
+   Task's built-in default template.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (**Local
    router**, Coding, Data fetching, …); create Tool profile catalogs (table
@@ -858,6 +862,28 @@ from skill usage counters (still forbidden).
 filtered by `owner_agent`, sorted by `logged_at` desc, plus a **Calendar**
 view on `logged_at` (date index). Full playbook: `memory-and-skills.md`.
 
+## Suggestion (`api_key`: `suggestion`)
+
+Improvement feedback when a model, Subagent, Skill, harness, tool, Memory, or
+Prompt should change. Distinct from Logs (what happened) and Memory (durable
+facts).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `suggestion_kind` | select | `model_fit` \| `new_subagent` \| `new_skill` \| `harness` \| `tool` \| `memory` \| `prompt` \| `other` (featured) |
+| `suggestion_status` | select | `draft` \| `proposed` \| `accepted` \| `done` \| `declined` (featured) |
+| `owner_agent` | objects | Agent the change is about (featured) |
+| `proposed_by` | objects | Filer (agent or Agathe) (featured) |
+| `proposed_at` | date | When filed (featured) |
+| `summary` | text | One or two sentences (featured) |
+| `related_objects` | objects | Optional linked harness_profile / skill / subagent / prompt |
+| `reviewed_by` | objects | Optional |
+| `notes` | text | |
+
+**Default template:** Suggestion default. Agent indexes via `suggestions_page`
+→ Query filtered by `owner_agent`. Org triage: **Suggestions – Inbox**. Full
+playbook: `suggestions.md`. Shared Rules rule **25**.
+
 ## Schedule (`api_key`: `schedule`)
 
 One intended job (Hermes cron / Bot Routine / event wake) owned by an Agent.
@@ -898,5 +924,6 @@ filtered by `owner_agent`, sorted by `next_run` asc (optional Calendar view on
 Messaging rooms are type **`group`** (migrate legacy Group pages with
 `set_type`). Shared Rules and prompt libraries are type **`prompt`**. Memory
 children are type **`memory`**. Procedures / Skill Template / guides are type
-**`skill`**. Per-action summaries are type **`log`**. Scheduled jobs are type
-**`schedule`**. Skills, Logs, and Agenda indexes are type **`query`**.
+**`skill`**. Per-action summaries are type **`log`**. Improvement feedback is
+type **`suggestion`**. Scheduled jobs are type **`schedule`**. Skills, Logs,
+Suggestions, and Agenda indexes are type **`query`**.
