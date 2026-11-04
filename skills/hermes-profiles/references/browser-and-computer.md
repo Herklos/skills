@@ -63,6 +63,31 @@ Watch live with the Cua Spaces app, `cua spaces ls`, or `cua viewer`. Env overri
 
 **When not to use Cua Spaces:** the task must drive the operator's real host desktop (Accessibility / Screen Recording on this Mac/PC), or a Linux gateway Bot Screen shared with Hermes Desktop takeover without a Space. Document that exception on the agent page.
 
+## Anytype per-HQ pair → Hermes
+
+Org source of truth (skill `anytype-agents` → `hq-runtime-pair.md`): each HQ owns
+one **Computer** (`{HQ} – Cua Spaces`) and one **Browser** (`{HQ} – Cua Chromium`).
+Subteams and Agents under that HQ link the same pair. Board and Primary leave
+both empty (Primary `computer_surface: none`).
+
+When applying a linked Agent into a Hermes profile, decline as follows (Anytype
+does not push configs):
+
+| Anytype | Hermes apply |
+|---------|--------------|
+| Computer `computer_surface: cua-spaces`, `desktop_enabled: true`, `computer_scope: dedicated` | `plugins install` cua-spaces; `terminal.backend: cua`; `plugins.entries.cua-spaces.settings.desktop: true`; prefer a **stable** Space name/id per HQ (e.g. `engineering-hq`) with `delete_on_exit: false` so the HQ shares one Space instead of minting a throwaway each run |
+| Browser `browser_source: local-chromium`, `browser_identity: dedicated-throwaway`, `headed: false` | `tools enable browser`; `browser.cloud_provider: local`; `browser.use_real_profile: false`; `browser.user_data_dir: ""`; `browser.headed: false`. With Cua desktop stack on Linux, Chromium runs **inside** that HQ Space |
+| Agent `computer_surface: none` / empty Computer+Browser (Primary) | Do not enable `computer_use` / Space desktop for that profile unless the user asks; terminal may still use another backend |
+| Exception Computer (`host` / `bot-screen`) | Follow Host desktop or Linux Bot Screen sections below; document on the agent page |
+
+Suggested Space naming when pinning `plugins.entries.cua-spaces.settings.space`:
+`{hq-slug}-hq` (matches Anytype Computer slug prefix). One Space per HQ keeps
+Subteams/Agents under that HQ on the same machine; do not give every agent its
+own Space unless the user asks.
+
+Standing redesign rule: do not apply live Hermes profiles until the user says
+the Anytype redesign pass is done.
+
 ## Shared vs dedicated (org language)
 
 Use these labels on Anytype agent pages and map them to Hermes as follows.

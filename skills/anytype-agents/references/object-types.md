@@ -321,7 +321,8 @@ Also `tag`, `links`, `backlinks`. Long apply notes stay in the body.
 
 **Per-HQ catalog (org convention):** one Browser per HQ, not a shared org-wide
 row. Create when the HQ is created; Subteams and Agents under that HQ link the
-same object. Board and Primary leave `browser` empty.
+same object. Board and Primary leave `browser` empty. Full create/link/migrate
+playbook: `hq-runtime-pair.md`.
 
 | Name pattern | slug pattern | Typical props |
 |--------------|--------------|---------------|
@@ -357,7 +358,7 @@ Also `tag`, `links`, `backlinks`.
 **Per-HQ catalog (org convention):** one Computer per HQ. Create when the HQ is
 created; Subteams and Agents under that HQ link the same object. Board and
 Primary leave `computer` empty (Primary also sets Agent.`computer_surface` to
-`none`).
+`none`). Full create/link/migrate playbook: `hq-runtime-pair.md`.
 
 | Name pattern | slug pattern | Typical props |
 |--------------|--------------|---------------|

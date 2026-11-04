@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.22.0
+version: 1.23.0
 license: MIT
 metadata:
   category: agents
@@ -51,6 +51,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
 | `references/mcp-recipes.md` | MCP search/create/patch/archive patterns |
+| `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Cua Chromium Browser create, link, migrate |
 
 ## Resolve space and roots
 
@@ -191,8 +192,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 1. Prefer **Catalog + links**: create typed objects, then link from Agent / Team /
    Subteam (`browser`, `computer`, `tool_profile`)
-2. **Per-HQ Browser + Computer (org convention):** when adding an HQ, create one
-   Computer (`{hq-slug}-cua-spaces`, `computer_surface: cua-spaces`,
+2. **Per-HQ Browser + Computer (org convention):** full create/link/migrate
+   playbook in `hq-runtime-pair.md`. When adding an HQ, create one Computer
+   (`{hq-slug}-cua-spaces`, `computer_surface: cua-spaces`,
    `computer_scope: dedicated`, `desktop_enabled: true`) and one Browser
    (`{hq-slug}-cua-chromium`, `browser_source: local-chromium`,
    `browser_identity: dedicated-throwaway`). Name them `{HQ name} – Cua Spaces`
@@ -272,11 +274,11 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|project`
 - **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
-- **New HQ:** create `team` (`kind: HQ`) → create HQ Computer + Browser pair → link both on the HQ → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
+- **New HQ:** create `team` (`kind: HQ`) → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → link both on the HQ → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
-- **New Browser / Computer:** for a new HQ, create the HQ pair; for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
+- **New Browser / Computer:** for a new HQ, follow `hq-runtime-pair.md`; for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub
 - **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)
 - **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder

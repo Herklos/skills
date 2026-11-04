@@ -4,8 +4,8 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.15.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.22.0 | Org roster, typed inventory, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.16.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.23.0 | Org roster, typed inventory, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` when you are ready.
 
@@ -22,7 +22,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Models**: main / decision / routing model (including local `llamacpp`), auxiliary tasks, fallback providers, MoA
 - **Delegation**: `advanced-delegation` + `model_map` / profile routes so a parent routes specialized work to Subagents
 - **Memory**: per-profile `MEMORY.md` / `USER.md`, write approval, optional external provider
-- **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); host desktop and Linux Bot Screen as exceptions
+- **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + Chromium in that Space; host desktop and Linux Bot Screen as exceptions
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs
@@ -77,7 +77,7 @@ Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills reso
 - Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive (Engineering → Coding; fetch/veille → Data fetching)
 - Voice stack on Local router: local Whisper + Edge TTS; Agent holds enablement / modes (Foyer assistants may enable voice; others often leave it off with the stack prefilled)
 
-**References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`.
+**References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`, **`hq-runtime-pair`** (per-HQ Cua Computer/Browser).
 
 **Typical flows**
 

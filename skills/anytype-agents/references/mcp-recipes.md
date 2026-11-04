@@ -174,8 +174,9 @@ Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 
 ## Create a per-HQ Browser + Computer pair
 
-Org convention: one Computer and one Browser per HQ. Link both on the HQ, its
-Subteams, and its Agents. Board / Primary leave both empty.
+Full playbook: `hq-runtime-pair.md`. Org convention: one Computer and one
+Browser per HQ. Link both on the HQ, its Subteams, and its Agents. Board /
+Primary leave both empty.
 
 ```json
 {
