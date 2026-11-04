@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.31.7
+version: 1.32.0
 license: MIT
 metadata:
   category: agents
@@ -33,12 +33,14 @@ Primary leave both empty (`computer_surface: none` on Primary). **Voice** (STT/T
 lives on **Harness profile**; Agent holds enablement / modes
 (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`)
 and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
-`voice.md`. **Most agents use Local router** (local model as parent brain;
-default voice stack local Whisper + Edge TTS). Spawn routes live on
+`voice.md`. **Most agents use Local parent** (chat = Ollama `lfm3` / effort
+none; approvals = Hermes builtin llamacpp `d1-2b-q4_k_m`; voice stack local
+Whisper + Edge TTS). **lfm3 cannot run on llamacpp.** Spawn routes live on
 **Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
-profiles (Coding, Data fetching, …); the local parent routes when needed and
-answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
-`delegation.md`.
+profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
+**Foyer** (dedicated Foyer profile, no Subagents) and **CLASQUIN / Arnold**
+(Anthropic Claude subscription only, no Subagents). Decline into Hermes via
+`hermes-profiles` `delegation.md`.
 
 ## References (load when needed)
 
@@ -151,10 +153,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update an agent
 
-1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
+1. Confirm HQ, reporting line, **Harness profile** (prefer **Local parent**; Foyer → **Foyer**; Arnold → **CLASQUIN**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local parent), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `messaging_group`
 5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps a short System prompt pointer + Agenda pointer only (no Suggested runtime section, no Full System Prompt fence, no Short description / Autonomy / Home / Chief / Team / HQ prose that duplicates properties)
 6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, a Logs **Query**, and an Agenda **Query**; link via `memory_pages` + `skills_page` + `logs_page` + `agenda_page` (`memory-and-skills.md` + `agenda-and-schedules.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
@@ -208,10 +210,14 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 2. **Harness profile** (stack): type `harness_profile` with Hermes-shaped fields:
    `model_provider` / `model_default` / `model_effort` / `model_harness`,
    `fallback_1_*` / `fallback_2_*`, `aux_<task>_*` for vision / compression /
-   web_extract / skills_hub / title_generation, and optional voice stack
-   (`stt_*` / `tts_*` / `voice_notes`). **Local router** org default:
-   `llamacpp` / `d1-2b-q4_k_m` + STT `local`/`base` + TTS `edge`/`en-US-AriaNeural`.
-   Subagent-only stacks leave STT/TTS as `none` and aux at `auto`
+   web_extract / skills_hub / title_generation / **approval**, and optional voice
+   stack (`stt_*` / `tts_*` / `voice_notes`). **Local parent** org default:
+   chat `ollama-launch` / `lfm3` / none; `aux_approval_*` = `llamacpp` /
+   `d1-2b-q4_k_m`; STT `local`/`base` + TTS `edge`/`en-US-AriaNeural`; no cloud
+   fallbacks. **Foyer** mirrors Local parent (voice-friendly, no Subagents).
+   **CLASQUIN** = Anthropic Claude subscription only. Specialist stacks
+   (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think) leave STT/TTS as
+   `none` and other aux at `auto`
 3. Bodies from `type-templates.md`; link profiles from Agents → Shared
 4. Point agents (and Subagents) at a profile via `harness_profile` (no Agent `harness` select)
 5. After editing a shared profile, re-apply models **and voice** into each linked agent's
@@ -339,7 +345,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 ## Common recipes (summary)
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|schedule|group|project`
-- **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query (`memory-and-skills.md` + `agenda-and-schedules.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
+- **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query (`memory-and-skills.md` + `agenda-and-schedules.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Group:** create `group` + welcome Prompt → set `members` / platform fields → link Agent/HQ `messaging_group` → Hermes apply via `messaging-groups.md` when asked

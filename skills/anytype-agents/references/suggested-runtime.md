@@ -34,8 +34,8 @@ block to the Agent object body.
 
 ```markdown
 ## Suggested runtime apply notes (YYYY-MM-DD)
-**Harness profile:** {Local router (default for most agents) | Coding | Data fetching | …}  (link Agent.`harness_profile`)
-**model.* (from profile):** {model_provider} · {model_default} · {model_effort} · harness {catalog}  (Local router → llamacpp · d1-2b-q4_k_m · medium)
+**Harness profile:** {Local parent (default for most agents) | Foyer | CLASQUIN | Chiefs | Coding | Reviewing | Browser | Web/MCP | Deep think}  (link Agent.`harness_profile`)
+**model.* (from profile):** {model_provider} · {model_default} · {model_effort} · harness {catalog}  (Local parent → ollama-launch · lfm3 · none; aux approval → llamacpp · d1-2b-q4_k_m)
 **fallback_providers (from profile, ordered):**
 - 1: {fallback_1_provider} · {fallback_1_model} · {effort}
 - 2: {fallback_2_provider} · {fallback_2_model} · {effort}
@@ -52,7 +52,8 @@ block to the Agent object body.
 - Enabled: yes (`delegation` toolset) | no
 - **Pattern:** parent Local router answers peers / light asks itself; spawn a Subagent only when a specialized route fits
 - **Anytype Subagents:** none | list linked Agent.`subagents` (type `subagent`; each has task_key + harness_profile + scope/tools)
-- **Decision / routing model:** same as profile `model.*` (Local router → llamacpp · d1-2b-q4_k_m) | {provider}·{model} · {reasoning}
+- **Chat / routing model:** same as profile `model.*` (Local parent → ollama-launch · lfm3) | {provider}·{model} · {reasoning}
+- **Approvals:** profile `aux_approval_*` (Local parent / Foyer → llamacpp · d1-2b-q4_k_m)
 - **Mode:** `model_map` (preferred) | `default` (one worker for all) | `profile_routes`
 - Plugin: **advanced-delegation** on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
 - **Task-specific models** (prefer decline from Subagent objects; else hand-list):

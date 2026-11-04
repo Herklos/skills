@@ -18,11 +18,11 @@ Related: `models.md` for main / auxiliary / fallback / MoA. The parent **routing
 **task-specific models** via the official **`advanced-delegation`** plugin
 (`delegation.backend: model_map`).
 
-**Org default (Anytype Local router):** most parents use a **local model** as
-`model.*`. That parent answers other agents / light asks itself when no Subagent
-is needed, and picks named `model_map` routes (from Anytype Subagent objects)
-for specialized work. Default single-model workers are fine for simple fleets
-that never fan out.
+**Org default (Anytype Local parent):** most parents use **Ollama `lfm3`** as
+`model.*` (chat + route picking) and **llamacpp `d1-2b-q4_k_m`** for
+`auxiliary.approval`. That parent answers other agents / light asks itself when
+no Subagent is needed, and picks named `model_map` routes (from Anytype Subagent
+objects) for specialized work. Exceptions: Foyer and CLASQUIN (no Subagents).
 
 ### Two layers: routing model vs task-specific models
 
@@ -212,23 +212,19 @@ local_runtime:
   backend: auto                           # cuda / metal / vulkan / cpu
 
 model:
-  provider: llamacpp                      # Local router decision model
-  default: d1-2b-q4_k_m                   # or exact name after Add model file (models.md)
-
-fallback_providers:
-  - provider: openrouter
-    model: anthropic/claude-sonnet-4
+  provider: ollama-launch                 # Local parent chat (lfm3; not llamacpp)
+  default: lfm3
 
 auxiliary:
-  compression:
-    provider: openrouter
-    model: google/gemini-2.5-flash
-  vision:
-    provider: openrouter
-    model: google/gemini-2.5-flash
   approval:
-    provider: openrouter
-    model: google/gemini-2.5-flash
+    provider: llamacpp
+    model: d1-2b-q4_k_m                   # Hermes builtin; local_runtime enabled
+  compression:
+    provider: auto
+    model: ''
+  vision:
+    provider: auto
+    model: ''
   review:
     provider: openrouter
     model: anthropic/claude-opus-4.6
@@ -279,12 +275,12 @@ routes from Anytype **Subagent** objects (see below).
 
 ## Decline from Anytype Subagent objects
 
-When the org uses skill `anytype-agents`, most parents link **Local router** as
+When the org uses skill `anytype-agents`, most parents link **Local parent** as
 `harness_profile` and zero or more typed **`subagent`** objects
-(`parent_agent` + Agent.`subagents`). Decline Local router → parent `model.*`.
-Treat Subagents as the source of truth for `model_map` routes; re-apply after
-edits. Do not invent a Subagent for “quick peer answers”; that stays on the
-local parent.
+(`parent_agent` + Agent.`subagents`). Decline Local parent → parent `model.*`
+(ollama/lfm3) + `auxiliary.approval` (llamacpp/d1). Treat Subagents as the
+source of truth for `model_map` routes; re-apply after edits. Do not invent a
+Subagent for “quick peer answers”; that stays on the local parent.
 
 | Anytype Subagent field | Hermes `model_map` option |
 |------------------------|---------------------------|
@@ -298,10 +294,11 @@ Steps:
 
 1. Read the parent Agent in Anytype (`format: md`) and list linked Subagents
    (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
-2. Decline parent Agent.`harness_profile` (usually **Local router**) into
-   `local_runtime` + `model.*`: prefer profile `model_provider` /
-   `model_default` (org: `llamacpp` / `d1-2b-q4_k_m`); see `models.md`
-   **Local decision model**. Also map `fallback_*` and `aux_*` when filled.
+2. Decline parent Agent.`harness_profile` (usually **Local parent**) into
+   `model.*` + `auxiliary.approval` + `local_runtime` for d1: prefer profile
+   `model_provider` / `model_default` (org: `ollama-launch` / `lfm3`) and
+   `aux_approval_*` (`llamacpp` / `d1-2b-q4_k_m`); see `models.md`
+   **Local parent**. Also map `fallback_*` and other `aux_*` when filled.
 3. For each live Subagent, open its `harness_profile` and take `model_*` /
    effort (honor `model_override` / `spawn_effort` when set).
 4. `hermes -p <slug> tools enable delegation`
@@ -348,7 +345,7 @@ to the ids your runtime actually accepts (`models.md`).
 | Need | Configure |
 |------|-----------|
 | Parallel research / isolated workers | `tools enable delegation` + `delegate_task` |
-| **Local parent router (org default)** | Anytype Local router → parent `model.*` (local); answer peers without spawning |
+| **Local parent router (org default)** | Anytype Local parent → `model.*` lfm3 + `auxiliary.approval` d1; answer peers without spawning |
 | **Routing model** (who picks routes) | Parent `model.*` — see `models.md` |
 | **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options` |
 | Routes from Anytype Subagent objects | Decline table above; keep Agent.`subagents` in sync |

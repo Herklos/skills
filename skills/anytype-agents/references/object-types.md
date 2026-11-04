@@ -67,7 +67,7 @@ Featured properties (API keys):
 | `team` | objects | Link to owning Team or Subteam |
 | `reports_to` | objects | Link to chief / Primary agent |
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
-| `harness_profile` | objects | Link to one **Harness profile** (source of `model.*` / fallbacks / aux). **Default for most agents: Local router** |
+| `harness_profile` | objects | Link to one **Harness profile** (source of `model.*` / fallbacks / aux). **Default for most agents: Local parent** |
 | `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
 | `system_prompt` | objects | Link to one **Prompt** (`prompt_kind=system`; canonical SOUL / system text) |
 | `browser` | objects | Link to one **Browser** catalog object |
@@ -121,11 +121,14 @@ later enable; Foyer personal assistants may set `voice_enabled=true` +
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 
 **Recommended parent pattern (most agents):**
-1. Agent.`harness_profile` → **Local router** (local model is the routing brain)
-2. Several Subagents with richer profiles (Coding, Data fetching, …) for work that
-   needs a stronger/cheaper specialized stack
+1. Agent.`harness_profile` → **Local parent** (chat = Ollama `lfm3` / none; approvals
+   = llamacpp `d1-2b-q4_k_m`; route picking also uses parent `model.*`)
+2. Several Subagents with richer profiles (Chiefs, Coding, Reviewing, Browser,
+   Web/MCP, Deep think) for specialized work
 3. Parent answers peers / light questions itself when no Subagent route is needed
    (no “quick answer” Subagent required)
+4. Exceptions: **Foyer** agents → **Foyer** profile, no Subagents; **Arnold** →
+   **CLASQUIN** (Claude subscription), no Subagents
 
 **Do not** use a select `harness` on Agent. Legacy spaces may still have an old
 `harness` select (`hermes` / `grok` / …); migrate by linking `harness_profile`
@@ -240,13 +243,16 @@ Toolsets and scope are documented on the Subagent and applied to the parent
 prompt / child brief; Hermes children inherit the parent's tool policy unless
 you use `profile_routes` for a dedicated child profile.
 
-**Example Subagents** (link from Engineering chiefs / implementers):
+**Example Subagents** (role packs; link from parent Agent.`subagents`):
 
 | Name | task_key | Profile | Intent |
 |------|----------|---------|--------|
-| Fast fetch | `fetch` | Data fetching | Lookups, scrape, light summary |
-| Deep code | `deep` | Coding | Hard debug, careful refactor |
-| Quick edit | `fast` | Coding (lower effort note) | Small edits, simple tests |
+| Chiefs | `chiefs` | Chiefs | HQ / Primary orchestration |
+| Coding | `coding` | Coding | Implementation, debug, tests |
+| Review | `review` | Reviewing | Code / doc / PR review |
+| Web | `web` | Web/MCP | Web, MCP, data collection |
+| Browser | `browser` | Browser | Browser instrumenting |
+| Deep | `deep` | Deep think | Analysis, audit, refactor, refine |
 
 ## Harness (`api_key`: `harness`)
 
@@ -294,6 +300,7 @@ profile to refresh every linked agent's intended `model.*`,
 | `aux_web_extract_*` | same | Hermes `auxiliary.web_extract.*` |
 | `aux_skills_hub_*` | same | Hermes `auxiliary.skills_hub.*` |
 | `aux_title_generation_*` | same | Hermes `auxiliary.title_generation.*` |
+| `aux_approval_provider` / `aux_approval_model` / `aux_approval_effort` | text / text / select | Hermes `auxiliary.approval.*`. Local parent / Foyer: `llamacpp` / `d1-2b-q4_k_m` |
 | `notes` | text | When to use this profile |
 | `stt_provider` | select | `local` \| `groq` \| `openai` \| `mistral` \| `xai` \| `elevenlabs` \| `deepinfra` \| `none` (featured). Display name **STT provider** |
 | `stt_model` | text | e.g. `base`, `whisper-large-v3-turbo` |
@@ -312,21 +319,27 @@ Also `tag`, `links`, `backlinks`. Put longer rationale and apply notes in the bo
    when Hermes accepts it on that task).
 4. `model_harness` / `fallback_*_harness` are catalog UX only.
 
-**Voice stack:** parent profiles (Local router) set STT/TTS defaults agents
-inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as `none`.
-Apply with `hermes-profiles` → `voice.md`.
+**Voice stack:** parent profiles (**Local parent**, **Foyer**) set STT/TTS defaults
+agents inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as
+`none`. Apply with `hermes-profiles` → `voice.md`.
 
 **Example profiles:**
 
 | Profile | model.* | fallback_1 | fallback_2 | Aux | Voice | Typical use |
 |---------|---------|------------|------------|-----|-------|-------------|
-| **Local router** | `llamacpp` / `d1-2b-q4_k_m` · medium · Local model | `xai` · Grok 4.5 · medium | `anthropic` · Haiku 5.5 · medium | `auto` | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent brain) |
-| Coding | `anthropic` · Claude Code Sonnet 5.5 · high · Claude | `openai-codex` · Sol 6.1 · high | `xai` · Grok 4.5 · high | `auto` | STT/TTS `none` | Subagent routes (`deep`, `fast`, …) |
-| Data fetching | `openai-codex` · Terra 6.1 · high · Codex | `anthropic` · Haiku 5.5 · medium | `xai` · Grok 4.5 · medium | `auto` | STT/TTS `none` | Subagent routes (`fetch`, …) |
+| **Local parent** | `ollama-launch` / `lfm3` · none · Local model | (none) | (none) | approval=`llamacpp`/`d1-2b-q4_k_m`; others `auto` | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent brain) |
+| **Foyer** | same as Local parent | (none) | (none) | same dual local | local+edge (voice-friendly) | Foyer/home agents; no Subagents |
+| **CLASQUIN** | `anthropic` · Claude Code Sonnet 5.5 · high | (none) | (none) | `auto` | none | Arnold only; Claude subscription |
+| Chiefs | `xai` · Grok 4.5 · high | Sonnet 5.5 · high | Sol 6.1 · medium | `auto` | none | Subagent `chiefs` |
+| Coding | `anthropic` · Sonnet 5.5 · high | Sol 6.1 · medium | Grok 4.5 · high | `auto` | none | Subagent `coding` |
+| Reviewing | `openai-codex` · Sol 6.1 · medium | Sonnet 5.5 · high | Grok 4.5 · high | `auto` | none | Subagent `review` |
+| Browser | `openai-codex` · Terra 6.1 · high | Haiku 5.5 · high | Grok 4.5 · medium | `auto` | none | Subagent `browser` |
+| Web/MCP | same as Browser | same | same | `auto` | none | Subagent `web` |
+| Deep think | same as Coding | same | same | `auto` | none | Subagent `deep` |
 
-Parent Agents usually link **Local router**. Subagents link Coding / Data fetching
-(or other specialized stacks). The local parent picks a Subagent `task_key` when
-needed and answers directly otherwise.
+Parent Agents usually link **Local parent**. Subagents link specialist stacks.
+**lfm3** is served by Ollama (`ollama-launch`); **d1** is Hermes builtin llamacpp
+(lfm3 cannot run on llamacpp).
 
 **Default template name:** `Harness profile default`. Body: `type-templates.md`.
 

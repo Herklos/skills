@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.21.0
+version: 1.22.0
 license: MIT
 metadata:
   category: agents
@@ -237,7 +237,7 @@ Full guide: `references/models.md`.
 | Concern | Config / CLI |
 |---------|----------------|
 | Main / decision / routing model | `model.*` / `hermes -p <slug> model` / `/model` |
-| Local decision (Local router) | `local_runtime` + `provider: llamacpp` + `d1-2b-q4_k_m` (`models.md`) |
+| Local parent (chat + approval) | Chat `ollama-launch` / `lfm3` / none; approval `auxiliary.approval` = `llamacpp` / `d1-2b-q4_k_m` + `local_runtime` (`models.md`) |
 | Side jobs | `auxiliary.<task>.*` (default `auto` = main) |
 | Backup mid-turn | `fallback_providers` / `hermes -p <slug> fallback` |
 | MoA | `moa.presets` / `hermes -p <slug> moa configure` |
