@@ -52,18 +52,23 @@ Outline only:
     "properties": {
       "role": "Implementer",
       "lifecycle": "draft",
-      "harness_profile": ["<codingHarnessProfileObjectId>"],
+      "harness_profile": ["<localRouterHarnessProfileObjectId>"],
       "autonomy": "change-with-gates",
-      "short_description": "Implements one Ready coding TODO…"
+      "short_description": "Implements one Ready coding TODO…",
+      "delegation_enabled": true,
+      "terminal_backend": "cua",
+      "computer_surface": "cua-spaces",
+      "map_path": "Agents → Engineering HQ → Development → Lee"
     },
-    "markdown": "**Short Description**\n…\n\n## Full System Prompt (copy into the bot)\n```\n# Role\nYou are Lee…\n```\n"
+    "markdown": "## Full System Prompt (copy into the bot)\n```\n# Role\nYou are Lee…\n```\n"
   }
 }
 ```
 
 Omit `template` to use the type default (**Agent default**). Create memory
-children as `page`. Patch the parent Team / HQ to add a link. Full property
-tables: `object-types.md`. Default template body dumps: `type-templates.md`.
+children as `page` and link via `memory_pages`. Patch the parent Team / Subteam
+`members`. Full property tables: `object-types.md`. Default template body dumps:
+`type-templates.md`.
 
 ## Create a Harness catalog entry
 
@@ -177,9 +182,13 @@ Keep Subagent.`parent_agent` and Agent.`subagents` both ways. Decline into Herme
     "properties": {
       "kind": "HQ",
       "lifecycle": "live",
-      "mission": "…"
+      "chief": ["<chiefAgentId>"],
+      "members": ["<chiefAgentId>"],
+      "subteams": ["<subteamId>"],
+      "mission": "…",
+      "routing_summary": "All work via chief; see Subteams."
     },
-    "markdown": "## Mission\n…\n"
+    "markdown": "## Rules\n1. Follow Agents → Shared Rules.\n"
   }
 }
 ```
@@ -198,15 +207,17 @@ Keep Subagent.`parent_agent` and Agent.`subagents` both ways. Decline into Herme
     "properties": {
       "lifecycle": "live",
       "parent_team": ["<engineeringHqObjectId>"],
-      "mission": "…"
-    },
-    "markdown": "## Mission\n…\n\n## Members\n…\n"
+      "chief": ["<chiefAgentId>"],
+      "members": ["<agentId>"],
+      "mission": "…",
+      "routing_summary": "Members → HQ chief → Primary."
+    }
   }
 }
 ```
 
 Omit `template` to use **Subteam default** when the type has one. Patch the
-parent HQ map to link the new Subteam. Prefer this over `team` + `kind: Sub-team`.
+parent HQ `subteams` property. Prefer this over `team` + `kind: Sub-team`.
 
 ## Create a project portfolio root
 
@@ -220,9 +231,13 @@ parent HQ map to link the new Subteam. Prefer this over `team` + `kind: Sub-team
     "properties": {
       "project_status": "Active",
       "project_category": "Core Platform",
-      "one_liner": "…"
+      "one_liner": "…",
+      "overview": "…",
+      "execution_policy": "Unset",
+      "lead_agent": ["<agentId>"],
+      "owning_team": ["<hqTeamId>"]
     },
-    "markdown": "## Overview\n…\n"
+    "markdown": "## Core Features\n…\n"
   }
 }
 ```

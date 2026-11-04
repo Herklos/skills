@@ -13,71 +13,65 @@ Type default template dumps (Agent / Team / Subteam / Project): **`type-template
 
 Title: `{Name} – {Role}`
 
-1. Heading + optional Autonomy line
-2. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading)
-3. **Short Description** (one paragraph: mission, HQ, reporting line, ownership)
-4. **Full System Prompt** fenced block (copy into the bot)
-5. **Your Memory Pages** (links)
-6. Map line: `Agents → {HQ} → [{Subteam} →] {Agent}` and any `Projects → …` paths
+**Set as properties** (do not rely on markdown alone): `role`, `team`,
+`reports_to`, `lifecycle`, `harness_profile`, `subagents`, `autonomy`,
+`short_description`, `hermes_profile`, `board_member`, `linked_projects`,
+`memory_pages`, `messaging_group`, `map_path`, `delegation_enabled`,
+`terminal_backend`, `computer_surface`. See `object-types.md`.
 
-Body outline (write as normal page markdown, not nested fences):
+Body (narrative only):
 
-- `# {Name} – {Role}` then optional `**Autonomy:** …`
+1. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading;
+   point structured facts at properties + harness_profile)
+2. **Full System Prompt** fenced block (copy into the bot)
+3. Optional notes that do not fit properties
+
+Body outline:
+
+- `# {Name} – {Role}` (name/role also live in title + `role` property)
 - `## Suggested runtime (YYYY-MM-DD)` from `suggested-runtime.md`
-- `## Short Description` (one paragraph)
 - `## Full System Prompt (copy into the bot)` with a fenced prompt (skeleton below)
-- `## Your Memory Pages` (bullet links)
-- Map line naming `Agents → {HQ} → …` and any `Projects → …` paths
 
-Link memory children after create.
+Skip `## Short Description`, `**Autonomy:**`, and prose-only map lines when
+`short_description`, `autonomy`, and `map_path` properties are set. Link memory
+children via `memory_pages` after create.
 
 ## HQ page
 
+Set as properties: `kind` (`HQ` / `Board` / `Group`), `chief`, `members`,
+`subteams`, `mission`, `routing_summary`, optional `messaging_group` /
+`skills_page`.
+
 ```markdown
 # {Name} HQ
-> Chief: **{Name}**. …
-
-**Mission**
-…
-
-## Subteams | Domains | Members
-…
-
-## Routing
-Specialists → chief → Primary (adjust to local docs).
 
 ## Rules
 1. …
 n. Follow Agents → Shared Rules.
 
-## Map
-- Agents → {HQ} → …
+## Map notes
+(Optional detail beyond `routing_summary` / `subteams` / `members` properties.)
 ```
 
-Link: chief, group, skills, transition notes, **`subteam`** children (not `team` + `kind: Sub-team`).
+Link: chief, group, skills, transition notes, **`subteam`** children via the
+`subteams` property (not `team` + `kind: Sub-team`).
 
 ## Subteam page
 
 Type **`subteam`**. Title: `{Domain} – {HQ short name}` or `{Name} Subteam`.
 
+Set as properties: `parent_team`, `chief`, `lifecycle`, `mission`, `members`,
+`routing_summary`, optional `messaging_group` / `skills_page`.
+
 ```markdown
 # {Name} Subteam
-> Parent HQ: **{HQ}**. Lead: **{Name or HQ chief}**.
 
-**Mission**
-…
-
-## Members
-- …
-
-## Routing
-Members → Subteam lead (if any) → HQ chief → Primary.
-
-## Map
-- Agents → {HQ} → {Subteam} → …
+## Map notes
+(Optional detail beyond properties.)
 ```
 
-Set `parent_team` to the HQ. Optional `chief` when the Subteam has its own lead.
+Body may omit Mission / Members / Routing headings when those properties are
+filled.
 
 ## Group page
 
@@ -111,12 +105,13 @@ Skip usage-logging fields if Shared Rules forbid them.
 
 ## Project page
 
+Set as properties: `project_status`, `project_category`, `owning_team`,
+`one_liner`, `overview`, `execution_policy`, `lead_agent`, `related_projects`,
+optional `git_hub` / `public_url`, and child hub links (`technical_page`,
+`product_page`, `pm_page`, `design_page`, `business_page`, `marketing_page`).
+
 ```markdown
 # {Project}
-One-line positioning.
-
-## Overview
-…
 
 ## Core Features
 …
@@ -129,11 +124,12 @@ One-line positioning.
 
 ## Key Differentiators
 …
-
-**Related projects:** …
 ```
 
-Common children: Technical, Business, Project Management (Roadmap / Backlog / TODO), Product, Design, Marketing.
+Skip duplicating one-liner / overview / related-projects / execution policy in
+markdown when properties are set. Common children: Technical, Business, Project
+Management (Roadmap / Backlog / TODO), Product, Design, Marketing (also link via
+the matching `*_page` properties).
 
 ## Full System Prompt skeleton (inside the fence)
 

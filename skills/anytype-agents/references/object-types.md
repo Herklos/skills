@@ -32,6 +32,11 @@ Skills resolution order when a space uses Subteams:
 
 ## Agent (`api_key`: `agent`)
 
+**Properties hold structured facts.** Do not duplicate Short Description,
+Autonomy, Board seat, map path, Hermes slug, terminal/computer defaults, or
+linked projects only in markdown. Body keeps **Suggested runtime** narrative
+and **Full System Prompt**.
+
 Featured properties (API keys):
 
 | Key | Format | Notes |
@@ -42,15 +47,23 @@ Featured properties (API keys):
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
 | `harness_profile` | objects | Link to one **Harness profile** (source of primary + backup models). **Default for most agents: Local router** |
 | `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
+| `board_member` | checkbox | Board seat |
+| `linked_projects` | objects | Projects this agent works |
 
 Other properties:
 
 | Key | Format | Notes |
 |-----|--------|-------|
 | `autonomy` | select | `read-only` \| `propose` \| `change-with-gates` |
-| `hermes_profile` | text | Optional Hermes home slug when applying via `hermes-profiles` |
+| `hermes_profile` | text | Hermes home slug under `~/.hermes/profiles/<slug>` when applying via `hermes-profiles` |
 | `primary_model` | text | Optional agent-local override note; prefer the linked Harness profile |
 | `short_description` | text | One-liner mission |
+| `memory_pages` | objects | Skills / Memory / Operating Notes children |
+| `messaging_group` | objects | Group page / chat roster |
+| `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
+| `delegation_enabled` | checkbox | Parent may spawn Subagents |
+| `terminal_backend` | select | `cua` \| `local` \| `docker` \| `ssh` \| `other` (org default: `cua`) |
+| `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (org default: `cua-spaces`) |
 
 Also includes shared `tag`, `links`, `backlinks`.
 
@@ -73,19 +86,27 @@ and removing `harness` from the Agent type (`remove_property`).
 
 ## Team (`api_key`: `team`)
 
+Board / HQ / Group only. Domains under an HQ use type **`subteam`**.
+
 | Key | Format | Notes |
 |-----|--------|-------|
-| `kind` | select | `Board` \| `HQ` \| `Group` |
-| `chief` | objects | Link to chief Agent |
+| `kind` | select | `Board` \| `HQ` \| `Group` (featured) |
+| `chief` | objects | Link to chief Agent (featured) |
+| `members` | objects | Agent members (featured) |
 | `parent_team` | objects | Parent Team when nested (rare; HQs usually sit under Agents) |
 | `lifecycle` | select | Shared with Agent (`draft` / `live` / `archived`) |
+| `subteams` | objects | Child **Subteam** objects (featured on HQ) |
 | `mission` | text | Short mission |
+| `messaging_group` | objects | Group page |
+| `skills_page` | objects | HQ Skills index |
+| `routing_summary` | text | One-line routing |
 
-Also `tag`, `links`, `backlinks`.
+Also `tag`, `links`, `backlinks`. Put long routing prose in the body; keep the
+filterable one-liner in `routing_summary`.
 
 **Default template name:** `Team default`. Full dumped body: `type-templates.md`.
 Mirror shapes in `page-templates.md` (HQ page). Link child **`subteam`** objects
-from the HQ map; do not create new Sub-teams as `team`.
+via `subteams` and the HQ map; do not create new Sub-teams as `team`.
 
 Legacy: older spaces may still have `team` objects with `kind: Sub-team`. Prefer
 migrating those to type **`subteam`** via `set_type` (see below). Do not mint new
@@ -98,15 +119,19 @@ sub-teams on the `team` type.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `parent_team` | objects | Owning HQ / Team (required when known) |
-| `chief` | objects | Lead agent when the subteam has one (else HQ chief) |
-| `lifecycle` | select | Shared with Agent / Team (`draft` / `live` / `archived`) |
+| `parent_team` | objects | Owning HQ / Team (featured; required when known) |
+| `chief` | objects | Lead agent when the subteam has one (else HQ chief) (featured) |
+| `lifecycle` | select | Shared with Agent / Team (`draft` / `live` / `archived`) (featured) |
 | `mission` | text | Short domain mission |
+| `members` | objects | Agent members of this domain |
+| `routing_summary` | text | One-line routing |
+| `messaging_group` | objects | Group page when present |
+| `skills_page` | objects | Domain Skills index when present |
 
 Also `tag`, `links`, `backlinks`. No `kind` property: the type itself is the kind.
 
-**Default template name:** `Subteam default`. Full dumped body (skill-authored
-until live): `type-templates.md`. Also `page-templates.md` (Subteam page).
+**Default template name:** `Subteam default`. Body: `type-templates.md`. Also
+`page-templates.md` (Subteam page).
 
 Agent `team` (objects) may link the owning HQ **or** this Subteam when the agent
 sits under a domain.
@@ -217,16 +242,27 @@ does not auto-push into Claude/Codex/Grok/…).
 
 ## Project (`api_key`: `project`)
 
-Built-in Project type extended with org fields:
+Built-in Project type extended with org fields. Short overview and hub links
+live in properties; long narrative stays in the body.
 
 | Key | Format | Notes |
 |-----|--------|-------|
 | `project_status` | select | `Active` \| `Other` \| `Archived` |
 | `project_category` | select | `Core Platform` \| `Consumer Apps` \| `Research` \| `AI & Content` \| `B2B` \| `Tools` \| `Other` |
-| `owning_team` | objects | Link to Team |
+| `owning_team` | objects | Link to Team / HQ |
 | `git_hub` | url | Repo URL (API key is `git_hub`) |
 | `public_url` | url | Public product URL |
 | `one_liner` | text | Positioning line |
+| `execution_policy` | select | `Local` \| `Cloud` \| `Mixed` \| `Unset` (featured) |
+| `lead_agent` | objects | Owning coordinator when known (featured) |
+| `related_projects` | objects | Sibling / dependency projects |
+| `overview` | text | Short overview (2–4 sentences) |
+| `technical_page` | objects | Child Technical hub |
+| `product_page` | objects | Child Product hub |
+| `pm_page` | objects | Child Project Management hub |
+| `design_page` | objects | Child Design hub |
+| `business_page` | objects | Child Business hub |
+| `marketing_page` | objects | Child Marketing hub |
 
 **Default template name:** `Project default`. Full dumped body:
 `type-templates.md`.
@@ -251,12 +287,19 @@ template id from `API-list-templates` when you need a specific one; pass
       "harness_profile": ["<localRouterHarnessProfileObjectId>"],
       "subagents": ["<fastFetchSubagentId>", "<deepCodeSubagentId>"],
       "autonomy": "change-with-gates",
-      "short_description": "Implements one Ready coding TODO…"
+      "short_description": "Implements one Ready coding TODO…",
+      "delegation_enabled": true,
+      "terminal_backend": "cua",
+      "computer_surface": "cua-spaces",
+      "map_path": "Agents → Engineering HQ → Development → Lee"
     },
-    "markdown": "## Short Description\n…"
+    "markdown": "## Full System Prompt (copy into the bot)\n…"
   }
 }
 ```
+
+Omit body sections that only repeat properties (`## Short Description`,
+`**Autonomy:**`, map path as prose-only) when those properties are set.
 
 Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
 `task_key`, `harness_profile`, then add its id to the parent's `subagents`.
@@ -337,11 +380,17 @@ object; re-set only what is missing after the type change.
 1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`, and
    `harness_profile` with the property definitions above
    (`create_missing_options: true` for selects). On `team`, define `kind` options
-   `Board` / `HQ` / `Group` only (no `Sub-team`).
-2. On existing Agent types: `add_property` `harness_profile` and `subagents`
-   (objects, featured); `remove_property` legacy `harness` select when ready.
-3. `API-update-type` on built-in `project` with `add_property` ops for the Project
-   fields (or create them once if the space already has matching keys).
+   `Board` / `HQ` / `Group` only (no `Sub-team`). Prefer sequential creates when
+   several types share new property names (`members`, `skills_page`, …) so keys
+   stay clean aliases rather than colliding opaque ids.
+2. On existing Agent types: `add_property` for org/runtime fields above
+   (`board_member`, `linked_projects`, `memory_pages`, `messaging_group`,
+   `map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`);
+   keep `harness_profile` / `subagents`; `remove_property` legacy `harness`
+   select when ready.
+3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
+   `skills_page`, `routing_summary`. On Project: `execution_policy`,
+   `lead_agent`, `related_projects`, `overview`, and child hub page links.
 4. `API-create-template` with `template_for`: `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `project` and body markdown from
    **`type-templates.md`**.
@@ -350,7 +399,8 @@ object; re-set only what is missing after the type change.
    router**, Coding, Data fetching, …); create Subagent spawn configs; link most
    agents to Local router + `subagents` (and Subagent.`parent_agent`).
 7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
-   `team` objects → `subteam`).
+   `team` objects → `subteam`). Fill properties from the org map; leave unknown
+   urls / people empty.
 
 Do not hardcode space or template ids in skill text; resolve them via list/get
 each session.

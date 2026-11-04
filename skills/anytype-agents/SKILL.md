@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.17.0
+version: 1.18.0
 license: MIT
 metadata:
   category: agents
@@ -125,28 +125,28 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties: `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents` (Coding / Data fetching routes), `team` / `reports_to` when known, `autonomy`, optional `hermes_profile` / `short_description`
-5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned)
-6. Link from the HQ map / sub-team page
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `terminal_backend` / `computer_surface` (org defaults `cua` / `cua-spaces`), optional `linked_projects` / `memory_pages` / `messaging_group`
+5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned); link via `memory_pages`
+6. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
-8. Fill **Suggested runtime** from `suggested-runtime.md` (and a filled sample in `examples.md` when helpful)
+8. Fill **Suggested runtime** from `suggested-runtime.md` for narrative apply notes; prefer properties + harness_profile for models / computer / terminal / Subagents
 9. Tell the user Anytype is updated; **copy the Full System Prompt into the runtime bot** and verify groups/routines separately
 10. If the runtime is Hermes, continue with skill `hermes-profiles` and apply Suggested runtime using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `cron.md`)
 
 ### Create or update a Team / HQ
 
 1. Create type **`team`** with `kind` (`Board` / `HQ` / `Group`) and `lifecycle`
-2. Mirror an existing HQ's body sections (mission, Subteams / Domains / Members, routing, rules, map) from `page-templates.md` / **Team default** template
-3. Set `chief`, `parent_team`, `mission` when known
+2. Set `chief`, `members`, `subteams`, `mission`, `routing_summary`, optional `messaging_group` / `skills_page`
+3. Body from `page-templates.md` / **Team default** for rules and long notes only (avoid duplicating mission/members/routing already in properties)
 4. Link from Agents
 5. Update roster/routing and Board/group welcome text if membership changes
 
 ### Create or update a Subteam
 
 1. Prefer type **`subteam`** (do not create new Sub-teams as `team` with `kind: Sub-team`)
-2. Set `parent_team` to the owning HQ, plus `lifecycle`, optional `chief` / `mission`
-3. Body from `page-templates.md` / **Subteam default** template
-4. Link from the HQ map; point member agents' `team` (or map line) at this Subteam when they sit under it
+2. Set `parent_team` to the owning HQ, plus `lifecycle`, `members`, `routing_summary`, optional `chief` / `mission` / `messaging_group` / `skills_page`
+3. Body from `page-templates.md` / **Subteam default** template (properties first)
+4. Link from the HQ `subteams` property and map; point member agents' `team` at this Subteam when they sit under it
 5. Migrate legacy `team` + `kind: Sub-team` with `set_type` → `subteam` (`object-types.md`)
 
 ### Create or update a Subagent
@@ -170,8 +170,8 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update a Project portfolio root
 
-1. Create (or migrate) type **`project`** with `project_status`, `project_category`, optional `owning_team` / `git_hub` / `public_url` / `one_liner`
-2. Use **Project default** template / `page-templates.md` for body
+1. Create (or migrate) type **`project`** with `project_status`, `project_category`, `owning_team`, `one_liner`, `overview`, `execution_policy`, optional `lead_agent` / `related_projects` / `git_hub` / `public_url`, and child hub links (`technical_page`, `product_page`, `pm_page`, …)
+2. Use **Project default** template / `page-templates.md` for long body sections only
 3. Link from Projects hub; keep child docs as `page` unless the org types them too
 
 ### Edit Shared Rules

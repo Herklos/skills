@@ -12,13 +12,18 @@ current default.
 Companion shapes (HQ / Group / Skill / prompt skeleton): `page-templates.md`.
 Property keys: `object-types.md`.
 
-Dumped / authored **2026-11-04**: Agent / Team / Project from live org; Harness /
-Harness profile / Subagent from live bootstrap; Subteam skill-authored until type
-is live.
+Dumped / authored **2026-11-04**; property-complete pass **2026-11-04** (v1.18.0):
+Agent / Team / Project / Subteam live; Subteam default template live. Prefer
+properties for mission / members / routing / short description / autonomy /
+map path; template bodies keep Suggested runtime + Full System Prompt and
+optional long notes.
 
 ---
 
 ## Agent default (`template_for`: `agent`)
+
+Set Autonomy / Short description / Memory pages / Map path as **properties**
+(`object-types.md`). Template body:
 
 ````markdown
 ## Suggested runtime (YYYY-MM-DD)
@@ -28,14 +33,9 @@ is live.
 - 1: {Harness} · {model} · {effort}
 - 2: {Harness} · {model} · {effort}
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
-**Subagents / delegation:** enabled. Parent Local router answers light/peer asks itself; model_map routes from Agent.`subagents` (Coding / Data fetching / …) when specialized work is needed.
-**Personality / Memory / Browser / Computer / Tools / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
-
-## Autonomy
-read-only | propose | change-with-gates
-
-## Short Description
-One paragraph: mission, HQ, reporting line, ownership.
+**Subagents / delegation:** Agent.`delegation_enabled` + Agent.`subagents`. Parent Local router answers light/peer asks itself; model_map routes when specialized work is needed.
+**Terminal / computer:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces).
+**Personality / Memory / Browser / Tools / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## Full System Prompt (copy into the bot)
 ```
@@ -47,16 +47,11 @@ Follow **Agents → Agent Template – Shared Rules** in full.
 
 # Tools and systems
 - Harness profile: {name} (primary + backups from that object)
-- Models / personality / memory / browser / computer / tools / security / workspace: see Suggested runtime
+- Models / personality / memory / browser / computer / tools / security / workspace: see Suggested runtime + Agent properties
 
 # Escalation
 {chief → Primary → Human}
 ```
-
-## Your Memory Pages
-- Skills
-- Operating Notes (optional)
-- Lessons Learned (optional)
 ````
 
 Full Suggested runtime field list: `suggested-runtime.md`. Filled sample:
@@ -69,48 +64,28 @@ Full Suggested runtime field list: `suggested-runtime.md`. Filled sample:
 For Board / HQ / Group. Domains under an HQ use **Subteam default** (type
 `subteam`), not a second Team with a Sub-team kind.
 
+Set `kind`, `chief`, `members`, `subteams`, `mission`, `routing_summary` as
+properties. Template body:
+
 ```markdown
-## Mission
-…
-
-## Subteams | Domains | Members
-…
-
-## Routing
-Specialists → chief → Primary (adjust to local docs).
-
 ## Rules
 1. Follow Agents → Agent Template – Shared Rules.
 
-## Map
-- Agents → {HQ} → …
+## Map notes
+(Optional detail beyond `routing_summary` / `subteams` / `members`.)
 ```
-
-Live dump historically titled the members section `Sub-teams | Domains | Members`.
-Prefer **Subteams** and link typed `subteam` children from the map.
 
 ---
 
 ## Subteam default (`template_for`: `subteam`)
 
-Skill-authored bootstrap body. Create with `API-create-template` when the
-`subteam` type exists; set it as the type `default_template`.
+Live type + default template. Set `parent_team`, `chief`, `lifecycle`,
+`mission`, `members`, `routing_summary` as properties. Template body:
 
 ```markdown
-## Mission
-…
-
-## Members
-- …
-
-## Routing
-Members → Subteam lead (if any) → HQ chief → Primary.
-
-## Map
-- Agents → {HQ} → {Subteam} → …
+## Map notes
+(Optional detail beyond properties.)
 ```
-
-Set property `parent_team` to the owning HQ on create.
 
 ---
 
@@ -190,12 +165,10 @@ object to Agent.`subagents`.
 
 ## Project default (`template_for`: `project`)
 
+Set `one_liner`, `overview`, `execution_policy`, `lead_agent`,
+`related_projects`, and child `*_page` links as properties. Template body:
+
 ```markdown
-One-line positioning.
-
-## Overview
-…
-
 ## Core Features
 …
 
@@ -207,10 +180,10 @@ One-line positioning.
 
 ## Key Differentiators
 …
-
-**Related projects:** …
-Common children: Technical, Business, Project Management (Roadmap / Backlog / TODO), Product, Design, Marketing.
 ```
+
+Common children: Technical, Business, Project Management (Roadmap / Backlog /
+TODO), Product, Design, Marketing (also link via `technical_page` / …).
 
 ---
 

@@ -1,8 +1,16 @@
 # Suggested runtime (agent page section)
 
 Document the intended runtime stack on each agent. Values guide whoever
-configures the bot; they do **not** auto-apply. For Hermes, map fields with
-skill `hermes-profiles`:
+configures the bot; they do **not** auto-apply.
+
+**Prefer properties for structured facts:** Agent.`harness_profile`,
+`hermes_profile`, `delegation_enabled`, `terminal_backend`, `computer_surface`,
+`subagents`, plus Harness profile `decision_*` / primary / backups. Keep this
+body section for narrative apply notes and fields that do not yet have a
+property. Do not treat markdown bullets as the only source of truth for those
+keys.
+
+For Hermes, map fields with skill `hermes-profiles`:
 
 | Area | Reference |
 |------|-----------|
