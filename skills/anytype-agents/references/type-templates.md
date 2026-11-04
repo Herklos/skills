@@ -31,37 +31,25 @@ Query filtered by `parent_team` (replace static Sub-teams / Domains tables).
 Agent.`primary_model` removed **2026-11-04** (v1.31.2): models live on
 Harness profile only. Agent default template + live stubs cleaned
 **2026-11-04** (v1.31.3): no Full System Prompt fence; Team/Subteam/Subagent
-gain optional `system_prompt`. Prefer properties for mission / members /
-routing / short description /
-autonomy / map path / browser / computer / tool_profile / `system_prompt` /
-`memory_pages` / `skills_page` / `logs_page` / `agenda_page` /
-`messaging_group` / `standing_instructions` / `subteams_page`; template bodies
-keep Suggested runtime + System prompt pointer (canonical text on linked Prompt).
+gain optional `system_prompt`. Agent body property-dup cleanup **2026-11-04**
+(v1.31.4): drop `## Suggested runtime` and Short description / Autonomy /
+Home / Chief / HQ / Team / Reports-to prose once properties are set; Agent
+default is System prompt + Agenda pointers only. Prefer properties for
+mission / members / routing / short description / autonomy / map path /
+browser / computer / tool_profile / `system_prompt` / `memory_pages` /
+`skills_page` / `logs_page` / `agenda_page` / `messaging_group` /
+`standing_instructions` / `subteams_page`.
 
 ---
 
 ## Agent default (`template_for`: `agent`)
 
-Set Autonomy / Short description / Memory pages / Map path as **properties**
-(`object-types.md`). Template body:
+Set Autonomy / Short description / Team / Reports to / Memory pages / Map path /
+harness_profile / browser / computer / tool_profile / voice as **properties**
+(`object-types.md`). Do **not** paste Suggested runtime or property prose into
+the body. Template body:
 
-````markdown
-## Suggested runtime (YYYY-MM-DD)
-**Harness profile:** {Local router (default) | Coding | Data fetching | …}  (Agent.`harness_profile`)
-**model.* (from profile):** {provider} · {model_default} · {effort}
-**fallback_providers (from profile):**
-- 1: {provider} · {model} · {effort}
-- 2: {provider} · {model} · {effort}
-**auxiliary (from profile):** vision / compression / web_extract / skills_hub / title_generation (auto unless set)
-**Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
-**Subagents / delegation:** Agent.`delegation_enabled` + Agent.`subagents`. Parent Local router answers light/peer asks itself; model_map routes when specialized work is needed.
-**Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults owning HQ Hermes Chromium / HQ Cua Spaces / Standard interactive; Primary leaves browser+computer empty).
-**Terminal / computer selects:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces; Primary `computer_surface: none`; keep aligned with linked Computer / Tool profile).
-**Voice:** Agent.`voice_enabled` / `voice_auto_tts` / `voice_chat_mode` / `messaging_voice_mode`; STT/TTS from Harness profile (Local router: local+edge) or Agent overrides.
-**System prompt:** Agent.`system_prompt` → Prompt object (`prompt_kind=system`).
-**Agenda:** Agent.`agenda_page` → `{OwnerShort} – Agenda` Query of Schedules (`agenda-and-schedules.md`).
-**Personality / Memory / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
-
+```markdown
 ## System prompt
 Canonical system prompt lives on the linked **System prompt** property
 ([{Name} – System prompt](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
@@ -72,11 +60,10 @@ Prompt fence here.
 Canonical scheduled work lives on the linked **Agenda** Query
 ([{OwnerShort} – Agenda](anytype://object?objectId=<queryId>&spaceId=<spaceId>)).
 Create typed **Schedule** objects (`owner_agent` = this agent).
-````
+```
 
-Full Suggested runtime field list: `suggested-runtime.md`. Prompt create /
-migrate: `prompts.md`. Agenda / Schedule: `agenda-and-schedules.md`. Filled
-sample: `examples.md`.
+Hermes apply checklist (not page body): `suggested-runtime.md`. Prompt create /
+migrate: `prompts.md`. Agenda / Schedule: `agenda-and-schedules.md`.
 
 ---
 

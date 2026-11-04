@@ -10,7 +10,7 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 | `project-pm.md` | PM Epics / User stories / Tasks + filtered Roadmap/Backlog/TODO Queries |
 | `type-templates.md` | Dumped default template bodies (bootstrap / drift) |
 | `page-templates.md` | Creating/auditing body shapes |
-| `suggested-runtime.md` | Suggested runtime field list |
+| `suggested-runtime.md` | Hermes apply checklist (not Agent page body) |
 | `shared-rules-starter.md` | Bootstrapping Shared Rules |
 | `examples.md` | Fictional org / project walkthrough |
 | `handoff-templates.md` | Briefs, handoffs, welcome paste |

@@ -1,17 +1,17 @@
-# Suggested runtime (agent page section)
+# Suggested runtime (Hermes apply checklist)
 
-Document the intended runtime stack on each agent. Values guide whoever
-configures the bot; they do **not** auto-apply.
+**Not an Agent page body section.** Live agents keep System prompt + Agenda
+pointers only. Fill runtime facts as Agent / Harness profile / catalog
+**properties**, then use this checklist when applying into Hermes (or another
+harness). Values guide whoever configures the bot; they do **not** auto-apply.
 
-**Prefer properties for structured facts:** Agent.`harness_profile`,
+**Properties are the source of truth:** Agent.`harness_profile`,
 `hermes_profile`, `delegation_enabled`, `browser`, `computer`, `tool_profile`,
-`terminal_backend`, `computer_surface`, `subagents`, voice fields
+`terminal_backend`, `computer_surface`, `subagents`, `short_description`,
+`autonomy`, `team`, `reports_to`, `map_path`, voice fields
 (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`,
 optional `stt_*` / `tts_*`), plus Harness profile `model_*` / `fallback_*` /
-`aux_*` / voice stack. Keep this body section for narrative apply notes and
-fields that do not yet have a property. Do not treat markdown bullets as the
-only source of truth for Browser / Computer / Tools / Terminal / Voice when the
-matching properties or catalog links are set.
+`aux_*` / voice stack. Do not paste this checklist onto the Agent page.
 
 For Hermes, map fields with skill `hermes-profiles`:
 
@@ -29,10 +29,11 @@ For Hermes, map fields with skill `hermes-profiles`:
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks (Agenda / Schedule) | `cron.md` (+ anytype-agents `agenda-and-schedules.md`) |
 
-Paste under the agent title (date the heading when you revise it).
+Use as a private apply worksheet (date when you revise it). Do not commit this
+block to the Agent object body.
 
 ```markdown
-## Suggested runtime (YYYY-MM-DD)
+## Suggested runtime apply notes (YYYY-MM-DD)
 **Harness profile:** {Local router (default for most agents) | Coding | Data fetching | …}  (link Agent.`harness_profile`)
 **model.* (from profile):** {model_provider} · {model_default} · {model_effort} · harness {catalog}  (Local router → llamacpp · d1-2b-q4_k_m · medium)
 **fallback_providers (from profile, ordered):**

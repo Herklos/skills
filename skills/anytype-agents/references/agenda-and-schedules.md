@@ -185,7 +185,7 @@ Create typed **Schedule** objects (`owner_agent` = this agent). Recurring rows
 apply via hermes-profiles `cron.md` when asked.
 ```
 
-Suggested runtime **Scheduled tasks** bullets may stay as a one-line summary
+Agenda Query + Schedule properties hold scheduled work; do not keep Suggested runtime **Scheduled tasks** bullets on the Agent body. A one-line summary
 that points at the Agenda; do not duplicate every field in markdown when
 Schedule properties are filled.
 

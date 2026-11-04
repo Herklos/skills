@@ -52,10 +52,12 @@ Skills resolution order when a space uses Subteams:
 ## Agent (`api_key`: `agent`)
 
 **Properties hold structured facts.** Do not duplicate Short Description,
-Autonomy, Board seat, map path, Hermes slug, browser / computer / tools, or
-linked projects only in markdown. Body keeps **Suggested runtime** narrative
-and a short **System prompt** pointer. Canonical copy-into-bot text lives on a
-linked **`prompt`** object (`system_prompt`); see `prompts.md`.
+Autonomy, Team, Reports to, HQ / Home / Chief / map path, Hermes slug, browser /
+computer / tools, or linked projects in markdown. Agent body keeps a short
+**System prompt** pointer + **Agenda** pointer only (no `## Suggested runtime`
+section). Canonical copy-into-bot text lives on a linked **`prompt`** object
+(`system_prompt`); see `prompts.md`. Runtime apply checklist (Hermes only):
+`suggested-runtime.md`.
 
 Featured properties (API keys):
 
@@ -105,9 +107,10 @@ Other properties:
 Also includes shared `tag`, `links`, `backlinks`.
 
 Prefer catalog links (`browser`, `computer`, `tool_profile`) as the structured
-source for Suggested runtime Browser / Computer / Tools / Terminal detail. Keep
+source for Browser / Computer / Tools / Terminal detail. Keep
 `terminal_backend` / `computer_surface` selects consistent with those links for
-quick filters.
+quick filters. Do not paste a Suggested runtime body section once these
+properties are set.
 
 **Voice:** Harness profile holds the shared STT/TTS stack. Agent holds enablement
 / modes and may override `stt_*` / `tts_*`. Prefer properties over markdown-only
@@ -328,7 +331,7 @@ needed and answers directly otherwise.
 
 **Default template name:** `Harness profile default`. Body: `type-templates.md`.
 
-Apply: when an agent's Suggested runtime or live bot models / voice change,
+Apply: when an agent's harness profile or live bot models / voice change,
 update the **Harness profile** object, then re-apply to each linked agent's
 runtime (Anytype does not auto-push into Claude/Codex/Grok/Hermes/…).
 
@@ -566,15 +569,17 @@ template id from `API-list-templates` when you need a specific one; pass
       "map_path": "Agents → Engineering HQ → Development → Lee"
     },
     "system_prompt": ["<promptObjectId>"],
-    "markdown": "## System prompt\nCanonical system prompt lives on the linked **System prompt** property. Copy from that Prompt into the bot.\n"
+    "markdown": "## System prompt\nCanonical system prompt lives on the linked **System prompt** property. Copy from that Prompt into the bot.\n\n## Agenda\nCanonical scheduled work lives on the linked **Agenda** Query.\n"
   }
 }
 ```
 
 Create the Prompt object first (or in the same session) per `prompts.md`. Omit
 body sections that only repeat properties (`## Short Description`,
-`**Autonomy:**`, map path as prose-only) when those properties are set. Do not
-paste a Full System Prompt / SOUL fence on the Agent once `system_prompt` is set.
+`**Autonomy:**`, `**Home:**` / `**Chief:**` / `**HQ:**` / `**Reports to:**`,
+`## Suggested runtime`, map path as prose-only) when those properties are set.
+Do not paste a Full System Prompt / SOUL fence on the Agent once `system_prompt`
+is set.
 
 Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
 `task_key`, `harness_profile`, then add its id to the parent's `subagents`.

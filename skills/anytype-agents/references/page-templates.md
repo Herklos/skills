@@ -7,7 +7,7 @@ types `agent`, `team`, `subteam`, `group`, `prompt`, `memory`, `skill`, `log`,
 indexes are Queries. Shared Rules is type `prompt`. Prefer duplicating a live
 peer in the same space over inventing a new layout.
 
-Suggested runtime field list: **`suggested-runtime.md`**.
+Hermes apply checklist (not Agent body): **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
 Type default template dumps (Agent / Team / Subteam / Project): **`type-templates.md`**.
 
@@ -24,27 +24,27 @@ Title: `{Name} – {Role}`
 modes / optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
 `memory-and-skills.md` + `agenda-and-schedules.md`.
 
-Body (narrative only):
+Body (pointers + unique narrative only):
 
-1. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading;
-   point structured facts at properties + harness_profile + browser / computer /
-   tool_profile catalogs + Agenda)
-2. **System prompt** short pointer to the linked Prompt (`system_prompt`)
-3. **Agenda** short pointer to the linked Agenda Query (`agenda_page`) when
+1. **System prompt** short pointer to the linked Prompt (`system_prompt`)
+2. **Agenda** short pointer to the linked Agenda Query (`agenda_page`) when
    schedules exist or the Query is linked
-4. Optional notes / memory that do not fit properties
+3. Optional notes / checklists / memory that do **not** fit properties
 
 Body outline:
 
-- `# {Name} – {Role}` (name/role also live in title + `role` property)
-- `## Suggested runtime (YYYY-MM-DD)` from `suggested-runtime.md`
 - `## System prompt` + one paragraph pointing at `[{Name} – System prompt]`
 - `## Agenda` + one paragraph pointing at `[{OwnerShort} – Agenda]`
 
-Skip `## Short Description`, `**Autonomy:**`, and prose-only map lines when
-`short_description`, `autonomy`, and `map_path` properties are set. Link Memory
-objects via `memory_pages`, the Skills Query via `skills_page`, the Logs Query
-via `logs_page`, and the Agenda Query via `agenda_page` after create
+**Do not** put these on the Agent body once the matching property is set:
+`short_description`, `autonomy`, `team`, `reports_to`, `map_path` / HQ / Home /
+Chief, harness / browser / computer / tools / voice runtime stacks, or a
+`## Suggested runtime` section. Fill the properties first; delete body
+duplicates. `suggested-runtime.md` is an apply checklist for Hermes, not page
+markdown.
+
+Link Memory objects via `memory_pages`, the Skills Query via `skills_page`, the
+Logs Query via `logs_page`, and the Agenda Query via `agenda_page` after create
 (`memory-and-skills.md` + `agenda-and-schedules.md`). Create the Prompt object
 first (`prompts.md`); do not keep a Full System Prompt / SOUL fence on the
 Agent. Replace old Automations / Noodle / Hermes schedule prose with the Agenda

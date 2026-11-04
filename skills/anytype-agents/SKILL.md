@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.31.3
+version: 1.31.4
 license: MIT
 metadata:
   category: agents
@@ -48,7 +48,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Browser / Computer / Tool profile / Group / Project type keys, properties, migration |
 | `references/type-templates.md` | Dumped default template bodies (incl. Subagent / Harness / Group / runtime catalogs) for bootstrap and drift |
 | `references/page-templates.md` | Agent / HQ / Subteam / Group / skill / project body shapes |
-| `references/suggested-runtime.md` | Suggested runtime field list (Hermes mapping; prefer Browser / Computer / Tool profile links) |
+| `references/suggested-runtime.md` | Hermes apply checklist (not Agent page body); prefer properties + Browser / Computer / Tool profile links |
 | `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
@@ -135,8 +135,8 @@ Never invent roster membership, legal conclusions, or financial numbers. Prefer 
 ### Show an agent
 
 1. Prefer `API-search-space` with `"type": "agent"` (or search by display name / role)
-2. Read: short description, suggested runtime, linked **System prompt** Prompt, memory links, skills
-3. Note featured properties (`role`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`, `browser`, `computer`, `tool_profile`, `autonomy`, …) and body sections
+2. Read properties first: `short_description`, `team`, `reports_to`, `autonomy`, `harness_profile`, catalog links, linked **System prompt** Prompt, memory / skills / logs / agenda
+3. Body should be System prompt + Agenda pointers (plus unique narrative only); flag leftover Suggested runtime or property-dup prose for cleanup
 
 ### Show a project (agent context)
 
@@ -155,13 +155,13 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
 4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `messaging_group`
-5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps Suggested runtime + a short System prompt pointer (no Full System Prompt fence)
+5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps a short System prompt pointer + Agenda pointer only (no Suggested runtime section, no Full System Prompt fence, no Short description / Autonomy / Home / Chief / Team / HQ prose that duplicates properties)
 6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, a Logs **Query**, and an Agenda **Query**; link via `memory_pages` + `skills_page` + `logs_page` + `agenda_page` (`memory-and-skills.md` + `agenda-and-schedules.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 8. Inside the Prompt body, point at Shared Rules (short pointer, not a full paste, when token economy matters) and include `# HQ standing instructions (mandatory)` + `# Agenda (mandatory)` short sections (`hq-standing-instructions.md`, `agenda-and-schedules.md`)
-9. Fill **Suggested runtime** from `suggested-runtime.md` for narrative apply notes; prefer properties + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields, Agenda) over markdown-only Browser / Computer / Tools / Voice / schedule bullets
+9. Fill runtime facts as **properties** + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields, `short_description`, `autonomy`, `team`, `reports_to`, `map_path`, Agenda). Use `suggested-runtime.md` only as an apply checklist when configuring Hermes, not as agent-page markdown
 10. Tell the user Anytype is updated; **copy the linked Prompt into the runtime bot** and verify groups/routines separately
-11. If the runtime is Hermes, continue with skill `hermes-profiles` and apply Suggested runtime using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`). Recurring Schedules on the Agenda decline via `cron.md` only when the user asks to apply. Do **not** paste HQ standing libraries into SOUL; keep the short pointer
+11. If the runtime is Hermes, continue with skill `hermes-profiles` and apply from properties using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`). Recurring Schedules on the Agenda decline via `cron.md` only when the user asks to apply. Do **not** paste HQ standing libraries into SOUL; keep the short pointer
 
 ### Create or update a Team / HQ
 
@@ -198,7 +198,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 2. Optional `system_prompt` when the spawn needs its own system text (else inherit parent agent)
 3. Body from `type-templates.md` / **Subagent default** (no Full System Prompt fence)
 4. Add the Subagent id to the parent's Agent.`subagents` (keep both links)
-5. Document the route under the parent's Suggested runtime Subagents section
+5. Document the route on the Subagent object + parent Agent.`subagents` (no Suggested runtime body section)
 6. If Hermes: decline into `model_map` via `hermes-profiles` `delegation.md`
 
 ### Create or update a Harness / Harness profile
@@ -339,7 +339,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 ## Common recipes (summary)
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|schedule|group|project`
-- **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → Suggested runtime + pointer body → Memory objects + Skills Query + Logs Query + Agenda Query (`memory-and-skills.md` + `agenda-and-schedules.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
+- **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query (`memory-and-skills.md` + `agenda-and-schedules.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Group:** create `group` + welcome Prompt → set `members` / platform fields → link Agent/HQ `messaging_group` → Hermes apply via `messaging-groups.md` when asked

@@ -47,8 +47,11 @@ Team.`standing_instructions` (`hq-standing-instructions.md`). Agents still
 short-point at Shared Rules and HQ standing inside their system prompt body.
 
 **Cleanup:** Agent pages must not keep `## Full System Prompt` / `## Full SOUL.md`
-fences once `system_prompt` is set. Agent default template uses a short pointer
-only. Teams / Subteams / Subagents normally have no system-prompt body section.
+fences once `system_prompt` is set. Agent default template uses System prompt +
+Agenda pointers only (no `## Suggested runtime`, no Short description /
+Autonomy / Home / Chief / HQ / Team / Reports-to prose that duplicates
+properties). Teams / Subteams / Subagents normally have no system-prompt body
+section.
 
 ## Naming
 
@@ -61,7 +64,7 @@ only. Teams / Subteams / Subagents normally have no system-prompt body section.
 
 ## Agent body after migrate
 
-1. **Suggested runtime** (narrative; properties + catalogs hold structured facts)
+1. **Properties first** (short_description, team, reports_to, harness_profile, catalogs); no Suggested runtime body section
 2. **System prompt** heading + one paragraph pointer to the linked Prompt
    (property **System prompt** / `system_prompt`)
 3. **Agenda** short pointer to Agent.`agenda_page` when linked
