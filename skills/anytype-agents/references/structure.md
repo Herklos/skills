@@ -36,7 +36,7 @@ From an `https://object.any.coop/<objectId>?spaceId=<spaceId>` or `anytype://obj
 ```
 Agents
 ├── Shared Rules (template / mandatory rules)
-├── Skills (global) ── Skill Template
+├── Skills (global Query of skill) ── Skill Template (type skill)
 ├── Harnesses (type `harness` catalog)
 ├── Harness profiles (type `harness_profile` stacks)
 ├── Primary (coordinator)
@@ -90,10 +90,11 @@ Org inventory uses custom keys **`agent`**, **`team`**, **`subteam`**,
 (not a harness select). Prefer **`subagent`** objects linked via Agent.`subagents`
 for spawn routes (decline to Hermes `model_map`). Project PM uses **`epic`** /
 **`user_story`** / **`task`** with per-project Queries named Roadmap / Backlog /
-TODO (`project-pm.md`). Supporting docs (Shared Rules, Skills, memory children,
-hubs) stay **`page`**. Spaces also expose `note`, `collection`, `query`,
-`template`, media types. See `object-types.md` for property keys, default
-templates, create and `set_type` migration.
+TODO (`project-pm.md`). Supporting docs: Shared Rules as **`prompt`**; memory as
+**`memory`**; procedures as **`skill`**; Skills indexes as **`query`**; other
+hubs may stay **`page`**. Spaces also expose `note`, `collection`, `query`,
+`template`, media types. See `object-types.md` + `memory-and-skills.md` for
+property keys, default templates, create and `set_type` migration.
 
 ## Runtime vs docs
 

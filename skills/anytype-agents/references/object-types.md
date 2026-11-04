@@ -4,9 +4,11 @@ Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
 `API-list-types` / `API-get-type` and templates with `API-list-templates`.
 
-Skills, Groups (welcome pages), memory children, and other hub pages stay type
-`page` unless the space defines otherwise. **Shared Rules**, system/welcome
-prompts, and prompt libraries use type **`prompt`** (see `prompts.md`).
+Groups (welcome pages) and other hub scaffolding stay type `page` unless the
+space defines otherwise. **Shared Rules**, system/welcome prompts, and prompt
+libraries use type **`prompt`** (see `prompts.md`). Agent support notes use
+type **`memory`**; procedures use type **`skill`**; Skills indexes are
+**Queries** (see `memory-and-skills.md`).
 
 ## Type keys
 
@@ -73,7 +75,8 @@ Other properties:
 | `hermes_profile` | text | Hermes home slug under `~/.hermes/profiles/<slug>` when applying via `hermes-profiles` |
 | `primary_model` | text | Optional agent-local override note; prefer the linked Harness profile |
 | `short_description` | text | One-liner mission |
-| `memory_pages` | objects | Skills / Memory / Operating Notes children |
+| `memory_pages` | objects | Typed **Memory** children (decisions, lessons, resources, …) |
+| `skills_page` | objects | Skills **Query** for this agent |
 | `messaging_group` | objects | Group page / chat roster |
 | `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
 | `delegation_enabled` | checkbox | Parent may spawn Subagents |
@@ -134,7 +137,7 @@ Board / HQ / Group only. Domains under an HQ use type **`subteam`**.
 | `subteams` | objects | Child **Subteam** objects (featured on HQ) |
 | `mission` | text | Short mission |
 | `messaging_group` | objects | Group page |
-| `skills_page` | objects | HQ Skills index |
+| `skills_page` | objects | HQ Skills **Query** |
 | `routing_summary` | text | One-line routing |
 | `browser` | objects | Optional team-default **Browser** catalog link |
 | `computer` | objects | Optional team-default **Computer** catalog link |
@@ -166,7 +169,7 @@ sub-teams on the `team` type.
 | `members` | objects | Agent members of this domain |
 | `routing_summary` | text | One-line routing |
 | `messaging_group` | objects | Group page when present |
-| `skills_page` | objects | Domain Skills index when present |
+| `skills_page` | objects | Domain Skills **Query** when present |
 | `browser` | objects | Optional domain-default **Browser** catalog link |
 | `computer` | objects | Optional domain-default **Computer** catalog link |
 | `tool_profile` | objects | Optional domain-default **Tool profile** catalog link |
@@ -683,13 +686,47 @@ create/migrate recipes, and Agent/Group pointer shapes: **`prompts.md`**.
 Rules and Mission-style libraries are themselves type `prompt` (`set_type` in
 place).
 
+## Memory (`api_key`: `memory`)
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `other` (featured) |
+| `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
+| `owner_agent` | objects | Owning Agent (featured) |
+| `owner_team` | objects | Optional |
+| `owner_subteam` | objects | Optional |
+| `cadence` | text | Optional |
+| `last_reviewed` | date | Optional |
+| `notes` | text | |
+
+**Default template:** Memory default. Full playbook: `memory-and-skills.md`.
+
+## Skill (`api_key`: `skill`)
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `skill_kind` | select | `procedure` \| `template` \| `guide` (featured) |
+| `skill_key` | text | lowercase-hyphen id (featured) |
+| `skill_scope` | select | `global` \| `team` \| `subteam` \| `agent` \| `project` (featured) |
+| `skill_status` | select | `draft` \| `active` \| `deprecated` \| `archived` (featured) |
+| `version` | text | |
+| `intent` | text | Router blurb (featured) |
+| `owner_agent` / `owner_team` / `owner_subteam` / `owner_project` | objects | Match scope |
+| `parent_skill` / `related_skills` | objects | Optional |
+| `box_path` | text | Optional |
+| `reviewed_by` | objects | Optional |
+| `notes` | text | |
+
+**Default template:** Skill default. Indexes are **Queries**, not `skill_kind=index`.
+Full playbook: `memory-and-skills.md`.
+
 ## What stays `page`
 
 - Agents / Projects hub roots (optional)
-- Skill Template, Skills indexes
-- Agent memory children (Skills, Operating Notes, …)
 - Group welcome pages when not modeled as Team `kind: Group` (link
   `welcome_prompt` → Prompt; body keeps a short pointer)
 - Drafts hub scaffolding, misc notes, restore/backup dumps
 
-Shared Rules and prompt libraries are type **`prompt`**, not `page`.
+Shared Rules and prompt libraries are type **`prompt`**. Memory children are
+type **`memory`**. Procedures / Skill Template / guides are type **`skill`**.
+Skills indexes are type **`query`**.

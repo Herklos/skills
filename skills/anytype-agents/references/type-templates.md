@@ -17,10 +17,13 @@ runtime catalogs **2026-11-04** (v1.19.0): Browser / Computer / Tool profile
 types + Agent/Team/Subteam link props. Per-HQ Browser/Computer pairs
 **2026-11-04** (v1.22.0): one `{HQ} – Cua Spaces` + `{HQ} – Cua Chromium` per
 HQ; Subteams/Agents inherit; Board/Primary empty. Prompt type **2026-11-04**
-(v1.25.0): system/welcome/shared_rules/library/draft. Prefer properties for
+(v1.25.0): system/welcome/shared_rules/library/draft. Memory + Skill types
+**2026-11-04** (v1.26.0): agent notes as `memory`; procedures as `skill`;
+Skills indexes as Queries via `skills_page`. Prefer properties for
 mission / members / routing / short description / autonomy / map path / browser /
-computer / tool_profile / `system_prompt`; template bodies keep Suggested
-runtime + System prompt pointer (canonical text on linked Prompt).
+computer / tool_profile / `system_prompt` / `memory_pages` / `skills_page`;
+template bodies keep Suggested runtime + System prompt pointer (canonical text
+on linked Prompt).
 
 ---
 
@@ -288,13 +291,71 @@ properties (`prompts.md`). Template body:
 
 ---
 
+## Memory default (`template_for`: `memory`)
+
+Set `memory_kind`, `lifecycle`, `owner_agent` as properties
+(`memory-and-skills.md`). Template body:
+
+```markdown
+## Purpose
+(What this memory page is for.)
+
+## Entries
+(Durable facts, decisions, lessons, or resources.)
+
+## Notes
+(Cadence / review notes.)
+```
+
+---
+
+## Skill default (`template_for`: `skill`)
+
+Set `skill_kind`, `skill_key`, `skill_scope`, `skill_status`, `intent`,
+matching `owner_*` as properties (`memory-and-skills.md`). Template body:
+
+```markdown
+## Goal
+(One clear outcome.)
+
+## When to use / When not to use
+- Use when:
+- Do not use when:
+
+## Prerequisites
+(Knowledge, tools, access.)
+
+## Procedure
+1. …
+2. …
+3. **Verify:** …
+
+## Output format / template
+(Concrete structure.)
+
+## Constraints & gotchas
+-
+
+## Verification checklist
+- [ ] Output matches goal
+
+## Progressive disclosure
+(Load-when → resource.)
+
+## Change log
+| Date | Change | By |
+|------|--------|----|
+```
+
+---
+
 ## Recreate a default template (MCP)
 
 1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `prompt` | `project` | `epic` | `user_story`, name
-   `{Type} default`, and body blocks from the matching section above
-   (`heading_2` + `paragraph`).
+   `tool_profile` | `prompt` | `memory` | `skill` | `project` | `epic` |
+   `user_story`, name `{Type} default`, and body blocks from the matching
+   section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -304,7 +365,7 @@ properties (`prompts.md`). Template body:
 
 1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
    `harness_profile`, `browser`, `computer`, `tool_profile`, `prompt`,
-   `project`, `epic`, `user_story`.
+   `memory`, `skill`, `project`, `epic`, `user_story`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of

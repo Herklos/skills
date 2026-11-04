@@ -1,10 +1,10 @@
 # Page templates (generic)
 
 Use these shapes when creating or auditing **bodies**. Inventory objects use
-types `agent`, `team`, `subteam`, `prompt`, and `project` (see
-`object-types.md` + `prompts.md`); memory children and Skills stay `page`.
-Shared Rules is type `prompt`. Prefer duplicating a live peer in the same space
-over inventing a new layout.
+types `agent`, `team`, `subteam`, `prompt`, `memory`, `skill`, and `project`
+(see `object-types.md` + `prompts.md` + `memory-and-skills.md`). Skills indexes
+are Queries. Shared Rules is type `prompt`. Prefer duplicating a live peer in
+the same space over inventing a new layout.
 
 Suggested runtime field list: **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
@@ -18,9 +18,10 @@ Title: `{Name} – {Role}`
 `reports_to`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`,
 `browser`, `computer`, `tool_profile`, `voice_enabled`, `autonomy`,
 `short_description`, `hermes_profile`, `board_member`, `linked_projects`,
-`memory_pages`, `messaging_group`, `map_path`, `delegation_enabled`,
-`terminal_backend`, `computer_surface`, voice modes / optional `stt_*` /
-`tts_*`. See `object-types.md` + `prompts.md`.
+`memory_pages`, `skills_page`, `messaging_group`, `map_path`,
+`delegation_enabled`, `terminal_backend`, `computer_surface`, voice modes /
+optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
+`memory-and-skills.md`.
 
 Body (narrative only):
 
@@ -37,9 +38,10 @@ Body outline:
 - `## System prompt` + one paragraph pointing at `[{Name} – System prompt]`
 
 Skip `## Short Description`, `**Autonomy:**`, and prose-only map lines when
-`short_description`, `autonomy`, and `map_path` properties are set. Link memory
-children via `memory_pages` after create. Create the Prompt object first
-(`prompts.md`); do not keep a Full System Prompt / SOUL fence on the Agent.
+`short_description`, `autonomy`, and `map_path` properties are set. Link Memory
+objects via `memory_pages` and the Skills Query via `skills_page` after create
+(`memory-and-skills.md`). Create the Prompt object first (`prompts.md`); do not
+keep a Full System Prompt / SOUL fence on the Agent.
 
 ## HQ page
 
@@ -97,22 +99,24 @@ Canonical welcome paste lives on the linked **Welcome prompt** property
 Document membership here; applying it to a messaging platform is a separate
 runtime step. Full Prompt create/migrate: `prompts.md`.
 
-## Skill page
+## Skill (type `skill`)
 
-1. Metadata: name, title, scope (`global` / `team:[HQ]` / `subteam:[name]` / `project:[name]` / `agent:[name]`), owner, status, version
-2. Description router: third person, what + when (+ when not)
-3. Goal
-4. When to use / When not to use
-5. Prerequisites
-6. Procedure with a **Verify** step
-7. Output format
-8. Constraints & gotchas
-9. Verification checklist
-10. Progressive disclosure
-11. Change log
-12. Authoring checklist before status=active
+Set as properties: `skill_kind`, `skill_key`, `skill_scope`, `skill_status`,
+`version`, `intent`, matching `owner_*` (`memory-and-skills.md`). Body:
 
-Skip usage-logging fields if Shared Rules forbid them.
+1. Goal
+2. When to use / When not to use
+3. Prerequisites
+4. Procedure with a **Verify** step
+5. Output format
+6. Constraints & gotchas
+7. Verification checklist
+8. Progressive disclosure
+9. Change log
+10. Authoring checklist before `skill_status=active`
+
+Skip Metadata tables once properties are set. Skip usage-logging fields if
+Shared Rules forbid them. Owner Skills **Query** lists the skill automatically.
 
 ## Project page
 

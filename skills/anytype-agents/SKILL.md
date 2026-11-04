@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.25.0
+version: 1.26.0
 license: MIT
 metadata:
   category: agents
@@ -18,8 +18,9 @@ metadata:
 
 Org source of truth for a multi-agent roster lives in **Anytype** as typed
 objects (`agent`, `team`, `subteam`, `subagent`, `harness`, `harness_profile`,
-`browser`, `computer`, `tool_profile`, `prompt`, `project`, plus PM `epic` /
-`user_story` / extended `task`) plus supporting `page`s.
+`browser`, `computer`, `tool_profile`, `prompt`, `memory`, `skill`, `project`,
+plus PM `epic` / `user_story` / extended `task`) plus supporting `page`s and
+Skills **Queries**.
 Runtime bots are separate: editing Anytype does not by itself update a live bot
 prompt or messaging group. Verify runtime separately after doc changes. Model
 stacks live on **Harness profile** objects; agents link `harness_profile` so one
@@ -55,6 +56,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Cua Chromium Browser create, link, migrate |
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
 | `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, Group `welcome_prompt`, migrate |
+| `references/memory-and-skills.md` | Memory + Skill types, Agent.`memory_pages` / `skills_page`, Skills Queries, migrate |
 
 ## Resolve space and roots
 
@@ -89,9 +91,11 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Tool profile | Typed `tool_profile` catalog: toolsets + approvals + terminal; agents / teams / subteams link here |
 | Agent | Typed `agent` object: role, memory links, skills, `harness_profile`, `subagents`, `system_prompt` → Prompt, runtime catalog links |
 | Prompt | Typed `prompt` object: canonical system / welcome / shared_rules / library / draft text (`prompts.md`) |
+| Memory | Typed `memory` object: decisions, lessons, resources, operating notes, playbooks (`memory-and-skills.md`) |
+| Skill | Typed `skill` object: procedures / template / guides; indexes are Queries via `skills_page` |
 | Group | Messaging roster notes (`page` + `welcome_prompt` → Prompt); membership text is not auto-synced to chat |
 | Shared Rules | Mandatory rules every agent must follow (type `prompt`, `prompt_kind=shared_rules`) |
-| Skills | Procedures (`page`); resolve most-specific first: Agent → Subteam → Team → Project → Global |
+| Skills | Typed procedures + owner Queries; resolve most-specific first: Agent → Subteam → Team → Project → Global |
 | Drafts | Agent designs not live until approved (often type `prompt` with `prompt_kind=draft`) |
 | Projects | Portfolio roots as typed `project`; children often stay `page` |
 | Epic / User story / Task | PM work items; Roadmap / Backlog / TODO Queries filter by `linked_projects` (`project-pm.md`; Task `kind` includes `spike`) |
@@ -144,9 +148,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `skills_page` / `messaging_group`
 5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps Suggested runtime + a short System prompt pointer (no Full System Prompt fence)
-6. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned); link via `memory_pages`
+6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes) and a Skills **Query**; link via `memory_pages` + `skills_page` (`memory-and-skills.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 8. Inside the Prompt body, point at Shared Rules (short pointer, not a full paste, when token economy matters)
 9. Fill **Suggested runtime** from `suggested-runtime.md` for narrative apply notes; prefer properties + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields) over markdown-only Browser / Computer / Tools / Voice bullets
@@ -253,13 +257,14 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 3. Link from Agent.`system_prompt` or Group page `welcome_prompt` as appropriate
 4. Keep Agent / Group bodies as short pointers only (`prompts.md`)
 
-### Author a skill page
+### Author a skill
 
-1. Follow the Skill Template in the space (or `references/page-templates.md`)
-2. Place under agent / team / project / global Skills as appropriate
-3. Respect no-usage-logging rules if the Shared Rules forbid counters
-4. Non-trivial skills: review with the documented skills/HR owner
-5. Mark active only after the authoring checklist
+1. Create type **`skill`** (`skill_kind=procedure`) from Skill default / Skill Template (`memory-and-skills.md`)
+2. Set `skill_key`, `skill_scope`, `skill_status`, `intent`, matching `owner_*`
+3. Ensure the owner’s Skills Query (`skills_page`) will list it
+4. Respect no-usage-logging rules if the Shared Rules forbid counters
+5. Non-trivial skills: review with the documented skills/HR owner (`reviewed_by`)
+6. Mark `skill_status=active` only after the authoring checklist
 
 ### Link agent work to a Project
 
@@ -294,8 +299,8 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ## Common recipes (summary)
 
-- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|project`
-- **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → Suggested runtime + pointer body → memory `page`s → link HQ / Subteam → prompt copy reminder
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|project`
+- **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → Suggested runtime + pointer body → Memory objects + Skills Query (`memory-and-skills.md`) → link HQ / Subteam → prompt copy reminder
 - **New HQ:** create `team` (`kind: HQ`) → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → link both on the HQ → clone peer HQ sections → link Agents → update roster + Group welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
