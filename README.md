@@ -5,7 +5,7 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.15.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.21.0 | Org roster, typed inventory, and Projects via Anytype MCP |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.22.0 | Org roster, typed inventory, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` when you are ready.
 
@@ -57,7 +57,7 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 | `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools) |
 | `harness` | Product catalog (Claude, Codex, Grok, Copilot, Muse, NIM, Local model) |
 | `harness_profile` | Reusable primary + backup model stack, optional decision model, shared STT/TTS |
-| `browser` / `computer` / `tool_profile` | Runtime catalogs; agents/teams/subteams link them |
+| `browser` / `computer` / `tool_profile` | Runtime catalogs; Browser/Computer are per-HQ (Cua pair); Tool profiles are shared; agents/teams/subteams link them |
 | `project` | Portfolio root with status, owning team, execution policy, child hub links |
 
 Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills resolve Agent → Subteam → Team → Project → Global.
@@ -74,7 +74,7 @@ Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills reso
 **Org defaults (documented in the skill)**
 
 - Most agents link **Local router** (local decision model as parent brain; spawn Subagents for specialized routes)
-- Computer → Cua Spaces dedicated; Tool profile → Standard interactive (Engineering → Coding; fetch/veille → Data fetching); Browser → None unless interactive (then Cua Spaces Chromium)
+- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive (Engineering → Coding; fetch/veille → Data fetching)
 - Voice stack on Local router: local Whisper + Edge TTS; Agent holds enablement / modes (Foyer assistants may enable voice; others often leave it off with the stack prefilled)
 
 **References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`.
@@ -82,8 +82,9 @@ Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills reso
 **Typical flows**
 
 - Orient: discover space → open Agents → read Shared Rules + roster
-- New specialist: create `agent` + Local router → link runtime catalogs → optional Subagents → memory pages → link HQ/Subteam → remind to copy prompt into the runtime bot
-- New HQ / Subteam / Project: typed create → link from parent hub → update roster when needed
+- New specialist: create `agent` + Local router → link owning HQ Computer/Browser pair + tool profile → optional Subagents → memory pages → link HQ/Subteam → remind to copy prompt into the runtime bot
+- New HQ: typed create → create HQ Computer + Browser pair → link pair on HQ → update roster when needed
+- New Subteam / Project: typed create → Subteam inherits parent HQ pair → link from parent hub → update roster when needed
 - Hermes apply: continue with `hermes-profiles` using Suggested runtime + matching refs
 
 Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)

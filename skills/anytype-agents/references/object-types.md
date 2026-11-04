@@ -319,14 +319,17 @@ Reusable browser-access catalog. Agents / Teams / Subteams link one via
 
 Also `tag`, `links`, `backlinks`. Long apply notes stay in the body.
 
-**Canonical catalog (create these once):**
+**Per-HQ catalog (org convention):** one Browser per HQ, not a shared org-wide
+row. Create when the HQ is created; Subteams and Agents under that HQ link the
+same object. Board and Primary leave `browser` empty.
 
-| Name | slug | Typical use |
-|------|------|-------------|
-| None | `none` | Default when web_search / web_extract suffice |
-| Cua Spaces Chromium | `cua-spaces-chromium` | Interactive pages inside Cua Space (pair with Cua computer) |
-| Local Chromium throwaway | `local-chromium-throwaway` | Host-local Chromium, fresh profile |
-| Operator real profile | `operator-real-profile` | Consent-gated real Chrome/Edge/Brave logins |
+| Name pattern | slug pattern | Typical props |
+|--------------|--------------|---------------|
+| `{HQ name} – Cua Chromium` | `{hq-slug}-cua-chromium` | `browser_source: local-chromium`, `browser_identity: dedicated-throwaway`, `access_needed: true`, `headed: false` |
+
+Example: `Engineering HQ – Cua Chromium` / `engineering-cua-chromium`. Pair with
+the same HQ's Computer. Do not mint shared None / Local throwaway / Operator
+rows unless the user asks for an exception surface.
 
 **Default template name:** `Browser default`. Body: `type-templates.md`.
 
@@ -339,7 +342,7 @@ Reusable computer / desktop catalog. Agents / Teams / Subteams link one via
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `slug` | text | Stable id (e.g. `cua-spaces-dedicated`, `none`) (featured) |
+| `slug` | text | Stable id (e.g. `engineering-cua-spaces`) (featured) |
 | `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
 | `access_needed` | checkbox | Whether desktop / computer_use is needed (featured; shared key with Browser) |
 | `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (featured; shared with Agent select) |
@@ -351,14 +354,18 @@ Reusable computer / desktop catalog. Agents / Teams / Subteams link one via
 
 Also `tag`, `links`, `backlinks`.
 
-**Canonical catalog (create these once):**
+**Per-HQ catalog (org convention):** one Computer per HQ. Create when the HQ is
+created; Subteams and Agents under that HQ link the same object. Board and
+Primary leave `computer` empty (Primary also sets Agent.`computer_surface` to
+`none`).
 
-| Name | slug | Typical use |
-|------|------|-------------|
-| None | `none` | No desktop / computer_use |
-| Cua Spaces dedicated | `cua-spaces-dedicated` | **Org default** (`terminal.backend: cua`, desktop true) |
-| Host desktop shared | `host-desktop-shared` | Exception: drive operator host UI |
-| Linux Bot Screen | `bot-screen` | Linux gateway Bot Screen exception |
+| Name pattern | slug pattern | Typical props |
+|--------------|--------------|---------------|
+| `{HQ name} – Cua Spaces` | `{hq-slug}-cua-spaces` | `computer_surface: cua-spaces`, `computer_scope: dedicated`, `permission_mode: standard`, `desktop_enabled: true`, `access_needed: true` |
+
+Example: `Engineering HQ – Cua Spaces` / `engineering-cua-spaces`. Pair with the
+same HQ's Browser. Host desktop / Bot Screen / None are exception surfaces only
+when the user asks.
 
 **Default template name:** `Computer default`. Body: `type-templates.md`.
 
@@ -402,11 +409,12 @@ Hermes apply: `runtime-limits-and-tools.md`. Pair with linked Browser / Computer
 when those toolsets are enabled.
 
 **Fill conventions (org):**
-- Computer → **Cua Spaces dedicated** for live agents / HQs / subteams
+- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium`
+  pair for that HQ, its Subteams, and its Agents
+- Board + Primary → leave `browser` / `computer` empty (Primary
+  `computer_surface: none`)
 - Tool profile → **Standard interactive**; Engineering → **Coding**; fetch /
   veille roles → **Data fetching**
-- Browser → **None** unless interactive pages are needed; then **Cua Spaces
-  Chromium** (with Cua computer)
 
 ## Project (`api_key`: `project`)
 
@@ -457,8 +465,8 @@ template id from `API-list-templates` when you need a specific one; pass
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…",
       "delegation_enabled": true,
-      "browser": ["<browserNoneOrCuaChromiumId>"],
-      "computer": ["<cuaSpacesDedicatedComputerId>"],
+      "browser": ["<engineeringHqCuaChromiumBrowserId>"],
+      "computer": ["<engineeringHqCuaSpacesComputerId>"],
       "tool_profile": ["<codingOrStandardToolProfileId>"],
       "terminal_backend": "cua",
       "computer_surface": "cua-spaces",
@@ -576,10 +584,11 @@ object; re-set only what is missing after the type change.
    `tool_profile` | `project` and body markdown from **`type-templates.md`**.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (**Local
-   router**, Coding, Data fetching, …); create Browser / Computer / Tool
-   profile catalogs (tables above); create Subagent spawn configs; link most
-   agents to Local router + runtime catalogs + `subagents` (and
-   Subagent.`parent_agent`).
+   router**, Coding, Data fetching, …); create Tool profile catalogs (table
+   above); for each HQ create one Computer + one Browser (per-HQ tables above)
+   and link that pair on the HQ / its Subteams / its Agents; create Subagent
+   spawn configs; link most agents to Local router + runtime catalogs +
+   `subagents` (and Subagent.`parent_agent`).
 7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
    `team` objects → `subteam`). Fill properties from the org map; leave unknown
    urls / people empty.

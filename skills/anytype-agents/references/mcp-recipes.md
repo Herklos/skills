@@ -172,31 +172,10 @@ and STT/TTS at `none`.
 
 Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 
-## Create a Browser catalog entry
+## Create a per-HQ Browser + Computer pair
 
-```json
-{
-  "space_id": "<spaceId>",
-  "create_missing_options": true,
-  "body": {
-    "type": "browser",
-    "name": "Cua Spaces Chromium",
-    "properties": {
-      "slug": "cua-spaces-chromium",
-      "lifecycle": "live",
-      "access_needed": true,
-      "browser_source": "local-chromium",
-      "browser_identity": "dedicated-throwaway",
-      "headed": false,
-      "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
-      "notes": "Chromium inside Cua Space with desktop stack."
-    },
-    "markdown": "## When to use\nInteractive pages while computer is Cua Spaces.\n"
-  }
-}
-```
-
-## Create a Computer catalog entry
+Org convention: one Computer and one Browser per HQ. Link both on the HQ, its
+Subteams, and its Agents. Board / Primary leave both empty.
 
 ```json
 {
@@ -204,9 +183,9 @@ Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
   "create_missing_options": true,
   "body": {
     "type": "computer",
-    "name": "Cua Spaces dedicated",
+    "name": "Engineering HQ – Cua Spaces",
     "properties": {
-      "slug": "cua-spaces-dedicated",
+      "slug": "engineering-cua-spaces",
       "lifecycle": "live",
       "access_needed": true,
       "computer_surface": "cua-spaces",
@@ -214,9 +193,45 @@ Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
       "permission_mode": "standard",
       "desktop_enabled": true,
       "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
-      "notes": "Org default. terminal.backend cua; desktop true."
+      "notes": "Dedicated Cua Space for Engineering HQ."
     },
-    "markdown": "## When to use\nDefault computer for live agents.\n"
+    "markdown": "## When to use\nEngineering HQ + its Subteams + Agents.\n"
+  }
+}
+```
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "browser",
+    "name": "Engineering HQ – Cua Chromium",
+    "properties": {
+      "slug": "engineering-cua-chromium",
+      "lifecycle": "live",
+      "access_needed": true,
+      "browser_source": "local-chromium",
+      "browser_identity": "dedicated-throwaway",
+      "headed": false,
+      "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
+      "notes": "Chromium inside the Engineering HQ Cua Space."
+    },
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces.\n"
+  }
+}
+```
+
+Omit `icon` on create when using shortcut `name`/`markdown` (icon forces the
+AnyBlock document form). After create, patch the HQ / Subteams / Agents:
+
+```json
+{
+  "op": "set_properties",
+  "set": {
+    "browser": ["<hqBrowserId>"],
+    "computer": ["<hqComputerId>"],
+    "computer_surface": "cua-spaces"
   }
 }
 ```

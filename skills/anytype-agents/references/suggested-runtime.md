@@ -84,17 +84,17 @@ Paste under the agent title (date the heading when you revise it).
 - Org default stack: local / base + edge / en-US-AriaNeural
 - Apply: hermes-profiles `voice.md`
 **Browser access:** (prefer Agent.`browser` → type `browser` catalog)
-- Catalog: {None | Cua Spaces Chromium | Local Chromium throwaway | Operator real profile | …}
+- Catalog: {{HQ name} – Cua Chromium | empty on Board/Primary | exception surface …}
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)
-- Source: local Chromium | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
+- Source: local Chromium (HQ Cua Chromium) | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
 - Identity: dedicated throwaway | dedicated persistent | team/shared persistent | operator real profile
 - Headed: no | yes · Notes: {vault logins? cron needs cookies?}
 **Computer access:** (prefer Agent.`computer` → type `computer` catalog)
-- Catalog: {None | **Cua Spaces dedicated (default)** | Host desktop shared | Linux Bot Screen | …}
+- Catalog: {{HQ name} – Cua Spaces | empty on Board/Primary | host / Bot Screen exception …}
 - Needed: no | yes (native desktop / OS UI; not for ordinary web)
-- Surface: **Cua Spaces (default)** | host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
+- Surface: **Cua Spaces (HQ default)** | host desktop | Linux Bot Screen | none (Primary)
 - Docs: https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces
-- Scope: dedicated (this profile / Space) | team/shared host (same OS user; not isolated)
+- Scope: dedicated (this HQ Space) | team/shared host (same OS user; not isolated)
 - Permission mode: standard | bounded (manifest) · Notes: {desktop stack on Linux Space? TCC / takeover for 2FA?}
 **Tools access:** (prefer Agent.`tool_profile` → type `tool_profile` catalog)
 - Catalog: {**Standard interactive (default)** | Coding | Data fetching | Read-only light | …}

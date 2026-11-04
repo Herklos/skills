@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.21.0
+version: 1.22.0
 license: MIT
 metadata:
   category: agents
@@ -24,7 +24,10 @@ prompt or messaging group. Verify runtime separately after doc changes. Model
 stacks live on **Harness profile** objects; agents link `harness_profile` so one
 profile edit covers many agents. Browser / computer / tool access live on
 reusable **Browser**, **Computer**, and **Tool profile** catalog objects;
-agents, teams, and subteams link them the same way. **Voice** (STT/TTS stack)
+agents, teams, and subteams link them the same way. **Browser / Computer are
+per-HQ:** each HQ owns one dedicated Cua Spaces computer and one Cua Chromium
+browser; Subteams and Agents under that HQ link the same pair. Board and
+Primary leave both empty (`computer_surface: none` on Primary). **Voice** (STT/TTS stack)
 lives on **Harness profile**; Agent holds enablement / modes
 (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`)
 and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
@@ -135,7 +138,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults Browser **None**, Computer **Cua Spaces dedicated**, Tool profile **Standard interactive**), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `messaging_group`
 5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned); link via `memory_pages`
 6. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
@@ -186,23 +189,32 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update Browser / Computer / Tool profile
 
-1. Prefer **Catalog + links**: create reusable typed objects once, then link from
-   Agent / Team / Subteam (`browser`, `computer`, `tool_profile`)
-2. **Browser** (`browser`): `slug`, `access_needed`, `browser_source`, `browser_identity`,
+1. Prefer **Catalog + links**: create typed objects, then link from Agent / Team /
+   Subteam (`browser`, `computer`, `tool_profile`)
+2. **Per-HQ Browser + Computer (org convention):** when adding an HQ, create one
+   Computer (`{hq-slug}-cua-spaces`, `computer_surface: cua-spaces`,
+   `computer_scope: dedicated`, `desktop_enabled: true`) and one Browser
+   (`{hq-slug}-cua-chromium`, `browser_source: local-chromium`,
+   `browser_identity: dedicated-throwaway`). Name them `{HQ name} – Cua Spaces`
+   and `{HQ name} – Cua Chromium`. Link that pair on the HQ, every Subteam under
+   it, and every Agent under it. Board and Primary leave `browser` / `computer`
+   empty (Primary also `computer_surface: none`). Do not create shared org-wide
+   None / Host / Bot Screen catalog rows unless the user asks for an exception.
+3. **Browser** (`browser`): `slug`, `access_needed`, `browser_source`, `browser_identity`,
    optional `headed` / `cloud_provider` / `docs_url` / `notes`
-3. **Computer** (`computer`): `slug`, `access_needed`, `computer_surface`, `computer_scope`,
+4. **Computer** (`computer`): `slug`, `access_needed`, `computer_surface`, `computer_scope`,
    optional `permission_mode` / `desktop_enabled` / `docs_url` / `notes`
-4. **Tool profile** (`tool_profile`): `slug`, `intent`, `enabled_toolsets`,
+5. **Tool profile** (`tool_profile`): `slug`, `intent`, `enabled_toolsets`,
    `disabled_toolsets`, `tool_approvals`, `cron_approvals`, optional `hard_deny` /
-   `terminal_backend` / `terminal_cwd` / `timeout_seconds` / `notes`
-5. Bodies from `type-templates.md`; keep catalogs under Agents → Shared (or a
-   Runtime index). After editing a shared catalog object, re-apply into each
-   linked agent's live runtime (Hermes: `browser-and-computer.md`,
+   `terminal_backend` / `terminal_cwd` / `timeout_seconds` / `notes` (still a
+   shared org catalog: Standard interactive / Coding / Data fetching / Read-only)
+6. Bodies from `type-templates.md`; keep catalogs under Agents → Shared (or a
+   Runtime index). After editing a catalog object, re-apply into each linked
+   agent's live runtime (Hermes: `browser-and-computer.md`,
    `runtime-limits-and-tools.md`)
-6. Fill conventions (org default): Computer → **Cua Spaces dedicated**; Tool
-   profile → **Standard interactive** (Engineering → **Coding**; fetch/veille →
-   **Data fetching**); Browser → **None** unless interactive pages are needed
-   (then **Cua Spaces Chromium** with Cua computer)
+7. Fill conventions: Computer + Browser → owning HQ pair; Tool profile →
+   **Standard interactive** (Engineering → **Coding**; fetch/veille →
+   **Data fetching**)
 
 ### Create or update a Project portfolio root
 
@@ -260,11 +272,11 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|project`
 - **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → body from `page-templates.md` + `suggested-runtime.md` → memory `page`s → link HQ / Subteam → prompt copy reminder
-- **New HQ:** create `team` (`kind: HQ`) → optional runtime catalog links → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
-- **New Subteam:** create `subteam` with `parent_team` → optional runtime catalog links → link HQ map → optional member agents
+- **New HQ:** create `team` (`kind: HQ`) → create HQ Computer + Browser pair → link both on the HQ → clone peer HQ sections → link Agents → update roster + Group welcome (`handoff-templates.md`)
+- **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
-- **New Browser / Computer / Tool profile:** create catalog object → link Agents Shared → point agents / teams / subteams at it
+- **New Browser / Computer:** for a new HQ, create the HQ pair; for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub
 - **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`)
 - **Shared Rules change:** edit → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
