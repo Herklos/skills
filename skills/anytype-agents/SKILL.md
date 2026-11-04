@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.31.6
+version: 1.31.7
 license: MIT
 metadata:
   category: agents
@@ -154,7 +154,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `messaging_group`
 5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps a short System prompt pointer + Agenda pointer only (no Suggested runtime section, no Full System Prompt fence, no Short description / Autonomy / Home / Chief / Team / HQ prose that duplicates properties)
 6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, a Logs **Query**, and an Agenda **Query**; link via `memory_pages` + `skills_page` + `logs_page` + `agenda_page` (`memory-and-skills.md` + `agenda-and-schedules.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ

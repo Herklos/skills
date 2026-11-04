@@ -75,7 +75,6 @@ Featured properties (API keys):
 | `tool_profile` | objects | Link to one **Tool profile** catalog object |
 | `voice_enabled` | checkbox | Intended to use Hermes voice mode (featured) |
 | `board_member` | checkbox | Board seat |
-| `linked_projects` | objects | Projects this agent works |
 
 Other properties:
 
@@ -705,11 +704,13 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    `tool_profile`, shared `system_prompt` (Agent required; Team/Subteam/Subagent
    optional), and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
    `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
-   `board_member`, `linked_projects`, `memory_pages`, `skills_page`,
+   `board_member`, `memory_pages`, `skills_page`,
    `logs_page`, `agenda_page`, `messaging_group`, `map_path`,
    `delegation_enabled`, `terminal_backend`, `computer_surface`; keep
-   `harness_profile` / `subagents`; `remove_property` legacy `harness` select
-   and unused `primary_model` when ready. On Group: `welcome_prompt` is a Group
+   `harness_profile` / `subagents`; `remove_property` legacy `harness` select,
+   unused `primary_model`, and unused Agent `linked_projects` when ready
+   (Project.`lead_agent` / `owning_team` + map_path cover agent↔project;
+   keep `linked_projects` on epic / user_story / task). On Group: `welcome_prompt` is a Group
    property (not Page). On Harness profile: add STT/TTS stack fields above.
    Prompt / Memory / Skill / Log / Schedule / Group bootstrap detail:
    `prompts.md` + `memory-and-skills.md` + `agenda-and-schedules.md` + Group
