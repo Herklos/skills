@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.27.0
+version: 1.28.0
 license: MIT
 metadata:
   category: agents
@@ -54,6 +54,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
 | `references/mcp-recipes.md` | MCP search/create/patch/archive patterns |
 | `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Cua Chromium Browser create, link, migrate |
+| `references/cua-hq-spaces.md` | Create live Cua Space per HQ Computer; store full id in Computer.`cua_space` |
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
 | `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, Group `welcome_prompt`, migrate |
 | `references/memory-and-skills.md` | Memory + Skill + Log types, Agent.`memory_pages` / `skills_page` / `logs_page`, Skills / Logs Queries, migrate |
@@ -209,14 +210,18 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    `computer_scope: dedicated`, `desktop_enabled: true`) and one Browser
    (`{hq-slug}-cua-chromium`, `browser_source: local-chromium`,
    `browser_identity: dedicated-throwaway`). Name them `{HQ name} – Cua Spaces`
-   and `{HQ name} – Cua Chromium`. Link that pair on the HQ, every Subteam under
-   it, and every Agent under it. Board and Primary leave `browser` / `computer`
-   empty (Primary also `computer_surface: none`). Do not create shared org-wide
-   None / Host / Bot Screen catalog rows unless the user asks for an exception.
+   and `{HQ name} – Cua Chromium`. **Then create the live Cua Space**
+   (`cua spaces create linux --on local --name {hq-slug}-hq`) and set
+   Computer.`cua_space` to the full id (e.g. `local:engineering-hq`); playbook
+   `cua-hq-spaces.md`. Link that pair on the HQ, every Subteam under it, and
+   every Agent under it. Board and Primary leave `browser` / `computer` empty
+   (Primary also `computer_surface: none`). Do not create shared org-wide None /
+   Host / Bot Screen catalog rows unless the user asks for an exception.
 3. **Browser** (`browser`): `slug`, `access_needed`, `browser_source`, `browser_identity`,
    optional `headed` / `cloud_provider` / `docs_url` / `notes`
 4. **Computer** (`computer`): `slug`, `access_needed`, `computer_surface`, `computer_scope`,
-   optional `permission_mode` / `desktop_enabled` / `docs_url` / `notes`
+   optional `cua_space` (full live Space id, e.g. `local:engineering-hq`) /
+   `permission_mode` / `desktop_enabled` / `docs_url` / `notes`
 5. **Tool profile** (`tool_profile`): `slug`, `intent`, `enabled_toolsets`,
    `disabled_toolsets`, `tool_approvals`, `cron_approvals`, optional `hard_deny` /
    `terminal_backend` / `terminal_cwd` / `timeout_seconds` / `notes` (still a
@@ -309,11 +314,11 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|project`
 - **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → Suggested runtime + pointer body → Memory objects + Skills Query + Logs Query (`memory-and-skills.md`) → link HQ / Subteam → prompt copy reminder
-- **New HQ:** create `team` (`kind: HQ`) → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → link both on the HQ → clone peer HQ sections → link Agents → update roster + Group welcome Prompt (`prompts.md` / `handoff-templates.md`)
+- **New HQ:** create `team` (`kind: HQ`) → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → clone peer HQ sections → link Agents → update roster + Group welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
-- **New Browser / Computer:** for a new HQ, follow `hq-runtime-pair.md`; for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
+- **New Browser / Computer:** for a new HQ, follow `hq-runtime-pair.md` then `cua-hq-spaces.md` (live Space + Computer.`cua_space`); for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
 - **New Prompt:** create `prompt` with kind + owners → link Agent.`system_prompt` or Group `welcome_prompt` (`prompts.md`)
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub → PM Queries (`project-pm.md`)
 - **New PM item:** create `epic` / `user_story` / `task` with `linked_projects` (+ Task `kind`, incl. `spike`)

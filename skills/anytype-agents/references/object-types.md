@@ -365,6 +365,7 @@ Reusable computer / desktop catalog. Agents / Teams / Subteams link one via
 | `computer_scope` | select | `dedicated` \| `team-shared` \| `none`. Display name **Computer scope** |
 | `permission_mode` | select | `standard` \| `bounded`. Display name **Permission mode** |
 | `desktop_enabled` | checkbox | Cua Spaces desktop stack on when true. Display name **Desktop enabled** |
+| `cua_space` | text | Live Cua Space id (e.g. `local:engineering-hq`) (featured). Display name **Cua space**. Not the Computer `slug` |
 | `docs_url` | url | Optional docs |
 | `notes` | text | Short apply notes |
 
@@ -373,7 +374,9 @@ Also `tag`, `links`, `backlinks`.
 **Per-HQ catalog (org convention):** one Computer per HQ. Create when the HQ is
 created; Subteams and Agents under that HQ link the same object. Board and
 Primary leave `computer` empty (Primary also sets Agent.`computer_surface` to
-`none`). Full create/link/migrate playbook: `hq-runtime-pair.md`.
+`none`). Full create/link/migrate playbook: `hq-runtime-pair.md`. After the
+Computer row exists, create the live Cua Space and set `cua_space`:
+`cua-hq-spaces.md`.
 
 | Name pattern | slug pattern | Typical props |
 |--------------|--------------|---------------|

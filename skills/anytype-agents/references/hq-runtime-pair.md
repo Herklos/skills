@@ -7,8 +7,10 @@ pair. Board and Primary leave both empty.
 Load when creating an HQ, adding a Subteam/Agent under an HQ, migrating away
 from shared org-wide Browser/Computer catalogs, or auditing runtime links.
 Property tables: `object-types.md`. Short MCP snippets: `mcp-recipes.md`.
-Hermes apply of the linked pair: skill `hermes-profiles` →
-`browser-and-computer.md` (section **Anytype per-HQ pair → Hermes**).
+**Live Cua Space create + Computer.`cua_space`:** `cua-hq-spaces.md` (do this
+after the Computer row exists). Hermes apply of the linked pair: skill
+`hermes-profiles` → `browser-and-computer.md` (section **Anytype per-HQ pair →
+Hermes**).
 
 ## Convention
 
@@ -48,6 +50,7 @@ Data fetching / Read-only). This playbook is Browser + Computer only.
 | `computer_scope` | `dedicated` |
 | `permission_mode` | `standard` |
 | `desktop_enabled` | `true` |
+| `cua_space` | set after live create (e.g. `local:engineering-hq`); see `cua-hq-spaces.md` |
 | `docs_url` | `https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces` |
 | `notes` | Dedicated Cua Space for this HQ; `terminal.backend: cua`; desktop true. Linked from HQ, Subteams, Agents. |
 
@@ -167,10 +170,12 @@ When retiring shared org-wide Browser/Computer objects:
 
 1. Create `team` (`kind: HQ`) with chief / mission / …
 2. Create Computer + Browser pair (this file)
-3. Link pair on the HQ
-4. Create Subteams → link same pair
-5. Create / move Agents → link same pair + `computer_surface: cua-spaces`
-6. Remind: Hermes apply is separate (`hermes-profiles` `browser-and-computer.md`)
+3. Create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`)
+4. Link pair on the HQ
+5. Create Subteams → link same pair
+6. Create / move Agents → link same pair + `computer_surface: cua-spaces`
+7. Remind: Hermes apply is separate (`hermes-profiles` `browser-and-computer.md`;
+   pin `settings.space` from Computer.`cua_space`)
 
 ## Verify
 
@@ -186,7 +191,8 @@ Spot-check one HQ, one Subteam, one Agent under it, Board, and Primary.
 
 ## What this is not
 
-- Creating the live Cua Space VM on the host (that is Hermes/Cua CLI at apply
-  time: `plugins install` cua-spaces, `terminal.backend: cua`, `desktop: true`).
+- Creating the live Cua Space on the host (use **`cua-hq-spaces.md`** right
+  after the Computer row exists; Hermes still applies `terminal.backend: cua`
+  / `desktop: true` / `settings.space` at profile apply time).
 - Changing Tool profiles (shared catalog; see `object-types.md`).
 - Auto-pushing Anytype links into `~/.hermes/profiles/<slug>`.
