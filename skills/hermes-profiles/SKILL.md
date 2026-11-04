@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.22.0
+version: 1.23.0
 license: MIT
 metadata:
   category: agents
@@ -303,6 +303,23 @@ member profile. Allowlist the platform chat id on each profile; prefer
 typed **Group** objects (`anytype-agents` `object-types.md`); decline into
 Hermes only when the user asks to apply.
 
+### Anytype suggestions → Hermes apply
+
+Org improvement feedback lives as typed Anytype **`suggestion`** objects
+(Agent.`suggestions_page`; Shared Rule 25; Agathe weekly + agent ad-hoc). Full
+loop: `anytype-agents` → `suggestions.md`.
+
+Apply harness / Subagent / model / SOUL / cron / messaging changes into live
+`~/.hermes` profiles only when:
+
+1. the related suggestion is **`accepted`** (or the user explicitly asks to
+   apply), and
+2. you follow the matching ref (`models.md`, `delegation.md`,
+   `soul-templates.md`, `cron.md`, `messaging-groups.md`, …).
+
+Never auto-apply from a `draft` / `proposed` suggestion. Mark the suggestion
+`done` after a successful apply when you are tracking that object.
+
 ## Gateway
 
 ```bash
@@ -321,6 +338,7 @@ One gateway process per profile. Separate bot tokens per profile.
 3. Do not dump `.env`, auth tokens, or allowlist IDs into chat.
 4. Export strips API keys; treat archives as sensitive.
 5. After SOUL / personality / config / memory edits, note that live sessions need reload.
+6. Do not apply Anytype org changes into live profiles from `draft`/`proposed` suggestions; wait for `accepted` or an explicit user ask (see **Anytype suggestions → Hermes apply**).
 
 ## Common recipes (summary)
 

@@ -31,10 +31,15 @@ When declining from Anytype **Harness profile** (Hermes-shaped keys):
 |---------|--------|
 | `model_provider` + `model_default` (+ `model_effort`) | `model.*` (main / decision / routing) |
 | `fallback_1_*` / `fallback_2_*` (`provider`, `model`, optional `effort` / `harness`) | ordered `fallback_providers` |
-| `aux_<task>_provider` / `aux_<task>_model` (+ effort) for `vision`, `compression`, `web_extract`, `skills_hub`, `title_generation` | `auxiliary.<task>.*` (`auto` + empty model = inherit main) |
+| `aux_<task>_provider` / `aux_<task>_model` (+ effort) for `vision`, `compression`, `web_extract`, `skills_hub`, `title_generation`, **`approval`** | `auxiliary.<task>.*` (`auto` + empty model = inherit main) |
 | `model_harness` / `fallback_*_harness` | catalog UX only |
 
-If provider is `llamacpp`, also enable `local_runtime` (see Local decision model).
+If provider is `llamacpp`, also enable `local_runtime` (see Local parent).
+
+**When to apply:** write live `model.*` / `auxiliary.*` / `fallback_providers`
+only after an accepted Anytype **`suggestion`** (kinds `model_fit` / `harness`)
+or when the user explicitly asks. Source of truth for the loop:
+`anytype-agents` → `suggestions.md`. Editing Anytype does not push config.
 
 ## Main model
 

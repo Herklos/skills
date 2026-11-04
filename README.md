@@ -4,10 +4,10 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.16.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.25.0 | Org roster, typed inventory, Prompts, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.23.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.33.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
-Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` when you are ready.
+Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
 ---
 
@@ -27,17 +27,19 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs
 - **Voice**: mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord voice channel. Defaults: local Whisper + Edge TTS
-- **Cron**: scheduled jobs and Bot routines per profile
+- **Cron**: scheduled jobs and Bot routines per profile; Anytype Agenda → Hermes bind when asked
+- **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group
 - **Gateway**: start/stop/install one messaging gateway per profile (one bot token each)
+- **Suggestions gate**: apply Anytype harness / Subagent / model changes only after an accepted `suggestion` (or explicit ask)
 
-**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `recipes`, `troubleshooting`.
+**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `recipes`, `troubleshooting`.
 
 **Typical flows**
 
 - New specialist: `create` → `setup` → set `terminal.cwd` → edit SOUL → `doctor`
 - Twin of an existing agent: `create <new> --clone-from <src>`
 - Messaging bot: unique token in that profile `.env` → `gateway start` / `install`
-- Apply Anytype Suggested runtime: use the matching refs (`models.md`, `delegation.md`, `voice.md`, …)
+- Apply Anytype Suggested runtime: matching refs (`models.md`, `delegation.md`, `voice.md`, …) after accepted suggestion or user ask
 
 Docs: [Hermes profiles](https://hermes-agent.nousresearch.com/docs/user-guide/profiles) · Skill: [`skills/hermes-profiles/SKILL.md`](./skills/hermes-profiles/SKILL.md)
 
@@ -59,9 +61,11 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 | `harness_profile` | Reusable primary + backup model stack, optional decision model, shared STT/TTS |
 | `browser` / `computer` / `tool_profile` | Runtime catalogs; Browser/Computer are per-HQ (Cua pair); Tool profiles are shared; agents/teams/subteams link them |
 | `prompt` | System / welcome / shared_rules / library / draft text; Agents and Groups link them |
+| `memory` / `skill` / `log` / `suggestion` / `schedule` | Memory pages, skill catalog, activity logs, improvement feedback, Agenda jobs |
+| `group` | Messaging room roster + welcome Prompt + platform gates |
 | `project` | Portfolio root with status, owning team, execution policy, child hub links |
 
-Skills and memory children stay `page`. Shared Rules is type `prompt`. Group pages stay `page` with `welcome_prompt`. Skills resolve Agent → Subteam → Team → Project → Global.
+Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Project → Global. Suggestions index via Agent.`suggestions_page` (Shared Rule 25; Agathe weekly + ad-hoc).
 
 **What it covers**
 
@@ -74,20 +78,20 @@ Skills and memory children stay `page`. Shared Rules is type `prompt`. Group pag
 
 **Org defaults (documented in the skill)**
 
-- Most agents link **Local router** (local decision model as parent brain; spawn Subagents for specialized routes)
-- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive (Engineering → Coding; fetch/veille → Data fetching)
-- Voice stack on Local router: local Whisper + Edge TTS; Agent holds enablement / modes (Foyer assistants may enable voice; others often leave it off with the stack prefilled)
-- Canonical system / welcome text on typed **Prompt** objects; Agent.`system_prompt` and Group `welcome_prompt` link them; agent/group bodies keep short pointers
+- Most agents link **Local parent** (Ollama `lfm3` chat + llamacpp `d1` approval; spawn Subagents for specialized routes). Exceptions: Foyer, CLASQUIN
+- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive
+- Voice stack on Local parent / Foyer: local Whisper + Edge TTS; Agent holds enablement / modes
+- Canonical system / welcome text on typed **Prompt** objects; Agent.`system_prompt` and Group `welcome_prompt` link them; agent bodies keep short pointers
+- Improvement feedback as typed **`suggestion`**; no Hermes auto-apply
 
-**References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`, **`hq-runtime-pair`**, **`prompts`**, **`project-pm`**.
+**References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`, `hq-runtime-pair`, `cua-hq-spaces`, `prompts`, `memory-and-skills`, `suggestions`, `agenda-and-schedules`, `hq-standing-instructions`, `project-pm`.
 
 **Typical flows**
 
 - Orient: discover space → open Agents → read Shared Rules + roster
-- New specialist: create `agent` + Local router → link owning HQ Computer/Browser pair + tool profile → optional Subagents → create Prompt + `system_prompt` → memory pages → link HQ/Subteam → remind to copy Prompt into the runtime bot
-- New HQ: typed create → create HQ Computer + Browser pair → link pair on HQ → update roster + Group welcome Prompt when needed
-- New Subteam / Project: typed create → Subteam inherits parent HQ pair → link from parent hub → update roster when needed
-- Hermes apply: continue with `hermes-profiles` using Suggested runtime + matching refs
+- New specialist: create `agent` + Local parent → link owning HQ Computer/Browser pair + tool profile → role-pack Subagents → create Prompt + `system_prompt` → Memory + Skills/Logs/Agenda/Suggestions Queries → link HQ/Subteam
+- New Suggestion: create `suggestion` → Inbox / owner Query → approve agent+chief (P org-wide)
+- Hermes apply: continue with `hermes-profiles` after accepted suggestion or explicit ask
 
 Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)
 
@@ -102,7 +106,9 @@ agent + harness_profile  →   profile config / models / voice
 agent.system_prompt      →   SOUL / system prompt copy
 subagent routes          →   delegation model_map
 browser / computer / tools → browser-and-computer, runtime-limits
-Suggested runtime notes  →   apply via hermes-profiles refs
+suggestion (accepted)    →   gate for apply via hermes-profiles refs
+schedule / agenda        →   cron jobs (when asked)
+group                    →   messaging-groups (when asked)
 ```
 
 `anytype-agents` designs and stores the roster. `hermes-profiles` creates and configures the live homes. Keep them in sync deliberately; the skills never auto-push one into the other.

@@ -279,8 +279,14 @@ When the org uses skill `anytype-agents`, most parents link **Local parent** as
 `harness_profile` and zero or more typed **`subagent`** objects
 (`parent_agent` + Agent.`subagents`). Decline Local parent → parent `model.*`
 (ollama/lfm3) + `auxiliary.approval` (llamacpp/d1). Treat Subagents as the
-source of truth for `model_map` routes; re-apply after edits. Do not invent a
-Subagent for “quick peer answers”; that stays on the local parent.
+source of truth for `model_map` routes. Do not invent a Subagent for “quick
+peer answers”; that stays on the local parent.
+
+**When to apply:** push `model_map` / new Subagent routes into live Hermes only
+after an accepted Anytype **`suggestion`** (kinds `new_subagent` / `model_fit` /
+`harness`) or when the user explicitly asks. Until then, keep the intended
+routes on the Anytype Subagent objects. Loop docs: `anytype-agents` →
+`suggestions.md`.
 
 | Anytype Subagent field | Hermes `model_map` option |
 |------------------------|---------------------------|
