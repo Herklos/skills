@@ -16,10 +16,11 @@ Dumped / authored **2026-11-04**; property-complete pass **2026-11-04** (v1.18.0
 runtime catalogs **2026-11-04** (v1.19.0): Browser / Computer / Tool profile
 types + Agent/Team/Subteam link props. Per-HQ Browser/Computer pairs
 **2026-11-04** (v1.22.0): one `{HQ} – Cua Spaces` + `{HQ} – Cua Chromium` per
-HQ; Subteams/Agents inherit; Board/Primary empty. Prefer properties for mission /
-members / routing / short description / autonomy / map path / browser /
-computer / tool_profile; template bodies keep Suggested runtime + Full System
-Prompt and optional long notes.
+HQ; Subteams/Agents inherit; Board/Primary empty. Prompt type **2026-11-04**
+(v1.25.0): system/welcome/shared_rules/library/draft. Prefer properties for
+mission / members / routing / short description / autonomy / map path / browser /
+computer / tool_profile / `system_prompt`; template bodies keep Suggested
+runtime + System prompt pointer (canonical text on linked Prompt).
 
 ---
 
@@ -41,28 +42,18 @@ Set Autonomy / Short description / Memory pages / Map path as **properties**
 **Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults owning HQ Cua Chromium / HQ Cua Spaces / Standard interactive; Primary leaves browser+computer empty).
 **Terminal / computer selects:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces; Primary `computer_surface: none`; keep aligned with linked Computer / Tool profile).
 **Voice:** Agent.`voice_enabled` / `voice_auto_tts` / `voice_chat_mode` / `messaging_voice_mode`; STT/TTS from Harness profile (Local router: local+edge) or Agent overrides.
+**System prompt:** Agent.`system_prompt` → Prompt object (`prompt_kind=system`).
 **Personality / Memory / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
-## Full System Prompt (copy into the bot)
-```
-# Role
-You are {Name}, …
-
-# Shared rules
-Follow **Agents → Agent Template – Shared Rules** in full.
-
-# Tools and systems
-- Harness profile: {name} (model.* + fallbacks + aux from that object)
-- Browser / Computer / Tool profile: {linked catalog names}
-- Models / personality / memory / security / workspace: see Suggested runtime + Agent properties
-
-# Escalation
-{chief → Primary → Human}
-```
+## System prompt
+Canonical system prompt lives on the linked **System prompt** property
+([{Name} – System prompt](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
+Copy from that Prompt object into the bot. Do not paste a second Full System
+Prompt fence here.
 ````
 
-Full Suggested runtime field list: `suggested-runtime.md`. Filled sample:
-`examples.md`.
+Full Suggested runtime field list: `suggested-runtime.md`. Prompt create /
+migrate: `prompts.md`. Filled sample: `examples.md`.
 
 ---
 
@@ -282,12 +273,28 @@ parents as properties. See `project-pm.md`.
 
 ---
 
+## Prompt default (`template_for`: `prompt`)
+
+Set `prompt_kind`, `lifecycle`, `owner_agent` / `owner_group`, `audience` as
+properties (`prompts.md`). Template body:
+
+```markdown
+## Prompt
+(Copy-into-bot or welcome text.)
+
+## Notes
+(Apply / sync notes.)
+```
+
+---
+
 ## Recreate a default template (MCP)
 
 1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `project` | `epic` | `user_story`, name `{Type} default`,
-   and body blocks from the matching section above (`heading_2` + `paragraph`).
+   `tool_profile` | `prompt` | `project` | `epic` | `user_story`, name
+   `{Type} default`, and body blocks from the matching section above
+   (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -296,8 +303,8 @@ parents as properties. See `project-pm.md`.
 ## Drift check
 
 1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `browser`, `computer`, `tool_profile`, `project`, `epic`,
-   `user_story`.
+   `harness_profile`, `browser`, `computer`, `tool_profile`, `prompt`,
+   `project`, `epic`, `user_story`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of

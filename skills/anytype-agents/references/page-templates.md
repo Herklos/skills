@@ -1,9 +1,10 @@
 # Page templates (generic)
 
 Use these shapes when creating or auditing **bodies**. Inventory objects use
-types `agent`, `team`, `subteam`, and `project` (see `object-types.md`); memory
-children, Shared Rules, and Skills stay `page`. Prefer duplicating a live peer
-in the same space over inventing a new layout.
+types `agent`, `team`, `subteam`, `prompt`, and `project` (see
+`object-types.md` + `prompts.md`); memory children and Skills stay `page`.
+Shared Rules is type `prompt`. Prefer duplicating a live peer in the same space
+over inventing a new layout.
 
 Suggested runtime field list: **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
@@ -14,30 +15,31 @@ Type default template dumps (Agent / Team / Subteam / Project): **`type-template
 Title: `{Name} – {Role}`
 
 **Set as properties** (do not rely on markdown alone): `role`, `team`,
-`reports_to`, `lifecycle`, `harness_profile`, `subagents`, `browser`,
-`computer`, `tool_profile`, `voice_enabled`, `autonomy`, `short_description`,
-`hermes_profile`, `board_member`, `linked_projects`, `memory_pages`,
-`messaging_group`, `map_path`, `delegation_enabled`, `terminal_backend`,
-`computer_surface`, voice modes / optional `stt_*` / `tts_*`. See
-`object-types.md`.
+`reports_to`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`,
+`browser`, `computer`, `tool_profile`, `voice_enabled`, `autonomy`,
+`short_description`, `hermes_profile`, `board_member`, `linked_projects`,
+`memory_pages`, `messaging_group`, `map_path`, `delegation_enabled`,
+`terminal_backend`, `computer_surface`, voice modes / optional `stt_*` /
+`tts_*`. See `object-types.md` + `prompts.md`.
 
 Body (narrative only):
 
 1. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading;
    point structured facts at properties + harness_profile + browser / computer /
    tool_profile catalogs)
-2. **Full System Prompt** fenced block (copy into the bot)
-3. Optional notes that do not fit properties
+2. **System prompt** short pointer to the linked Prompt (`system_prompt`)
+3. Optional notes / memory that do not fit properties
 
 Body outline:
 
 - `# {Name} – {Role}` (name/role also live in title + `role` property)
 - `## Suggested runtime (YYYY-MM-DD)` from `suggested-runtime.md`
-- `## Full System Prompt (copy into the bot)` with a fenced prompt (skeleton below)
+- `## System prompt` + one paragraph pointing at `[{Name} – System prompt]`
 
 Skip `## Short Description`, `**Autonomy:**`, and prose-only map lines when
 `short_description`, `autonomy`, and `map_path` properties are set. Link memory
-children via `memory_pages` after create.
+children via `memory_pages` after create. Create the Prompt object first
+(`prompts.md`); do not keep a Full System Prompt / SOUL fence on the Agent.
 
 ## HQ page
 
@@ -79,16 +81,21 @@ filled.
 
 ## Group page
 
+Groups stay type `page`. Set property `welcome_prompt` to a Prompt
+(`prompt_kind=welcome`). Body:
+
 ```markdown
 # {Name} Group
 ## Members
 …
 
-## Welcome (copy-paste)
-Membership and routing blurb for the live chat group.
+## Welcome prompt
+Canonical welcome paste lives on the linked **Welcome prompt** property
+([{Name} Group – Welcome prompt](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
 ```
 
-Document membership here; applying it to a messaging platform is a separate runtime step.
+Document membership here; applying it to a messaging platform is a separate
+runtime step. Full Prompt create/migrate: `prompts.md`.
 
 ## Skill page
 
@@ -136,7 +143,10 @@ Management (links to **Roadmap / Backlog / TODO** Queries filtered by
 `linked_projects` over Epic / User story / Task; see `project-pm.md`), Product,
 Design, Marketing (also link via the matching `*_page` properties).
 
-## Full System Prompt skeleton (inside the fence)
+## System Prompt skeleton (body of the Prompt object)
+
+Put this text on the **Prompt** object (`prompt_kind=system`), not as a fence on
+the Agent page. Full create flow: `prompts.md`.
 
 ```text
 # Role
@@ -182,9 +192,10 @@ Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.
 
 ## Shared Rules pointer
 
-Prefer a short pointer in each agent prompt:
+Prefer a short pointer inside each system Prompt body:
 
-`Follow Agents → {Shared Rules page title} in full.`
+`Follow Agents → {Shared Rules title} in full.`
 
-Avoid pasting the entire rules document into every prompt when a pointer suffices.
+Shared Rules itself is type `prompt` (`prompt_kind=shared_rules`). Avoid pasting
+the entire rules document into every agent Prompt when a pointer suffices.
 Starter ruleset: `shared-rules-starter.md`. Worked org sample: `examples.md`.

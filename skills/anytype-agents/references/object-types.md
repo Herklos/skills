@@ -1,11 +1,12 @@
-# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Project)
+# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Prompt, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
 `API-list-types` / `API-get-type` and templates with `API-list-templates`.
 
-Skills, Shared Rules, Groups, memory children, and other hub pages stay type
-`page` unless the space defines otherwise.
+Skills, Groups (welcome pages), memory children, and other hub pages stay type
+`page` unless the space defines otherwise. **Shared Rules**, system/welcome
+prompts, and prompt libraries use type **`prompt`** (see `prompts.md`).
 
 ## Type keys
 
@@ -20,6 +21,7 @@ Skills, Shared Rules, Groups, memory children, and other hub pages stay type
 | `browser` | Browsers | Reusable browser access catalog (source + identity). Agents / Teams / Subteams link here |
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
+| `prompt` | Prompts | System prompts, group welcomes, Shared Rules, libraries, drafts (`prompts.md`) |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 | `epic` | Epics | Large delivery themes under a project (Roadmap Query) |
 | `user_story` | User stories | Backlog stories under a project (Backlog Query) |
@@ -42,7 +44,8 @@ Skills resolution order when a space uses Subteams:
 **Properties hold structured facts.** Do not duplicate Short Description,
 Autonomy, Board seat, map path, Hermes slug, browser / computer / tools, or
 linked projects only in markdown. Body keeps **Suggested runtime** narrative
-and **Full System Prompt**.
+and a short **System prompt** pointer. Canonical copy-into-bot text lives on a
+linked **`prompt`** object (`system_prompt`); see `prompts.md`.
 
 Featured properties (API keys):
 
@@ -54,6 +57,7 @@ Featured properties (API keys):
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
 | `harness_profile` | objects | Link to one **Harness profile** (source of `model.*` / fallbacks / aux). **Default for most agents: Local router** |
 | `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
+| `system_prompt` | objects | Link to one **Prompt** (`prompt_kind=system`; canonical SOUL / system text) |
 | `browser` | objects | Link to one **Browser** catalog object |
 | `computer` | objects | Link to one **Computer** catalog object |
 | `tool_profile` | objects | Link to one **Tool profile** catalog object |
@@ -528,13 +532,16 @@ template id from `API-list-templates` when you need a specific one; pass
       "computer_surface": "cua-spaces",
       "map_path": "Agents → Engineering HQ → Development → Lee"
     },
-    "markdown": "## Full System Prompt (copy into the bot)\n…"
+    "system_prompt": ["<promptObjectId>"],
+    "markdown": "## System prompt\nCanonical system prompt lives on the linked **System prompt** property. Copy from that Prompt into the bot.\n"
   }
 }
 ```
 
-Omit body sections that only repeat properties (`## Short Description`,
-`**Autonomy:**`, map path as prose-only) when those properties are set.
+Create the Prompt object first (or in the same session) per `prompts.md`. Omit
+body sections that only repeat properties (`## Short Description`,
+`**Autonomy:**`, map path as prose-only) when those properties are set. Do not
+paste a Full System Prompt / SOUL fence on the Agent once `system_prompt` is set.
 
 Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
 `task_key`, `harness_profile`, then add its id to the parent's `subagents`.
@@ -615,22 +622,24 @@ object; re-set only what is missing after the type change.
 ## Bootstrap types in a new space
 
 1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `browser`, `computer`, and `tool_profile` with the
-   property definitions above (`create_missing_options: true` for selects). On
-   `team`, define `kind` options `Board` / `HQ` / `Group` only (no `Sub-team`).
-   Prefer **sequential** creates when several types share new property names
-   (`members`, `skills_page`, `access_needed`, `computer_surface`, …) so keys
-   stay clean aliases rather than colliding opaque ids. Name new selects
-   carefully (`Browser source`, `Tool approvals`) when a shorter name already
-   exists with a different format.
+   `harness_profile`, `browser`, `computer`, `tool_profile`, and `prompt` with
+   the property definitions above (`create_missing_options: true` for selects).
+   On `team`, define `kind` options `Board` / `HQ` / `Group` only (no
+   `Sub-team`). Prefer **sequential** creates when several types share new
+   property names (`members`, `skills_page`, `access_needed`,
+   `computer_surface`, …) so keys stay clean aliases rather than colliding
+   opaque ids. Name new selects carefully (`Browser source`, `Tool approvals`)
+   when a shorter name already exists with a different format.
 2. On existing Agent / Team / Subteam types: `add_property` for org/runtime
-   fields above including featured `browser`, `computer`, `tool_profile`
-   objects links and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
-   `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
-   `board_member`, `linked_projects`, `memory_pages`, `messaging_group`,
-   `map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`;
-   keep `harness_profile` / `subagents`; `remove_property` legacy `harness`
-   select when ready. On Harness profile: add STT/TTS stack fields above.
+   fields above including featured `browser`, `computer`, `tool_profile`,
+   Agent `system_prompt`, and Agent voice fields (`voice_enabled`,
+   `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` /
+   `tts_*`); also `board_member`, `linked_projects`, `memory_pages`,
+   `messaging_group`, `map_path`, `delegation_enabled`, `terminal_backend`,
+   `computer_surface`; keep `harness_profile` / `subagents`; `remove_property`
+   legacy `harness` select when ready. On Page: `welcome_prompt`. On Harness
+   profile: add STT/TTS stack fields above. Prompt bootstrap detail:
+   `prompts.md`.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
    `skills_page`, `routing_summary` (+ runtime catalog links). On Project:
    `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
@@ -655,10 +664,32 @@ object; re-set only what is missing after the type change.
 Do not hardcode space or template ids in skill text; resolve them via list/get
 each session.
 
+## Prompt (`api_key`: `prompt`)
+
+Canonical copy-into-bot / welcome / shared-rules text. Full property table,
+create/migrate recipes, and Agent/Group pointer shapes: **`prompts.md`**.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `other` (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `owner_agent` | objects | Owning Agent when kind is system (featured) |
+| `owner_group` | objects | Owning Group page when kind is welcome (featured) |
+| `audience` | select | `agent` \| `group` \| `org` \| `library` (featured) |
+| `notes` | text | Apply / sync notes |
+
+**Default template:** Prompt default (`type-templates.md`). Agents link via
+`system_prompt`. Group pages link via `welcome_prompt` (Page property). Shared
+Rules and Mission-style libraries are themselves type `prompt` (`set_type` in
+place).
+
 ## What stays `page`
 
 - Agents / Projects hub roots (optional)
-- Shared Rules, Skill Template, Skills indexes
+- Skill Template, Skills indexes
 - Agent memory children (Skills, Operating Notes, …)
-- Group welcome pages when not modeled as Team `kind: Group`
-- Drafts hub scaffolding, misc notes
+- Group welcome pages when not modeled as Team `kind: Group` (link
+  `welcome_prompt` → Prompt; body keeps a short pointer)
+- Drafts hub scaffolding, misc notes, restore/backup dumps
+
+Shared Rules and prompt libraries are type **`prompt`**, not `page`.

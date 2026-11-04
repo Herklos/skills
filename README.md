@@ -5,7 +5,7 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.16.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.23.0 | Org roster, typed inventory, and Projects via Anytype MCP |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.25.0 | Org roster, typed inventory, Prompts, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` when you are ready.
 
@@ -51,16 +51,17 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 
 | Type | Purpose |
 |------|---------|
-| `agent` | Role, prompt, memory links, `harness_profile`, Subagents, browser/computer/tool links, voice modes |
+| `agent` | Role, memory links, `harness_profile`, Subagents, `system_prompt` → Prompt, browser/computer/tool links, voice modes |
 | `team` | Board / HQ / Group (`kind`) |
 | `subteam` | Domain / pod under an HQ (preferred over legacy Sub-team teams) |
 | `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools) |
 | `harness` | Product catalog (Claude, Codex, Grok, Copilot, Muse, NIM, Local model) |
 | `harness_profile` | Reusable primary + backup model stack, optional decision model, shared STT/TTS |
 | `browser` / `computer` / `tool_profile` | Runtime catalogs; Browser/Computer are per-HQ (Cua pair); Tool profiles are shared; agents/teams/subteams link them |
+| `prompt` | System / welcome / shared_rules / library / draft text; Agents and Groups link them |
 | `project` | Portfolio root with status, owning team, execution policy, child hub links |
 
-Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills resolve Agent → Subteam → Team → Project → Global.
+Skills and memory children stay `page`. Shared Rules is type `prompt`. Group pages stay `page` with `welcome_prompt`. Skills resolve Agent → Subteam → Team → Project → Global.
 
 **What it covers**
 
@@ -68,7 +69,7 @@ Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills reso
 - Create and patch agents, HQs, Subteams, Subagents, harness stacks, and runtime catalogs
 - Property-first design: structured facts on typed objects; body templates for long narrative only
 - Suggested runtime mapping into Hermes (models, delegation, browser/computer, tools, voice, cron)
-- Shared Rules rollout, handoff / welcome paste, MCP search/create/patch recipes
+- Shared Rules rollout, Prompt objects for system/welcome text, handoff / welcome paste, MCP search/create/patch recipes
 - Safety: confirm Board/roster/archive changes; Anytype edits do not refresh live prompts by themselves
 
 **Org defaults (documented in the skill)**
@@ -76,14 +77,15 @@ Supporting docs (Shared Rules, Skills, memory children) stay `page`. Skills reso
 - Most agents link **Local router** (local decision model as parent brain; spawn Subagents for specialized routes)
 - Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive (Engineering → Coding; fetch/veille → Data fetching)
 - Voice stack on Local router: local Whisper + Edge TTS; Agent holds enablement / modes (Foyer assistants may enable voice; others often leave it off with the stack prefilled)
+- Canonical system / welcome text on typed **Prompt** objects; Agent.`system_prompt` and Group `welcome_prompt` link them; agent/group bodies keep short pointers
 
-**References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`, **`hq-runtime-pair`** (per-HQ Cua Computer/Browser).
+**References** (loaded on demand): `structure`, `object-types`, `type-templates`, `page-templates`, `suggested-runtime`, `shared-rules-starter`, `examples`, `handoff-templates`, `mcp-recipes`, **`hq-runtime-pair`**, **`prompts`**, **`project-pm`**.
 
 **Typical flows**
 
 - Orient: discover space → open Agents → read Shared Rules + roster
-- New specialist: create `agent` + Local router → link owning HQ Computer/Browser pair + tool profile → optional Subagents → memory pages → link HQ/Subteam → remind to copy prompt into the runtime bot
-- New HQ: typed create → create HQ Computer + Browser pair → link pair on HQ → update roster when needed
+- New specialist: create `agent` + Local router → link owning HQ Computer/Browser pair + tool profile → optional Subagents → create Prompt + `system_prompt` → memory pages → link HQ/Subteam → remind to copy Prompt into the runtime bot
+- New HQ: typed create → create HQ Computer + Browser pair → link pair on HQ → update roster + Group welcome Prompt when needed
 - New Subteam / Project: typed create → Subteam inherits parent HQ pair → link from parent hub → update roster when needed
 - Hermes apply: continue with `hermes-profiles` using Suggested runtime + matching refs
 
@@ -97,6 +99,7 @@ Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)
 Anytype (org truth)          Hermes (runtime)
 ─────────────────            ────────────────
 agent + harness_profile  →   profile config / models / voice
+agent.system_prompt      →   SOUL / system prompt copy
 subagent routes          →   delegation model_map
 browser / computer / tools → browser-and-computer, runtime-limits
 Suggested runtime notes  →   apply via hermes-profiles refs
