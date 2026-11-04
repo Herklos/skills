@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.31.4
+version: 1.31.5
 license: MIT
 metadata:
   category: agents
@@ -136,7 +136,7 @@ Never invent roster membership, legal conclusions, or financial numbers. Prefer 
 
 1. Prefer `API-search-space` with `"type": "agent"` (or search by display name / role)
 2. Read properties first: `short_description`, `team`, `reports_to`, `autonomy`, `harness_profile`, catalog links, linked **System prompt** Prompt, memory / skills / logs / agenda
-3. Body should be System prompt + Agenda pointers (plus unique narrative only); flag leftover Suggested runtime or property-dup prose for cleanup
+3. Body should be System prompt + Agenda pointers (plus unique narrative only); flag leftover Suggested runtime, Sub-pages / Memory pages inventories, or property-dup prose for cleanup
 
 ### Show a project (agent context)
 

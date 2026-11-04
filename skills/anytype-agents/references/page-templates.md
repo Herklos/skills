@@ -43,6 +43,15 @@ Chief, harness / browser / computer / tools / voice runtime stacks, or a
 duplicates. `suggested-runtime.md` is an apply checklist for Hermes, not page
 markdown.
 
+**Do not** keep `## Sub-pages to create`, `## Sub-pages`, `## Your Memory Pages`,
+`## Memory pages`, or “(Sub-pages below.)” / “already created as sub-pages”
+inventories. Create Memory objects + Skills / Logs / Agenda Queries, wire
+`memory_pages` / `skills_page` / `logs_page` / `agenda_page`, then delete those
+body sections. Legacy Full backup / restore dumps stay type `page` (no Agent
+property; see `memory-and-skills.md` out of scope). Old Skills index `page`s are
+superseded by `skills_page` Queries. Routine pages belong as `schedule` rows on
+the Agenda.
+
 Link Memory objects via `memory_pages`, the Skills Query via `skills_page`, the
 Logs Query via `logs_page`, and the Agenda Query via `agenda_page` after create
 (`memory-and-skills.md` + `agenda-and-schedules.md`). Create the Prompt object
