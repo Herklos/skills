@@ -27,7 +27,7 @@ For Hermes, map fields with skill `hermes-profiles`:
 | Workspace | `workspace.md` |
 | Display / skins | `display.md` |
 | Voice / STT / TTS | `voice.md` |
-| Scheduled tasks | `cron.md` |
+| Scheduled tasks (Agenda / Schedule) | `cron.md` (+ anytype-agents `agenda-and-schedules.md`) |
 
 Paste under the agent title (date the heading when you revise it).
 
@@ -60,9 +60,10 @@ Paste under the agent title (date the heading when you revise it).
 - Alternatives: single worker {provider}·{model} (`backend: default`) | `profile_routes` ({profile}: {description})
 - Concurrency: max_concurrent_children {n} · max_iterations {n}
 - Setup: `hermes plugins install advanced-delegation` → decline Subagents via hermes-profiles `delegation.md` → `/delegation model_map`
-**Scheduled tasks:**
-- none yet
-- or: `{name}` · `{schedule}` · {prompt intent} · deliver {target} · skills {…} · workdir {path?} · model pin {per-job|cron.model|main} · no_agent/script {if any}
+**Scheduled tasks (Agenda):**
+- Canonical list: Agent.`agenda_page` → `{OwnerShort} – Agenda` Query of type `schedule` (anytype-agents `agenda-and-schedules.md`)
+- none yet | or summarize live/draft rows: `{schedule_key}` · `{schedule_kind}` · `{schedule_expr}` `{timezone}` · {intent} · deliver {target} · skills {…}
+- Apply recurring/oneshot into Hermes only when asked (`hermes-profiles` `cron.md`); event kind stays Anytype-only until a timer exists
 **Mixture of Agents (optional):** off | preset `{name}` (references: …; aggregator: …; fanout: user_turn|per_iteration|every_n:N)
 **Personality:**
 - SOUL / durable identity: {summary or "see Full System Prompt / SOUL.md"}

@@ -1,22 +1,25 @@
-# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Prompt, Project)
+# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Prompt, Group, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
 `API-list-types` / `API-get-type` and templates with `API-list-templates`.
 
-Groups (welcome pages) and other hub scaffolding stay type `page` unless the
-space defines otherwise. **Shared Rules**, system/welcome prompts, and prompt
-libraries use type **`prompt`** (see `prompts.md`). Agent support notes use
-type **`memory`**; procedures use type **`skill`**; per-action summaries use
-type **`log`**; Skills and Logs indexes are **Queries** (see
-`memory-and-skills.md`).
+Messaging rooms use typed **`group`** (welcome Prompt + platform fields). Hub
+scaffolding (Agents / Projects roots, drafts) may stay `page`. **Shared Rules**,
+system/welcome prompts, and prompt libraries use type **`prompt`** (see
+`prompts.md`). Agent support notes use type **`memory`**; procedures use type
+**`skill`**; per-action summaries use type **`log`**; Skills and Logs indexes
+are **Queries** (see `memory-and-skills.md`). Scheduled jobs use type
+**`schedule`**; each Agent's **Agenda** is a Query filtered by `owner_agent`
+via `agenda_page` (see `agenda-and-schedules.md`).
 
 ## Type keys
 
 | Type key | Plural | Use for |
 |----------|--------|---------|
 | `agent` | Agents | Primary, chiefs, specialists, archived agents |
-| `team` | Teams | Board, HQs, and groups-as-org-units when typed |
+| `team` | Teams | Board and HQs (`kind`: Board / HQ) |
+| `group` | Groups | Messaging roster + welcome Prompt + platform fields (not Team `kind: Group`) |
 | `subteam` | Subteams | Domains / pods under an HQ (**preferred**; do not model these as `team` with `kind: Sub-team`) |
 | `subagent` | Subagents | Spawn configs an Agent may start (task, harness profile, scope, tools). Not the same as `subteam` |
 | `harness` | Harnesses | Product catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
@@ -28,6 +31,7 @@ type **`log`**; Skills and Logs indexes are **Queries** (see
 | `memory` | Memories | Durable agent notes (`memory-and-skills.md`) |
 | `skill` | Skills | Procedures / templates / guides (`memory-and-skills.md`) |
 | `log` | Logs | Per-action activity summaries (`memory-and-skills.md`) |
+| `schedule` | Schedules | Recurring / oneshot / event jobs; Agenda Queries via Agent.`agenda_page` (`agenda-and-schedules.md`) |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 | `epic` | Epics | Large delivery themes under a project (Roadmap Query) |
 | `user_story` | User stories | Backlog stories under a project (Backlog Query) |
@@ -81,8 +85,10 @@ Other properties:
 | `short_description` | text | One-liner mission |
 | `memory_pages` | objects | Typed **Memory** children (decisions, lessons, resources, …) |
 | `skills_page` | objects | Skills **Query** for this agent |
-| `logs_page` | objects | Logs **Query** for this agent (per-action summaries) |
-| `messaging_group` | objects | Group page / chat roster |
+| `logs_page` | objects | Logs **Query** for this agent (per-action summaries; Calendar on `logged_at`) |
+| `agenda_page` | objects | Agenda **Query** for this agent (Schedules filtered by `owner_agent`; Calendar on `next_run`) |
+| `memory_review_off` | checkbox | When true, Memory Keeper (Agathe) skips this agent in Sunday hygiene (featured) |
+| `messaging_group` | objects | Typed **Group** (chat roster) |
 | `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
 | `delegation_enabled` | checkbox | Parent may spawn Subagents |
 | `terminal_backend` | select | `cua` \| `local` \| `docker` \| `ssh` \| `other` (org default: `cua`; keep aligned with linked Tool profile) |
@@ -130,27 +136,30 @@ and removing `harness` from the Agent type (`remove_property`).
 
 ## Team (`api_key`: `team`)
 
-Board / HQ / Group only. Domains under an HQ use type **`subteam`**.
+Board / HQ only. Domains under an HQ use type **`subteam`**. Messaging rooms
+use type **`group`** (do not create new `team` with `kind: Group`).
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `kind` | select | `Board` \| `HQ` \| `Group` (featured) |
+| `kind` | select | `Board` \| `HQ` (featured). **`Group` option deprecated** (prefer typed `group`) |
 | `chief` | objects | Link to chief Agent (featured) |
 | `members` | objects | Agent members (featured) |
 | `parent_team` | objects | Parent Team when nested (rare; HQs usually sit under Agents) |
 | `lifecycle` | select | Shared with Agent (`draft` / `live` / `archived`) |
 | `subteams` | objects | Child **Subteam** objects (featured on HQ) |
 | `mission` | text | Short mission |
-| `messaging_group` | objects | Group page |
+| `messaging_group` | objects | Typed **Group** |
 | `skills_page` | objects | HQ Skills **Query** |
 | `routing_summary` | text | One-line routing |
+| `standing_instructions` | objects | HQ/Board **Standing instructions** Prompt (`prompt_kind=library`) (featured). Full playbook: `hq-standing-instructions.md` |
 | `browser` | objects | Optional team-default **Browser** catalog link |
 | `computer` | objects | Optional team-default **Computer** catalog link |
 | `tool_profile` | objects | Optional team-default **Tool profile** catalog link |
 
-Also `tag`, `links`, `backlinks`. Put long routing prose in the body; keep the
-filterable one-liner in `routing_summary`. Agent-level runtime links override
-team defaults when both are set.
+Also `tag`, `links`, `backlinks`. Put long gates / principles / routing prose on
+the linked Standing instructions Prompt; keep the filterable one-liner in
+`routing_summary`. HQ body stays Map notes + pointer. Agent-level runtime links
+override team defaults when both are set.
 
 **Default template name:** `Team default`. Full dumped body: `type-templates.md`.
 Mirror shapes in `page-templates.md` (HQ page). Link child **`subteam`** objects
@@ -158,7 +167,8 @@ via `subteams` and the HQ map; do not create new Sub-teams as `team`.
 
 Legacy: older spaces may still have `team` objects with `kind: Sub-team`. Prefer
 migrating those to type **`subteam`** via `set_type` (see below). Do not mint new
-`Sub-team` select options.
+`Sub-team` select options. Do not mint new Team `kind: Group` objects; migrate
+informal Group pages to type **`group`**.
 
 ## Subteam (`api_key`: `subteam`)
 
@@ -173,7 +183,7 @@ sub-teams on the `team` type.
 | `mission` | text | Short domain mission |
 | `members` | objects | Agent members of this domain |
 | `routing_summary` | text | One-line routing |
-| `messaging_group` | objects | Group page when present |
+| `messaging_group` | objects | Typed **Group** when present |
 | `skills_page` | objects | Domain Skills **Query** when present |
 | `browser` | objects | Optional domain-default **Browser** catalog link |
 | `computer` | objects | Optional domain-default **Computer** catalog link |
@@ -559,9 +569,9 @@ paste a Full System Prompt / SOUL fence on the Agent once `system_prompt` is set
 Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
 `task_key`, `harness_profile`, then add its id to the parent's `subagents`.
 
-Team / Subteam / Subagent / Harness / Harness profile / Browser / Computer /
-Tool profile / project the same way with the matching `"type"` and property
-keys above.
+Team / Subteam / Group / Subagent / Harness / Harness profile / Browser /
+Computer / Tool profile / project the same way with the matching `"type"` and
+property keys above.
 
 ## Search by type
 
@@ -574,9 +584,9 @@ keys above.
 }
 ```
 
-Use `"type": "team"`, `"type": "subteam"`, `"type": "subagent"`, `"type": "harness"`,
-`"type": "harness_profile"`, `"type": "browser"`, `"type": "computer"`,
-`"type": "tool_profile"`, or `"type": "project"` the same way.
+Use `"type": "team"`, `"type": "group"`, `"type": "subteam"`, `"type": "subagent"`,
+`"type": "harness"`, `"type": "harness_profile"`, `"type": "browser"`,
+`"type": "computer"`, `"type": "tool_profile"`, or `"type": "project"` the same way.
 
 ## Migrate an existing page (`set_type`)
 
@@ -603,10 +613,10 @@ Keep the same object id and links. Apply `set_type` then `set_properties` in one
 }
 ```
 
-Recommended inventory scope: Agents hub agents + Board/HQ (`team`) + Subteams
-(`subteam`) + Subagents (`subagent`) + Harnesses + Harness profiles, and Projects
-hub portfolio roots. Leave Skills, Shared Rules, memory children, bugs, and other
-support pages as `page`.
+Recommended inventory scope: Agents hub agents + Board/HQ (`team`) + Groups
+(`group`) + Subteams (`subteam`) + Subagents (`subagent`) + Harnesses + Harness
+profiles, and Projects hub portfolio roots. Leave Skills, Shared Rules, memory
+children, bugs, and other support pages as `page` (or their typed forms).
 
 ### Migrate legacy `team` + `kind: Sub-team` → `subteam`
 
@@ -632,14 +642,45 @@ support pages as `page`.
 Keep `parent_team` / `chief` / `mission` when the keys already exist on the
 object; re-set only what is missing after the type change.
 
+### Migrate legacy Group `page` → `group`
+
+Prefer `set_type` → `group` (keeps id, `welcome_prompt`, and Agent
+`messaging_group` links), then fill properties:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<objectId>",
+  "create_missing_options": true,
+  "ops": [
+    { "op": "set_type", "type": "group" },
+    {
+      "op": "set_properties",
+      "set": {
+        "lifecycle": ["live"],
+        "parent_team": ["<hqTeamObjectId>"],
+        "members": ["<agentId>", "…"],
+        "slug": "engineering",
+        "platform": ["telegram"],
+        "require_mention": true,
+        "exclusive_bot_mentions": true
+      }
+    }
+  ]
+}
+```
+
+Keep existing `welcome_prompt` when present. Then patch HQ / Agent
+`messaging_group` to this Group id.
+
 ## Bootstrap types in a new space
 
-1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `browser`, `computer`, `tool_profile`, `prompt`,
-   `memory`, `skill`, and `log` with the property definitions above
-   (`create_missing_options: true` for selects).
-   On `team`, define `kind` options `Board` / `HQ` / `Group` only (no
-   `Sub-team`). Prefer **sequential** creates when several types share new
+1. `API-create-type` for `agent`, `team`, `group`, `subteam`, `subagent`,
+   `harness`, `harness_profile`, `browser`, `computer`, `tool_profile`,
+   `prompt`, `memory`, `skill`, `log`, and `schedule` with the property
+   definitions above (`create_missing_options: true` for selects).
+   On `team`, define `kind` options `Board` / `HQ` only (no `Sub-team`, no new
+   `Group` option). Prefer **sequential** creates when several types share new
    property names (`members`, `skills_page`, `access_needed`,
    `computer_surface`, …) so keys stay clean aliases rather than colliding
    opaque ids. Name new selects carefully (`Browser source`, `Tool approvals`)
@@ -649,33 +690,36 @@ object; re-set only what is missing after the type change.
    Agent `system_prompt`, and Agent voice fields (`voice_enabled`,
    `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` /
    `tts_*`); also `board_member`, `linked_projects`, `memory_pages`,
-   `skills_page`, `logs_page`, `messaging_group`, `map_path`,
+   `skills_page`, `logs_page`, `agenda_page`, `messaging_group`, `map_path`,
    `delegation_enabled`, `terminal_backend`, `computer_surface`; keep
    `harness_profile` / `subagents`; `remove_property` legacy `harness` select
-   when ready. On Page: `welcome_prompt`. On Harness profile: add STT/TTS stack
-   fields above. Prompt / Memory / Skill / Log bootstrap detail: `prompts.md`
-   + `memory-and-skills.md`.
+   when ready. On Group: `welcome_prompt` is a Group property (not Page). On
+   Harness profile: add STT/TTS stack fields above. Prompt / Memory / Skill /
+   Log / Schedule / Group bootstrap detail: `prompts.md` +
+   `memory-and-skills.md` + `agenda-and-schedules.md` + Group section below.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
-   `skills_page`, `routing_summary` (+ runtime catalog links). On Project:
+   `skills_page`, `routing_summary`, `standing_instructions` (+ runtime catalog
+   links). On Project:
    `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
    hub page links.
-4. `API-create-template` with `template_for`: `agent` | `team` | `subteam` |
-   `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `prompt` | `memory` | `skill` | `log` | `project` |
-   `epic` | `user_story` and body markdown from **`type-templates.md`**.
-   Extend built-in `task` with Kind (+ `spike`) and project links
-   (`project-pm.md`); keep Task's built-in default template.
+4. `API-create-template` with `template_for`: `agent` | `team` | `group` |
+   `subteam` | `subagent` | `harness` | `harness_profile` | `browser` |
+   `computer` | `tool_profile` | `prompt` | `memory` | `skill` | `log` |
+   `schedule` | `project` | `epic` | `user_story` and body markdown from
+   **`type-templates.md`**. Extend built-in `task` with Kind (+ `spike`) and
+   project links (`project-pm.md`); keep Task's built-in default template.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (**Local
    router**, Coding, Data fetching, …); create Tool profile catalogs (table
    above); for each HQ create one Computer + one Browser (per-HQ tables above)
    and link that pair on the HQ / its Subteams / its Agents; create Subagent
    spawn configs; link most agents to Local router + runtime catalogs +
-   `subagents` (and Subagent.`parent_agent`).
-7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
-   `team` objects → `subteam`). Fill properties from the org map; leave unknown
-   urls / people empty. For PM: migrate Roadmap/Backlog/TODO collections per
-   `project-pm.md`.
+   `subagents` (and Subagent.`parent_agent`); create typed Groups + welcome
+   Prompts and link `messaging_group`.
+7. Migrate existing inventory with `set_type` as above (including legacy
+   Sub-team `team` objects → `subteam`, and Group `page` → `group`). Fill
+   properties from the org map; leave unknown urls / people empty. For PM:
+   migrate Roadmap/Backlog/TODO collections per `project-pm.md`.
 
 Do not hardcode space or template ids in skill text; resolve them via list/get
 each session.
@@ -690,14 +734,46 @@ create/migrate recipes, and Agent/Group pointer shapes: **`prompts.md`**.
 | `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `other` (featured) |
 | `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
 | `owner_agent` | objects | Owning Agent when kind is system (featured) |
-| `owner_group` | objects | Owning Group page when kind is welcome (featured) |
+| `owner_group` | objects | Owning typed **Group** when kind is welcome (featured) |
 | `audience` | select | `agent` \| `group` \| `org` \| `library` (featured) |
 | `notes` | text | Apply / sync notes |
 
 **Default template:** Prompt default (`type-templates.md`). Agents link via
-`system_prompt`. Group pages link via `welcome_prompt` (Page property). Shared
+`system_prompt`. Groups link via `welcome_prompt` (Group property). Shared
 Rules and Mission-style libraries are themselves type `prompt` (`set_type` in
 place).
+
+## Group (`api_key`: `group`)
+
+Messaging roster for a shared Telegram / Discord / … room. Distinct from Team
+(`kind` Board/HQ) and Subteam. Hermes has no first-class Group object; decline
+platform settings via `hermes-profiles` → `messaging-groups.md`.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `parent_team` | objects | Owning HQ / Board Team (featured) |
+| `members` | objects | Agent members of the chat (featured) |
+| `welcome_prompt` | objects | One Prompt (`prompt_kind=welcome`) (featured) |
+| `platform` | select | `telegram` \| `discord` \| `slack` \| `whatsapp` \| `other` \| `none` (featured) |
+| `platform_chat_id` | text | Platform room/channel id when known (featured); leave empty until real |
+| `slug` | text | Stable lowercase id (e.g. `engineering`) (featured) |
+| `mission` | text | Short purpose of the room |
+| `routing_summary` | text | One-line who answers what |
+| `hermes_profiles` | text | Comma list of member Hermes slugs (checklist) |
+| `require_mention` | checkbox | Intended `telegram.require_mention` (and peers) |
+| `exclusive_bot_mentions` | checkbox | Intended `telegram.exclusive_bot_mentions` |
+| `notes` | text | Apply / sync notes |
+
+Also `tag`, `links`, `backlinks`. Canonical roster is `members`; keep each
+Agent.`messaging_group` pointing here. Body keeps Members + Welcome pointer
+only (`page-templates.md` / **Group default**).
+
+**Default template name:** `Group default`. Body: `type-templates.md`.
+
+**Hermes decline:** one bot token + gateway per member profile; allowlist
+`platform_chat_id`; apply mention gates from the checkboxes; paste welcome from
+`welcome_prompt`. Do not apply until the user asks.
 
 ## Memory (`api_key`: `memory`)
 
@@ -746,17 +822,48 @@ from skill usage counters (still forbidden).
 | `notes` | text | Optional |
 
 **Default template:** Log default. Agent indexes via `logs_page` → Query
-filtered by `owner_agent`, sorted by `logged_at` desc. Full playbook:
-`memory-and-skills.md`.
+filtered by `owner_agent`, sorted by `logged_at` desc, plus a **Calendar**
+view on `logged_at` (date index). Full playbook: `memory-and-skills.md`.
+
+## Schedule (`api_key`: `schedule`)
+
+One intended job (Hermes cron / Bot Routine / event wake) owned by an Agent.
+The agent's **Agenda** is a Query over these objects (no Agenda type).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `owner_agent` | objects | Owning Agent (featured; required; Agenda filter) |
+| `schedule_key` | text | Stable lowercase-hyphen id (featured); prefer Hermes `--name` |
+| `schedule_kind` | select | `recurring` \| `oneshot` \| `event` (featured) |
+| `schedule_expr` | text | Cron or natural schedule (featured); empty for pure events |
+| `timezone` | text | e.g. `Europe/Paris` (featured) |
+| `next_run` | date | Next fire / Calendar anchor (featured); Date Objects |
+| `intent` | text | Short what/when (featured) |
+| `deliver` | text | Hermes deliver target |
+| `skills` | text | Comma skill keys |
+| `workdir` | text | Absolute cwd when needed |
+| `model_pin` | text | Per-job pin note |
+| `no_agent` | checkbox | Script-only |
+| `script_path` | text | When `no_agent` |
+| `paused` | checkbox | |
+| `paused_reason` | text | |
+| `hermes_job_id` | text | Filled after Hermes apply |
+| `hermes_job_name` | text | Usually mirrors `schedule_key` |
+| `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
+| `notes` | text | |
+
+**Default template:** Schedule default. Agent indexes via `agenda_page` → Query
+filtered by `owner_agent`, sorted by `next_run` asc (optional Calendar view on
+`next_run`). Full playbook: `agenda-and-schedules.md`. Hermes decline:
+`hermes-profiles` → `cron.md`.
 
 ## What stays `page`
 
 - Agents / Projects hub roots (optional)
-- Group welcome pages when not modeled as Team `kind: Group` (link
-  `welcome_prompt` → Prompt; body keeps a short pointer)
 - Drafts hub scaffolding, misc notes, restore/backup dumps
 
-Shared Rules and prompt libraries are type **`prompt`**. Memory children are
-type **`memory`**. Procedures / Skill Template / guides are type **`skill`**.
-Per-action summaries are type **`log`**. Skills and Logs indexes are type
-**`query`**.
+Messaging rooms are type **`group`** (migrate legacy Group pages with
+`set_type`). Shared Rules and prompt libraries are type **`prompt`**. Memory
+children are type **`memory`**. Procedures / Skill Template / guides are type
+**`skill`**. Per-action summaries are type **`log`**. Scheduled jobs are type
+**`schedule`**. Skills, Logs, and Agenda indexes are type **`query`**.

@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.18.0
+version: 1.21.0
 license: MIT
 metadata:
   category: agents
@@ -37,7 +37,8 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/workspace.md` | `terminal.cwd`, projects, repo scan, worktrees |
 | `references/display.md` | Fonts, `display.*`, skins, ui-preferences |
 | `references/voice.md` | Voice mode, STT, TTS (`voice.*` / `stt.*` / `tts.*`), messaging `/voice` |
-| `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent |
+| `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent; **Anytype Agenda → Hermes** bind |
+| `references/messaging-groups.md` | Multi-bot Telegram/Discord rooms; Anytype typed **Group** → Hermes decline (tokens, allowlists, mention gates) |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
@@ -92,6 +93,7 @@ Do not print `.env` secret values into chat.
 | Agent | Running Hermes process using that home |
 | Bot | Profile in Desktop Bot Mode roster (`ui_meta` in `profile.yaml`) |
 | Messaging bot | Platform account token in that profile's `.env` |
+| Messaging group | Shared Telegram/Discord room with several profiles; Anytype typed Group holds roster + welcome + intended gates (`messaging-groups.md`) |
 | Subagent | Child from `delegate_task` (fresh chat, not a separate profile) |
 | Personality | Named voice overlay (`display.personality` / `/personality`) on top of SOUL |
 | Memory | Per-profile curated `MEMORY.md` / `USER.md`, optional one external provider |
@@ -205,7 +207,10 @@ hermes -p <slug> config set display.personality ''     # clear → SOUL only
 
 Put standing voice and role in SOUL. Use `/personality` for temporary mode shifts
 (or a sticky named default). Put user facts in memory (`USER.md` / `MEMORY.md`).
-Reload the session (or `hermes sessions refresh-prompts`) after SOUL edits.
+When applying from Anytype: keep Shared Rules + Agenda + HQ standing as **short
+pointers** in SOUL (do not paste HQ Standing instructions libraries). See
+`soul-templates.md` → Anytype Shared Rules + HQ standing. Reload the session
+(or `hermes sessions refresh-prompts`) after SOUL edits.
 
 ### profile.yaml
 
@@ -285,7 +290,18 @@ enablement / modes (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`,
 
 ### Scheduled tasks (cron)
 
-Full guide: `references/cron.md`. Enable `cronjob`; manage with `hermes cron` / `/cron`; document intended jobs on the agent page before applying.
+Full guide: `references/cron.md`. Enable `cronjob`; manage with `hermes cron` /
+`/cron`. Intended jobs live as Anytype **Schedule** objects on the agent's
+**Agenda** Query (`anytype-agents` `agenda-and-schedules.md`); decline
+recurring/oneshot rows into Hermes only when the user asks to apply.
+
+### Messaging groups (multi-bot rooms)
+
+Full guide: `references/messaging-groups.md`. One bot token + gateway per
+member profile. Allowlist the platform chat id on each profile; prefer
+`require_mention` + `exclusive_bot_mentions`. Intended rooms live as Anytype
+typed **Group** objects (`anytype-agents` `object-types.md`); decline into
+Hermes only when the user asks to apply.
 
 ## Gateway
 
@@ -312,6 +328,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Twin of existing:** `create <new> --clone-from <src>` (add `--clone-all` only if needed)
 - **Empty orchestrator:** `create <slug> --no-skills`
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
+- **Multi-bot group:** `messaging-groups.md` (tokens + allowlist + mention gates + welcome paste)
 - **Share package:** `export` / `import` or `profile install <git-url>`
 
 ## Workflow checklist

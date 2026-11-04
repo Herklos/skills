@@ -6,7 +6,7 @@ No space ids or personal names here. Discover live ids with MCP search each sess
 
 | File | When |
 |------|------|
-| `object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Project / Epic / User story / Task type keys |
+| `object-types.md` | Agent / Team / Group / Subteam / Subagent / Harness / Harness profile / Project / Epic / User story / Task type keys |
 | `project-pm.md` | PM Epics / User stories / Tasks + filtered Roadmap/Backlog/TODO Queries |
 | `type-templates.md` | Dumped default template bodies (bootstrap / drift) |
 | `page-templates.md` | Creating/auditing body shapes |
@@ -45,11 +45,11 @@ Agents
 │   ├── Subagents (type `subagent` spawn configs; optional)
 │   ├── Open loops / approvals (optional)
 │   └── Memory pages
-├── Board HQ (+ Board Group)
+├── Board HQ (+ Board Group, type `group`)
 ├── {Domain} HQ
 │   ├── Chief agent page
 │   ├── Subteam pages (type `subteam`)
-│   ├── Group page
+│   ├── Group (type `group` + welcome Prompt)
 │   ├── Skills (team)
 │   └── Specialist agent pages
 │       ├── Subagents (type `subagent`; 0..n per agent)
@@ -79,15 +79,16 @@ Titles vary by org. Treat the pattern as a guide; always read what exists.
 | Subteam | Domain / pod under an HQ (type `subteam`) |
 | Subagent | Spawn/route config under an Agent (type `subagent`; not a Subteam) |
 | Specialist | Narrow delivery; reports to a chief |
-| Group | Chat membership paste + welcome |
+| Group | Typed messaging roster + welcome Prompt + platform fields |
 | Skills hub | Index + template; resolution Agent → Subteam → Team → Project → Global |
 
 ## Types
 
-Org inventory uses custom keys **`agent`**, **`team`**, **`subteam`**,
-**`subagent`**, **`harness`**, **`harness_profile`**, **`epic`**,
+Org inventory uses custom keys **`agent`**, **`team`**, **`group`**,
+**`subteam`**, **`subagent`**, **`harness`**, **`harness_profile`**, **`epic`**,
 **`user_story`**, plus extended built-ins **`project`** and **`task`**. Prefer
-**`subteam`** for domains under an HQ. Prefer **`harness_profile`** on agents
+**`subteam`** for domains under an HQ. Prefer typed **`group`** for messaging
+rooms (Team `kind: Group` deprecated). Prefer **`harness_profile`** on agents
 (not a harness select). Prefer **`subagent`** objects linked via Agent.`subagents`
 for spawn routes (decline to Hermes `model_map`). Project PM uses **`epic`** /
 **`user_story`** / **`task`** with per-project Queries named Roadmap / Backlog /

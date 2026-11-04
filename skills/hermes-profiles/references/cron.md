@@ -13,11 +13,13 @@ gateway; `no_agent` script jobs can still run from `hermes cron tick`.
 Every Hermes profile that should own scheduled work:
 
 1. Enable the `cronjob` toolset so chat can call `cronjob_manage`.
-2. Keep a **Scheduled tasks** list on the agent page (Anytype Suggested runtime
-   or equivalent) that names each intended job: schedule, prompt intent,
-   delivery, skills, model pin, workdir.
-3. Apply the list with `/cron`, `hermes -p <slug> cron …`, or plain-language
-   asks that use `cronjob_manage`. Docs alone do not create live jobs.
+2. Keep intended jobs as typed Anytype **Schedule** objects on the agent's
+   **Agenda** Query (`agenda_page`). See anytype-agents
+   `agenda-and-schedules.md`. Suggested runtime may summarize; do not treat
+   markdown bullets as the only source when Schedules exist.
+3. Apply recurring/oneshot Schedules with `/cron`, `hermes -p <slug> cron …`,
+   or plain-language asks that use `cronjob_manage`. Docs alone do not create
+   live jobs. Skip apply during org redesign unless the user says apply.
 
 ```bash
 hermes -p <slug> tools enable cronjob
@@ -197,7 +199,67 @@ to "that server issue" fail.
 | Watchdog / heartbeat | `--no-agent --script …` (empty stdout = silent) |
 | Repo-aware audit | `--workdir /absolute/path` |
 | Unattended approvals | `approvals.cron_mode: deny` (or `approve` if trusted) |
-| Document intent | Agent **Scheduled tasks** list (Anytype / SOUL notes) |
+| Document intent | Anytype **Schedule** on Agenda Query (`agenda_page`); Suggested runtime summary optional |
+
+## Anytype Agenda → Hermes
+
+Org source of truth: Anytype type **`schedule`** on Agent.`agenda_page`
+(Query `{OwnerShort} – Agenda`). Companion skill: `anytype-agents`
+`agenda-and-schedules.md`. Dates/Calendar: Schedule.`next_run` (Anytype Date
+Objects). Editing Anytype does not create `cron/` jobs.
+
+### When to apply
+
+- User explicitly asks to apply / sync Hermes cron for an agent or Schedule.
+- Prefer `lifecycle=live`, `schedule_kind` in `recurring` | `oneshot`, non-empty
+  `schedule_expr`. Skip `event`, `archived`, and empty expr.
+- Respect `paused` / `paused_reason` (`--paused` on create, or create then pause).
+
+### Field map
+
+| Anytype Schedule | Hermes |
+|------------------|--------|
+| `schedule_key` | `--name` (job ref) |
+| `schedule_expr` | schedule argument (cron expr or natural) |
+| `timezone` | `--timezone` (else profile timezone) |
+| body **Prompt** | prompt string (fresh session; self-contained) |
+| `skills` (comma list) | one `--skill` per key |
+| `deliver` | `--deliver` |
+| `workdir` | `--workdir` |
+| `model_pin` | `--model` / `--provider` / `--pin`, or leave to `cron.model` / main |
+| `no_agent` + `script_path` | `--no-agent --script <path>` |
+| `paused` + `paused_reason` | `--paused --paused-reason "…"` |
+| after create | write back `hermes_job_id` / `hermes_job_name` on the Schedule |
+
+### Apply recipe
+
+```bash
+hermes -p <slug> tools enable cronjob
+hermes -p <slug> gateway start   # agent jobs need the gateway
+
+# Example from a live recurring Schedule:
+hermes -p <slug> cron create "<schedule_expr>" \
+  "$(cat <<'EOF'
+<Schedule body Prompt text>
+EOF
+)" \
+  --name <schedule_key> \
+  --timezone <timezone> \
+  --deliver <deliver> \
+  --skill <skill1> \
+  # optional: --workdir … --model … --provider … --paused …
+
+hermes -p <slug> cron list
+```
+
+Then `API-patch-object` the Schedule: set `hermes_job_name` to `schedule_key`
+(or the name Hermes stored) and `hermes_job_id` from `cron list` when available.
+Keep Agenda Calendar `next_run` in sync when you know the next fire.
+
+### Clone note
+
+`--clone` / `--clone-all` still skip `cron/`. Recreate from the Agenda Schedules
+(or deliberate cron store copy), not from Suggested runtime markdown alone.
 
 ## Doc links
 
@@ -205,3 +267,5 @@ to "that server issue" fail.
 - https://hermes-agent.nousresearch.com/docs/user-guide/messaging/webhooks#event-triggered-cron-jobs
 - Approvals: `security.md` / `runtime-limits-and-tools.md` (`approvals.cron_mode`)
 - cwd for gateway/cron: `workspace.md` (`terminal.cwd`)
+- Anytype Agenda / Schedule: anytype-agents `agenda-and-schedules.md`
+- Anytype dates / Calendar: https://doc.anytype.io/anytype/features/dates

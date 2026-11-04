@@ -336,7 +336,37 @@ Keep Subagent.`parent_agent` and Agent.`subagents` both ways. Decline into Herme
 }
 ```
 
-`kind` is `Board` | `HQ` | `Group` only. Domains under an HQ use **`subteam`**.
+`kind` is `Board` | `HQ` only (`Group` deprecated). Domains under an HQ use
+**`subteam`**. Messaging rooms use typed **`group`** (next recipe).
+
+## Create a Group
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "group",
+    "name": "Engineering Group",
+    "properties": {
+      "lifecycle": ["live"],
+      "parent_team": ["<engineeringHqObjectId>"],
+      "members": ["<agentId>", "…"],
+      "welcome_prompt": ["<welcomePromptId>"],
+      "platform": ["telegram"],
+      "slug": "engineering",
+      "require_mention": true,
+      "exclusive_bot_mentions": true,
+      "hermes_profiles": "etienne,arnold,simone"
+    },
+    "markdown": "## Members\nCanonical roster is the **Members** property.\n\n## Welcome prompt\nCanonical welcome paste lives on the linked **Welcome prompt** property.\n"
+  }
+}
+```
+
+Then patch HQ / Agent `messaging_group: ["<groupId>"]`. Migrate legacy Group
+pages with `set_type` → `group` (`object-types.md`). Hermes apply:
+`hermes-profiles` → `messaging-groups.md` (when asked).
 
 ## Create a Subteam
 
@@ -455,9 +485,9 @@ pages with `set_type` + `linked_projects` (and `kind: implementation` for TODO).
 }
 ```
 
-Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, `"subagent"`,
-`"harness"`, `"harness_profile"`, `"browser"`, `"computer"`, `"tool_profile"`,
-or `"project"` (support docs often stay `"page"`).
+Filter inventory with `"type": "agent"`, `"team"`, `"group"`, `"subteam"`,
+`"subagent"`, `"harness"`, `"harness_profile"`, `"browser"`, `"computer"`,
+`"tool_profile"`, or `"project"` (support docs often stay `"page"`).
 
 ## Archive
 

@@ -1,7 +1,7 @@
 # Prompt type (system / welcome / shared_rules / library / draft)
 
 Canonical copy-into-bot text lives on typed **`prompt`** objects. Agents and
-Group pages keep a short pointer in the body and link the Prompt via a
+typed **Groups** keep a short pointer in the body and link the Prompt via a
 property. Editing Anytype still does not push into live Hermes / bots; copy
 from the Prompt object when applying runtime.
 
@@ -23,7 +23,7 @@ Body shapes: `page-templates.md` / `type-templates.md`.
 | `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `other` (featured) |
 | `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
 | `owner_agent` | objects | Owning Agent when `prompt_kind=system` (featured) |
-| `owner_group` | objects | Owning Group **page** when `prompt_kind=welcome` (featured) |
+| `owner_group` | objects | Owning typed **Group** when `prompt_kind=welcome` (featured) |
 | `audience` | select | `agent` \| `group` \| `org` \| `library` (featured) |
 | `notes` | text | Apply / sync notes |
 
@@ -35,11 +35,13 @@ Also `tag`, `links`, `backlinks`. Put the full prompt text in the **body**
 | On type | Key | Format | Points to |
 |---------|-----|--------|-----------|
 | `agent` | `system_prompt` | objects | One Prompt (`prompt_kind=system`, usually) |
-| `page` (Group) | `welcome_prompt` | objects | One Prompt (`prompt_kind=welcome`) |
+| `group` | `welcome_prompt` | objects | One Prompt (`prompt_kind=welcome`) |
+| `team` | `standing_instructions` | objects | One Prompt (`prompt_kind=library`) for HQ/Board gates |
 
-Shared Rules and Mission/library pages are themselves type `prompt` (no separate
-link property required). Agents still short-point at Shared Rules inside their
-system prompt body.
+Shared Rules and Mission/library pages are themselves type `prompt`. HQ standing
+libraries also use `prompt_kind=library` and are linked from
+Team.`standing_instructions` (`hq-standing-instructions.md`). Agents still
+short-point at Shared Rules and HQ standing inside their system prompt body.
 
 ## Naming
 
@@ -55,7 +57,17 @@ system prompt body.
 1. **Suggested runtime** (narrative; properties + catalogs hold structured facts)
 2. **System prompt** heading + one paragraph pointer to the linked Prompt
    (property **System prompt** / `system_prompt`)
-3. Memory pages / standing notes that are not the copy-into-bot fence
+3. **Agenda** short pointer to Agent.`agenda_page` when linked
+4. Memory pages / standing notes that are not the copy-into-bot fence
+
+System Prompt body must tell the agent to schedule via the Agenda (Shared Rules
+Agenda rule + optional `# Agenda (mandatory)` section). See
+`agenda-and-schedules.md` → **Prompt wording**.
+
+System Prompt body must also tell the agent to open HQ standing instructions
+before gated work (Shared Rules HQ standing rule + `# HQ standing instructions
+(mandatory)`). See `hq-standing-instructions.md` → **Prompt wording**. Do
+**not** paste the full standing library into the system Prompt.
 
 Do **not** keep a second `## Full System Prompt` / `## Full SOUL.md` fenced
 block on the Agent. Hermes SOUL text is still a system Prompt (`prompt_kind=system`).
@@ -72,7 +84,7 @@ Prompt fence here.
 
 ## Group body after migrate
 
-Groups stay type `page`. Replace `## Welcome (copy-paste)` + fence with:
+Groups are type **`group`**. Replace `## Welcome (copy-paste)` + fence with:
 
 ```markdown
 ## Welcome prompt
@@ -80,7 +92,8 @@ Canonical welcome paste lives on the linked **Welcome prompt** property
 ([{Group} – Welcome prompt](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
 ```
 
-Set `welcome_prompt` to that Prompt id.
+Set Group.`welcome_prompt` to that Prompt id. Migrate legacy Group pages with
+`set_type` → `group` (`object-types.md`).
 
 ## Create a system Prompt + link an Agent
 
@@ -112,10 +125,10 @@ Set `welcome_prompt` to that Prompt id.
 Omit `template` to use **Prompt default**, or pass the template id from
 `API-list-templates` (`type: prompt`).
 
-## Create a welcome Prompt + link a Group page
+## Create a welcome Prompt + link a Group
 
-Same pattern with `prompt_kind=welcome`, `owner_group=[<groupPageId>]`,
-`audience=group`, then Group page `welcome_prompt=[<promptId>]`.
+Same pattern with `prompt_kind=welcome`, `owner_group=[<groupObjectId>]`,
+`audience=group`, then Group.`welcome_prompt=[<promptId>]`.
 
 ## Migrate Shared Rules / libraries in place
 
@@ -138,8 +151,10 @@ Prefer `set_type` → `prompt` (keeps id and links), then set properties:
 }
 ```
 
-Use `prompt_kind=library` for Mission & Prompt style libraries; `draft` for
-draft agent designs that stay typed as Prompt until promoted.
+Use `prompt_kind=library` for Mission & Prompt style libraries **and** for HQ /
+Board Standing instructions (link via Team.`standing_instructions`; see
+`hq-standing-instructions.md`). Use `draft` for draft agent designs that stay
+typed as Prompt until promoted.
 
 ## Search
 
@@ -170,7 +185,7 @@ Filter agents that still need a link:
 2. `API-create-template` `template_for: prompt` from `type-templates.md`
 3. `API-update-type` `{ "default_template": "<templateId>" }`
 4. On Agent: `add_property` **System prompt** (`system_prompt`, objects, featured)
-5. On Page: `add_property` **Welcome prompt** (`welcome_prompt`, objects)
+5. On Group: `welcome_prompt` is part of the Group type (featured objects)
 6. Migrate live agents / groups / Shared Rules as above
 
 ## What is out of scope

@@ -20,10 +20,16 @@ HQ; Subteams/Agents inherit; Board/Primary empty. Prompt type **2026-11-04**
 (v1.25.0): system/welcome/shared_rules/library/draft. Memory + Skill types
 **2026-11-04** (v1.26.0): agent notes as `memory`; procedures as `skill`;
 Skills indexes as Queries via `skills_page`. Log type **2026-11-04** (v1.27.0):
-per-action summaries as `log`; Logs Queries via Agent.`logs_page`. Prefer
-properties for mission / members / routing / short description / autonomy /
-map path / browser / computer / tool_profile / `system_prompt` /
-`memory_pages` / `skills_page` / `logs_page`; template bodies keep Suggested
+per-action summaries as `log`; Logs Queries via Agent.`logs_page`. Schedule type
+**2026-11-04** (v1.30.0): jobs as `schedule`; Agenda Queries via
+Agent.`agenda_page` (Calendar on `next_run`). Group type **2026-11-04**
+(v1.30.4): messaging rooms as `group` (welcome Prompt + platform fields);
+Team `kind: Group` deprecated. HQ standing **2026-11-04** (v1.31.0): Team
+`standing_instructions` → Prompt library; slim HQ bodies; short system Prompt
+section. Prefer properties for mission / members / routing / short description /
+autonomy / map path / browser / computer / tool_profile / `system_prompt` /
+`memory_pages` / `skills_page` / `logs_page` / `agenda_page` /
+`messaging_group` / `standing_instructions`; template bodies keep Suggested
 runtime + System prompt pointer (canonical text on linked Prompt).
 
 ---
@@ -47,6 +53,7 @@ Set Autonomy / Short description / Memory pages / Map path as **properties**
 **Terminal / computer selects:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces; Primary `computer_surface: none`; keep aligned with linked Computer / Tool profile).
 **Voice:** Agent.`voice_enabled` / `voice_auto_tts` / `voice_chat_mode` / `messaging_voice_mode`; STT/TTS from Harness profile (Local router: local+edge) or Agent overrides.
 **System prompt:** Agent.`system_prompt` → Prompt object (`prompt_kind=system`).
+**Agenda:** Agent.`agenda_page` → `{OwnerShort} – Agenda` Query of Schedules (`agenda-and-schedules.md`).
 **Personality / Memory / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## System prompt
@@ -54,27 +61,60 @@ Canonical system prompt lives on the linked **System prompt** property
 ([{Name} – System prompt](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
 Copy from that Prompt object into the bot. Do not paste a second Full System
 Prompt fence here.
+
+## Agenda
+Canonical scheduled work lives on the linked **Agenda** Query
+([{OwnerShort} – Agenda](anytype://object?objectId=<queryId>&spaceId=<spaceId>)).
+Create typed **Schedule** objects (`owner_agent` = this agent).
 ````
 
 Full Suggested runtime field list: `suggested-runtime.md`. Prompt create /
-migrate: `prompts.md`. Filled sample: `examples.md`.
+migrate: `prompts.md`. Agenda / Schedule: `agenda-and-schedules.md`. Filled
+sample: `examples.md`.
 
 ---
 
 ## Team default (`template_for`: `team`)
 
-For Board / HQ / Group. Domains under an HQ use **Subteam default** (type
-`subteam`), not a second Team with a Sub-team kind.
+For Board / HQ. Domains under an HQ use **Subteam default** (type `subteam`).
+Messaging rooms use **Group default** (type `group`), not Team `kind: Group`.
 
-Set `kind`, `chief`, `members`, `subteams`, `mission`, `routing_summary` as
-properties. Template body:
+Set `kind`, `chief`, `members`, `subteams`, `mission`, `routing_summary`,
+`standing_instructions` as properties. Template body:
 
 ```markdown
-## Rules
-1. Follow Agents → Agent Template – Shared Rules.
-
 ## Map notes
 (Optional detail beyond `routing_summary` / `subteams` / `members`.)
+Standing instructions (gates, principles, routing) live on the linked
+**Standing instructions** Prompt (Team.`standing_instructions`).
+```
+
+---
+
+## Group default (`template_for`: `group`)
+
+Set `lifecycle`, `parent_team`, `members`, `welcome_prompt`, `platform`,
+optional `platform_chat_id` / `slug` / `mission` / `routing_summary` /
+`hermes_profiles` / `require_mention` / `exclusive_bot_mentions` as properties
+(`object-types.md`). Template body:
+
+```markdown
+## How to use
+Coordination only. Durable state lives in Anytype (Prompts, Memory, Logs,
+Agenda, Projects).
+
+## Members
+Canonical roster is the **Members** property. Keep Agent.`messaging_group`
+pointing here.
+
+## Welcome
+Canonical welcome paste lives on the linked **Welcome prompt** property. Copy
+that Prompt into Telegram/Discord. Do not paste a second welcome fence here.
+
+## Hermes / platform
+Platform, Platform chat id, Require mention, Exclusive bot mentions, and Hermes
+profiles are properties. Apply into each member profile via hermes-profiles
+`messaging-groups.md` when asked (no auto-push).
 ```
 
 ---
@@ -370,13 +410,33 @@ Optional: result, links created, or follow-ups.
 
 ---
 
+## Schedule default (`template_for`: `schedule`)
+
+Set `owner_agent`, `schedule_key`, `schedule_kind`, optional `schedule_expr` /
+`timezone` / `next_run`, `intent`, deliver/skills as properties
+(`agenda-and-schedules.md`). Template body:
+
+```markdown
+## Prompt
+Full self-contained task for a fresh Hermes cron session. Include hostnames,
+paths, acceptance criteria, and delivery expectations.
+
+## Delivery
+Target channel or local output. The prompt should not try to send itself.
+
+## Notes
+Migration provenance, wake message for event kind, or apply notes.
+```
+
+---
+
 ## Recreate a default template (MCP)
 
-1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
-   `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `prompt` | `memory` | `skill` | `log` | `project` |
-   `epic` | `user_story`, name `{Type} default`, and body blocks from the
-   matching section above (`heading_2` + `paragraph`).
+1. `API-create-template` with `template_for` = `agent` | `team` | `group` |
+   `subteam` | `subagent` | `harness` | `harness_profile` | `browser` |
+   `computer` | `tool_profile` | `prompt` | `memory` | `skill` | `log` |
+   `schedule` | `project` | `epic` | `user_story`, name `{Type} default`, and
+   body blocks from the matching section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -384,9 +444,10 @@ Optional: result, links created, or follow-ups.
 
 ## Drift check
 
-1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `browser`, `computer`, `tool_profile`, `prompt`,
-   `memory`, `skill`, `log`, `project`, `epic`, `user_story`.
+1. `API-list-templates` for `agent`, `team`, `group`, `subteam`, `subagent`,
+   `harness`, `harness_profile`, `browser`, `computer`, `tool_profile`,
+   `prompt`, `memory`, `skill`, `log`, `schedule`, `project`, `epic`,
+   `user_story`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of

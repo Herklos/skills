@@ -1,10 +1,11 @@
 # Page templates (generic)
 
 Use these shapes when creating or auditing **bodies**. Inventory objects use
-types `agent`, `team`, `subteam`, `prompt`, `memory`, `skill`, `log`, and
-`project` (see `object-types.md` + `prompts.md` + `memory-and-skills.md`).
-Skills and Logs indexes are Queries. Shared Rules is type `prompt`. Prefer
-duplicating a live peer in the same space over inventing a new layout.
+types `agent`, `team`, `subteam`, `group`, `prompt`, `memory`, `skill`, `log`,
+`schedule`, and `project` (see `object-types.md` + `prompts.md` +
+`memory-and-skills.md` + `agenda-and-schedules.md`). Skills, Logs, and Agenda
+indexes are Queries. Shared Rules is type `prompt`. Prefer duplicating a live
+peer in the same space over inventing a new layout.
 
 Suggested runtime field list: **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
@@ -18,48 +19,56 @@ Title: `{Name} – {Role}`
 `reports_to`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`,
 `browser`, `computer`, `tool_profile`, `voice_enabled`, `autonomy`,
 `short_description`, `hermes_profile`, `board_member`, `linked_projects`,
-`memory_pages`, `skills_page`, `logs_page`, `messaging_group`, `map_path`,
-`delegation_enabled`, `terminal_backend`, `computer_surface`, voice modes /
-optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
-`memory-and-skills.md`.
+`memory_pages`, `skills_page`, `logs_page`, `agenda_page`, `messaging_group`,
+`map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`, voice
+modes / optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
+`memory-and-skills.md` + `agenda-and-schedules.md`.
 
 Body (narrative only):
 
 1. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading;
    point structured facts at properties + harness_profile + browser / computer /
-   tool_profile catalogs)
+   tool_profile catalogs + Agenda)
 2. **System prompt** short pointer to the linked Prompt (`system_prompt`)
-3. Optional notes / memory that do not fit properties
+3. **Agenda** short pointer to the linked Agenda Query (`agenda_page`) when
+   schedules exist or the Query is linked
+4. Optional notes / memory that do not fit properties
 
 Body outline:
 
 - `# {Name} – {Role}` (name/role also live in title + `role` property)
 - `## Suggested runtime (YYYY-MM-DD)` from `suggested-runtime.md`
 - `## System prompt` + one paragraph pointing at `[{Name} – System prompt]`
+- `## Agenda` + one paragraph pointing at `[{OwnerShort} – Agenda]`
 
 Skip `## Short Description`, `**Autonomy:**`, and prose-only map lines when
 `short_description`, `autonomy`, and `map_path` properties are set. Link Memory
-objects via `memory_pages`, the Skills Query via `skills_page`, and the Logs
-Query via `logs_page` after create (`memory-and-skills.md`). Create the Prompt
-object first (`prompts.md`); do not keep a Full System Prompt / SOUL fence on
-the Agent.
+objects via `memory_pages`, the Skills Query via `skills_page`, the Logs Query
+via `logs_page`, and the Agenda Query via `agenda_page` after create
+(`memory-and-skills.md` + `agenda-and-schedules.md`). Create the Prompt object
+first (`prompts.md`); do not keep a Full System Prompt / SOUL fence on the
+Agent. Replace old Automations / Noodle / Hermes schedule prose with the Agenda
+pointer.
 
 ## HQ page
 
-Set as properties: `kind` (`HQ` / `Board` / `Group`), `chief`, `members`,
-`subteams`, `mission`, `routing_summary`, optional `messaging_group` /
-`skills_page`, optional `browser` / `computer` / `tool_profile` team defaults.
+Set as properties: `kind` (`HQ` / `Board`), `chief`, `members`,
+`subteams`, `mission`, `routing_summary`, `standing_instructions` (→ Prompt
+library), optional `messaging_group` (typed Group) / `skills_page`, optional
+`browser` / `computer` / `tool_profile` team defaults.
 
 ```markdown
 # {Name} HQ
 
-## Rules
-1. …
-n. Follow Agents → Shared Rules.
-
 ## Map notes
-(Optional detail beyond `routing_summary` / `subteams` / `members` properties.)
+Subteams / domains via properties. Standing instructions (gates, principles,
+routing) live on the linked **Standing instructions** Prompt
+([{Name} HQ – Standing instructions](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
+Group, Skills, and Transition plan links stay here as needed.
 ```
+
+Do **not** keep a second full Rules / Delivery / Routing dump on the HQ once
+`standing_instructions` is set. Full playbook: `hq-standing-instructions.md`.
 
 Link: chief, group, skills, transition notes, **`subteam`** children via the
 `subteams` property (not `team` + `kind: Sub-team`).
@@ -82,23 +91,32 @@ Set as properties: `parent_team`, `chief`, `lifecycle`, `mission`, `members`,
 Body may omit Mission / Members / Routing headings when those properties are
 filled.
 
-## Group page
+## Group (type `group`)
 
-Groups stay type `page`. Set property `welcome_prompt` to a Prompt
-(`prompt_kind=welcome`). Body:
+Type **`group`**. Set as properties: `lifecycle`, `parent_team`, `members`,
+`welcome_prompt`, `platform`, optional `platform_chat_id` / `slug` / `mission` /
+`routing_summary` / `hermes_profiles` / `require_mention` /
+`exclusive_bot_mentions` / `notes` (`object-types.md`). Body:
 
 ```markdown
 # {Name} Group
+
 ## Members
-…
+Canonical roster is the **Members** property. Keep Agent.`messaging_group`
+pointing here.
 
 ## Welcome prompt
 Canonical welcome paste lives on the linked **Welcome prompt** property
 ([{Name} Group – Welcome prompt](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
+
+## Hermes / platform
+Platform, Platform chat id, Require mention, Exclusive bot mentions, and Hermes
+profiles are properties. Apply via hermes-profiles `messaging-groups.md` when
+asked (no auto-push).
 ```
 
-Document membership here; applying it to a messaging platform is a separate
-runtime step. Full Prompt create/migrate: `prompts.md`.
+Skip duplicating member lists in markdown when `members` is filled. Full Prompt
+create/migrate: `prompts.md`.
 
 ## Skill (type `skill`)
 
@@ -131,6 +149,20 @@ Name the object after the short summary. Body:
 
 Owner Logs **Query** (`logs_page`) lists the entry automatically. One Log per
 discrete action.
+
+## Schedule (type `schedule`)
+
+Set as properties: `owner_agent`, `schedule_key`, `schedule_kind`, optional
+`schedule_expr` / `timezone` / `next_run`, `intent`, deliver/skills/workdir /
+model_pin / paused fields (`agenda-and-schedules.md`). Name:
+`{schedule_key} – {OwnerShort}`. Body:
+
+1. Prompt (full self-contained Hermes cron prompt)
+2. Delivery
+3. Notes
+
+Owner Agenda **Query** (`agenda_page`) lists the row automatically. Calendar
+view on `next_run` optional.
 
 ## Project page
 
@@ -195,7 +227,19 @@ Follow **Agents → {Shared Rules title}** in full.
 - Limits: max_turns {…}; tool_output {…}; compression {…}
 - Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
 - Workspace/display: project {…}; skin {…}; tool_progress {…}
-- Scheduled tasks: {none | names + cadence summary}
+- Scheduled tasks: Agenda Query `{OwnerShort} – Agenda` | {none | schedule_key list}
+
+# Agenda (mandatory)
+When you schedule recurring work, a one-shot timer, or an event wake, create an
+Anytype **schedule** on your Agenda Query (`agenda_page`): owner_agent=you,
+schedule_key, schedule_kind (recurring|oneshot|event), schedule_expr+timezone
+when timed, intent/deliver/skills, body Prompt self-contained. Prefer the Agenda
+over chat-only or markdown-only schedule lists (Shared Rules Agenda rule).
+
+# HQ standing instructions (mandatory)
+Before delivery, routing, merge, design, legal, finance, or cross-HQ work, open
+your HQ Team → **Standing instructions** (Prompt library). Follow those
+gates/rules/routing. Do not invent HQ policy. Shared Rules still apply org-wide.
 
 # Memory
 Maintain linked Memory Pages. Prefer workspace docs over chat-only memory.

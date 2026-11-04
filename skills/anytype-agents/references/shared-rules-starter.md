@@ -55,6 +55,12 @@ Money, publish, production merge, mass delete: require an explicit human yes log
 
 12) Token economy
 Prefer pointers to long docs over pasting them into every prompt.
+
+13) Agenda (mandatory; type `schedule`)
+When you need to schedule recurring work, a one-shot timer, or an event wake: create an Anytype **schedule** on your Agenda (Agent → Agenda Query via `agenda_page`), with owner_agent, schedule_key, schedule_kind (recurring|oneshot|event), schedule_expr+timezone when timed, intent/deliver/skills, and a self-contained body Prompt. Prefer the Agenda over chat-only or markdown-only schedule lists. Recurring rows become Hermes cron when applied; until then the Agenda is the source of truth.
+
+14) HQ standing instructions (mandatory)
+Before delivery, routing, merge, design, legal, finance, or cross-HQ work: open your HQ Team → Standing instructions (Prompt library via Team.standing_instructions). Follow those gates/rules/routing. Do not invent HQ policy. Shared Rules still apply org-wide. Do not paste the full standing library into every system Prompt.
 ```
 
 ## Rollout checklist (Primary)

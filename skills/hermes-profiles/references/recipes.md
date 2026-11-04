@@ -76,6 +76,19 @@ hermes -p forge gateway install   # persistent service when desired
 
 Never reuse the same bot token across two profiles.
 
+## 8b. Multi-bot messaging group
+
+Full guide: `messaging-groups.md`. Summary:
+
+1. One distinct bot token per member profile `.env`
+2. Create a Telegram **supergroup** (or Discord channel); add every bot
+3. Allowlist the chat id on each profile (`telegram.group_allowed_chats`)
+4. Set `require_mention` + `exclusive_bot_mentions` (and bot loop guard)
+5. Start one gateway per profile
+6. Paste welcome from the Anytype Group's `welcome_prompt`
+
+Do not apply from Anytype until the user asks.
+
 ## 9. Rename and re-hook gateway
 
 ```bash
@@ -122,6 +135,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Skins / display chrome / fonts | `display.md` |
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
+| Multi-bot Telegram / Discord groups | `messaging-groups.md` |
 
 ## Decision guide: what to edit where
 
@@ -139,6 +153,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Skins, display chrome, fonts | `display.md` |
 | Voice mode, STT, TTS, messaging `/voice` | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
+| Multi-bot room allowlists / mention gates | `messaging-groups.md` |
 | Main / aux / fallback / MoA | `models.md` |
 | Task-specific subagent routes | `delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |

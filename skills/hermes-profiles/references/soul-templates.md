@@ -94,8 +94,23 @@ When assigning work, write:
 | Standing style rules | Secrets, tokens, or private URLs |
 | Pointers to skills/docs | Duplicating MEMORY.md facts |
 | Short "how to escalate" | Conflicting instructions vs Shared Rules elsewhere |
+| Short HQ standing pointer | Pasting the full HQ Standing instructions library |
 
 Good SOUL content: tone, directness, what to avoid stylistically, how to handle uncertainty. Skip one-off project paths and temporary workflow (those belong in `AGENTS.md`).
+
+### Anytype Shared Rules + HQ standing (when applying SOUL)
+
+When the org lives in Anytype (`anytype-agents`), the system Prompt / SOUL should
+keep **short pointers**, not full pastes:
+
+1. Shared Rules (org-wide) — one line pointer
+2. `# Agenda (mandatory)` — schedule via Agenda Query (`agenda-and-schedules.md`)
+3. `# HQ standing instructions (mandatory)` — open HQ Team → Standing instructions
+   Prompt library before gated work (`hq-standing-instructions.md`)
+
+Do **not** paste the HQ standing library body into `SOUL.md`. Agents open it in
+Anytype when needed. Editing Anytype does not push into Hermes; copy from the
+linked Agent system Prompt when the user asks to apply.
 
 ## Personality overlays (`/personality`)
 

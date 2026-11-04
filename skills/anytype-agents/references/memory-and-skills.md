@@ -183,6 +183,39 @@ Ensure a Logs Query exists for that agent (created once with the agent):
 Patch Agent: `logs_page=[<queryId>]`. New Log objects appear automatically via
 the filter.
 
+### Logs Calendar (date index)
+
+Add a **Calendar** view on `logged_at` so the agent memory/Logs section can
+filter activity by date (Anytype Date Objects). Keep the table **All** view
+sorted by `logged_at` desc for undated / backlog rows.
+
+```json
+{
+  "op": "insert_view",
+  "name": "Calendar",
+  "position": "first",
+  "set": {
+    "type": "calendar",
+    "end_property": "logged_at",
+    "sorts": [
+      {
+        "property": "logged_at",
+        "direction": "desc",
+        "empty_placement": "end"
+      }
+    ]
+  },
+  "columns": {
+    "logged_at": { "width": 200 },
+    "name": { "width": 280 },
+    "summary": { "width": 320 }
+  }
+}
+```
+
+Org fill: every live agent Logs Query has Calendar + All. Set `logged_at` when
+creating Logs so they plot on the calendar.
+
 Keep entries short. Prefer one Log per discrete action, not a running diary
 inside Memory.
 
