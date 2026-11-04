@@ -4,11 +4,12 @@ Document the intended runtime stack on each agent. Values guide whoever
 configures the bot; they do **not** auto-apply.
 
 **Prefer properties for structured facts:** Agent.`harness_profile`,
-`hermes_profile`, `delegation_enabled`, `terminal_backend`, `computer_surface`,
-`subagents`, plus Harness profile `decision_*` / primary / backups. Keep this
-body section for narrative apply notes and fields that do not yet have a
-property. Do not treat markdown bullets as the only source of truth for those
-keys.
+`hermes_profile`, `delegation_enabled`, `browser`, `computer`, `tool_profile`,
+`terminal_backend`, `computer_surface`, `subagents`, plus Harness profile
+`decision_*` / primary / backups. Keep this body section for narrative apply
+notes and fields that do not yet have a property. Do not treat markdown bullets
+as the only source of truth for Browser / Computer / Tools / Terminal when the
+matching catalog links are set.
 
 For Hermes, map fields with skill `hermes-profiles`:
 
@@ -71,23 +72,26 @@ Paste under the agent title (date the heading when you revise it).
 - Notifications: off | on | verbose
 - External provider: none | retaindb | byterover | honcho | hindsight | … (one)
 - Notes: {shared across profiles via provider? / reset policy}
-**Browser access:**
+**Browser access:** (prefer Agent.`browser` → type `browser` catalog)
+- Catalog: {None | Cua Spaces Chromium | Local Chromium throwaway | Operator real profile | …}
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)
 - Source: local Chromium | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
 - Identity: dedicated throwaway | dedicated persistent | team/shared persistent | operator real profile
 - Headed: no | yes · Notes: {vault logins? cron needs cookies?}
-**Computer access:**
+**Computer access:** (prefer Agent.`computer` → type `computer` catalog)
+- Catalog: {None | **Cua Spaces dedicated (default)** | Host desktop shared | Linux Bot Screen | …}
 - Needed: no | yes (native desktop / OS UI; not for ordinary web)
 - Surface: **Cua Spaces (default)** | host desktop | Linux Bot Screen | sandbox desktop | host beside sandbox
 - Docs: https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces
 - Scope: dedicated (this profile / Space) | team/shared host (same OS user; not isolated)
 - Permission mode: standard | bounded (manifest) · Notes: {desktop stack on Linux Space? TCC / takeover for 2FA?}
-**Tools access:**
+**Tools access:** (prefer Agent.`tool_profile` → type `tool_profile` catalog)
+- Catalog: {**Standard interactive (default)** | Coding | Data fetching | Read-only light | …}
 - Enabled toolsets: {web, terminal, file, browser, memory, delegation, cronjob, …}
 - Disabled / denied: {list or none}
 - Approvals: smart | manual | off · cron/unattended: deny | approve
 - Hard deny patterns: {none | globs}
-**Terminal / execution:**
+**Terminal / execution:** (from Tool profile + Agent.`terminal_backend` / Computer)
 - Backend: **cua (preferred)** | local | docker | ssh | modal | daytona | vercel_sandbox | singularity
 - cwd: {absolute path for host/local; leave unset with cua (Space home)}
 - Timeout (s): {180} · Container CPU/RAM/disk/network: {…} if sandboxed

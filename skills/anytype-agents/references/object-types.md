@@ -1,4 +1,4 @@
-# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Project)
+# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
@@ -17,12 +17,16 @@ Skills, Shared Rules, Groups, memory children, and other hub pages stay type
 | `subagent` | Subagents | Spawn configs an Agent may start (task, harness profile, scope, tools). Not the same as `subteam` |
 | `harness` | Harnesses | Product catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
 | `harness_profile` | Harness profiles | Reusable model stacks (primary + backups). Agents and Subagents link here |
+| `browser` | Browsers | Reusable browser access catalog (source + identity). Agents / Teams / Subteams link here |
+| `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
+| `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 
 Hub roots named **Agents** / **Projects** may remain `page`; their inventory
-children use the keys above. Keep Harness + Harness profile objects under
-Agents → Shared (or a Harnesses index). Keep Subagent objects linked from their
-parent Agent (`parent_agent` + Agent.`subagents`).
+children use the keys above. Keep Harness + Harness profile + Browser + Computer
++ Tool profile objects under Agents → Shared (or a Runtime / Harnesses index).
+Keep Subagent objects linked from their parent Agent (`parent_agent` +
+Agent.`subagents`).
 
 **Name collision:** `subteam` = org domain under an HQ. `subagent` = runtime
 worker/route the parent Agent can `delegate_task` (or equivalent). Do not mix them.
@@ -33,7 +37,7 @@ Skills resolution order when a space uses Subteams:
 ## Agent (`api_key`: `agent`)
 
 **Properties hold structured facts.** Do not duplicate Short Description,
-Autonomy, Board seat, map path, Hermes slug, terminal/computer defaults, or
+Autonomy, Board seat, map path, Hermes slug, browser / computer / tools, or
 linked projects only in markdown. Body keeps **Suggested runtime** narrative
 and **Full System Prompt**.
 
@@ -47,6 +51,9 @@ Featured properties (API keys):
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
 | `harness_profile` | objects | Link to one **Harness profile** (source of primary + backup models). **Default for most agents: Local router** |
 | `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
+| `browser` | objects | Link to one **Browser** catalog object |
+| `computer` | objects | Link to one **Computer** catalog object |
+| `tool_profile` | objects | Link to one **Tool profile** catalog object |
 | `board_member` | checkbox | Board seat |
 | `linked_projects` | objects | Projects this agent works |
 
@@ -62,10 +69,15 @@ Other properties:
 | `messaging_group` | objects | Group page / chat roster |
 | `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
 | `delegation_enabled` | checkbox | Parent may spawn Subagents |
-| `terminal_backend` | select | `cua` \| `local` \| `docker` \| `ssh` \| `other` (org default: `cua`) |
-| `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (org default: `cua-spaces`) |
+| `terminal_backend` | select | `cua` \| `local` \| `docker` \| `ssh` \| `other` (org default: `cua`; keep aligned with linked Tool profile) |
+| `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (org default: `cua-spaces`; keep aligned with linked Computer) |
 
 Also includes shared `tag`, `links`, `backlinks`.
+
+Prefer catalog links (`browser`, `computer`, `tool_profile`) as the structured
+source for Suggested runtime Browser / Computer / Tools / Terminal detail. Keep
+`terminal_backend` / `computer_surface` selects consistent with those links for
+quick filters.
 
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 
@@ -100,9 +112,13 @@ Board / HQ / Group only. Domains under an HQ use type **`subteam`**.
 | `messaging_group` | objects | Group page |
 | `skills_page` | objects | HQ Skills index |
 | `routing_summary` | text | One-line routing |
+| `browser` | objects | Optional team-default **Browser** catalog link |
+| `computer` | objects | Optional team-default **Computer** catalog link |
+| `tool_profile` | objects | Optional team-default **Tool profile** catalog link |
 
 Also `tag`, `links`, `backlinks`. Put long routing prose in the body; keep the
-filterable one-liner in `routing_summary`.
+filterable one-liner in `routing_summary`. Agent-level runtime links override
+team defaults when both are set.
 
 **Default template name:** `Team default`. Full dumped body: `type-templates.md`.
 Mirror shapes in `page-templates.md` (HQ page). Link child **`subteam`** objects
@@ -127,8 +143,12 @@ sub-teams on the `team` type.
 | `routing_summary` | text | One-line routing |
 | `messaging_group` | objects | Group page when present |
 | `skills_page` | objects | Domain Skills index when present |
+| `browser` | objects | Optional domain-default **Browser** catalog link |
+| `computer` | objects | Optional domain-default **Computer** catalog link |
+| `tool_profile` | objects | Optional domain-default **Tool profile** catalog link |
 
 Also `tag`, `links`, `backlinks`. No `kind` property: the type itself is the kind.
+Agent-level runtime links override subteam defaults when both are set.
 
 **Default template name:** `Subteam default`. Body: `type-templates.md`. Also
 `page-templates.md` (Subteam page).
@@ -240,6 +260,114 @@ Apply: when an agent's Suggested runtime or live bot models change, update the
 **Harness profile** object, then re-apply to each linked agent's runtime (Anytype
 does not auto-push into Claude/Codex/Grok/…).
 
+## Browser (`api_key`: `browser`)
+
+Reusable browser-access catalog. Agents / Teams / Subteams link one via
+`browser`. Prefer catalog + links over per-agent instances.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `slug` | text | Stable id (e.g. `none`, `cua-spaces-chromium`, `local-chromium-throwaway`) (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `access_needed` | checkbox | Whether interactive browser is needed (featured). Display name **Access needed** |
+| `browser_source` | select | `none` \| `local-chromium` \| `lightpanda` \| `cloud-browserbase` \| `cloud-browser-use` \| `cloud-firecrawl` \| `cloud-nous` \| `cdp-attach` \| `operator-real-profile` (featured). Display name **Browser source** (avoid bare `Source`; that clashes with a url property elsewhere) |
+| `browser_identity` | select | `none` \| `dedicated-throwaway` \| `dedicated-persistent` \| `team-shared-persistent` \| `operator-real-profile`. Display name **Browser identity** |
+| `headed` | checkbox | Headed Chromium when true |
+| `cloud_provider` | text | Optional cloud provider label when source is cloud-* |
+| `docs_url` | url | Optional docs |
+| `notes` | text | Short apply notes |
+
+Also `tag`, `links`, `backlinks`. Long apply notes stay in the body.
+
+**Canonical catalog (create these once):**
+
+| Name | slug | Typical use |
+|------|------|-------------|
+| None | `none` | Default when web_search / web_extract suffice |
+| Cua Spaces Chromium | `cua-spaces-chromium` | Interactive pages inside Cua Space (pair with Cua computer) |
+| Local Chromium throwaway | `local-chromium-throwaway` | Host-local Chromium, fresh profile |
+| Operator real profile | `operator-real-profile` | Consent-gated real Chrome/Edge/Brave logins |
+
+**Default template name:** `Browser default`. Body: `type-templates.md`.
+
+Hermes apply: skill `hermes-profiles` → `browser-and-computer.md`.
+
+## Computer (`api_key`: `computer`)
+
+Reusable computer / desktop catalog. Agents / Teams / Subteams link one via
+`computer`.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `slug` | text | Stable id (e.g. `cua-spaces-dedicated`, `none`) (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `access_needed` | checkbox | Whether desktop / computer_use is needed (featured; shared key with Browser) |
+| `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (featured; shared with Agent select) |
+| `computer_scope` | select | `dedicated` \| `team-shared` \| `none`. Display name **Computer scope** |
+| `permission_mode` | select | `standard` \| `bounded`. Display name **Permission mode** |
+| `desktop_enabled` | checkbox | Cua Spaces desktop stack on when true. Display name **Desktop enabled** |
+| `docs_url` | url | Optional docs |
+| `notes` | text | Short apply notes |
+
+Also `tag`, `links`, `backlinks`.
+
+**Canonical catalog (create these once):**
+
+| Name | slug | Typical use |
+|------|------|-------------|
+| None | `none` | No desktop / computer_use |
+| Cua Spaces dedicated | `cua-spaces-dedicated` | **Org default** (`terminal.backend: cua`, desktop true) |
+| Host desktop shared | `host-desktop-shared` | Exception: drive operator host UI |
+| Linux Bot Screen | `bot-screen` | Linux gateway Bot Screen exception |
+
+**Default template name:** `Computer default`. Body: `type-templates.md`.
+
+Hermes apply: `browser-and-computer.md` + Cua Spaces plugin docs.
+
+## Tool profile (`api_key`: `tool_profile`)
+
+Reusable toolsets + approvals + terminal defaults. Agents / Teams / Subteams
+link one via `tool_profile`. Use key `tool_profile` (not bare `tool`) to mirror
+`harness_profile` and avoid clashes.
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `slug` | text | Stable id (e.g. `standard-interactive`, `coding`) (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `intent` | text | When to use (featured) |
+| `enabled_toolsets` | text | Comma list (e.g. `web,terminal,file,memory,delegation`) |
+| `disabled_toolsets` | text | Comma list or empty |
+| `tool_approvals` | select | `smart` \| `manual` \| `off`. Display name **Tool approvals** (avoid bare `Approvals`) |
+| `cron_approvals` | select | `deny` \| `approve`. Display name **Cron approvals** |
+| `hard_deny` | text | Globs / patterns or `none` |
+| `terminal_backend` | select | Shared with Agent (`cua` \| `local` \| …); org default `cua` |
+| `terminal_cwd` | text | Absolute host cwd when needed; leave empty with cua |
+| `timeout_seconds` | number | Terminal timeout (e.g. `180`) |
+| `notes` | text | Short apply notes |
+
+Also `tag`, `links`, `backlinks`.
+
+**Canonical catalog (create these once):**
+
+| Name | slug | Typical use |
+|------|------|-------------|
+| Standard interactive | `standard-interactive` | **Org default** tool access |
+| Coding | `coding` | Engineering chiefs / specialists (+ browser, code_execution, computer_use) |
+| Data fetching | `data-fetching` | Lookups / scrape / light summary |
+| Read-only light | `read-only-light` | Propose / read-only autonomy |
+
+**Default template name:** `Tool profile default`. Body: `type-templates.md`.
+
+Hermes apply: `runtime-limits-and-tools.md`. Pair with linked Browser / Computer
+when those toolsets are enabled.
+
+**Fill conventions (org):**
+- Computer → **Cua Spaces dedicated** for live agents / HQs / subteams
+- Tool profile → **Standard interactive**; Engineering → **Coding**; fetch /
+  veille roles → **Data fetching**
+- Browser → **None** unless interactive pages are needed; then **Cua Spaces
+  Chromium** (with Cua computer)
+
 ## Project (`api_key`: `project`)
 
 Built-in Project type extended with org fields. Short overview and hub links
@@ -289,6 +417,9 @@ template id from `API-list-templates` when you need a specific one; pass
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…",
       "delegation_enabled": true,
+      "browser": ["<browserNoneOrCuaChromiumId>"],
+      "computer": ["<cuaSpacesDedicatedComputerId>"],
+      "tool_profile": ["<codingOrStandardToolProfileId>"],
       "terminal_backend": "cua",
       "computer_surface": "cua-spaces",
       "map_path": "Agents → Engineering HQ → Development → Lee"
@@ -304,8 +435,9 @@ Omit body sections that only repeat properties (`## Short Description`,
 Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
 `task_key`, `harness_profile`, then add its id to the parent's `subagents`.
 
-Team / Subteam / Subagent / Harness / Harness profile / project the same way with
-the matching `"type"` and property keys above.
+Team / Subteam / Subagent / Harness / Harness profile / Browser / Computer /
+Tool profile / project the same way with the matching `"type"` and property
+keys above.
 
 ## Search by type
 
@@ -314,12 +446,13 @@ the matching `"type"` and property keys above.
   "space_id": "<spaceId>",
   "type": "agent",
   "limit": 50,
-  "fields": ["name", "role", "lifecycle", "harness_profile", "subagents"]
+  "fields": ["name", "role", "lifecycle", "harness_profile", "subagents", "browser", "computer", "tool_profile"]
 }
 ```
 
 Use `"type": "team"`, `"type": "subteam"`, `"type": "subagent"`, `"type": "harness"`,
-`"type": "harness_profile"`, or `"type": "project"` the same way.
+`"type": "harness_profile"`, `"type": "browser"`, `"type": "computer"`,
+`"type": "tool_profile"`, or `"type": "project"` the same way.
 
 ## Migrate an existing page (`set_type`)
 
@@ -377,27 +510,34 @@ object; re-set only what is missing after the type change.
 
 ## Bootstrap types in a new space
 
-1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`, and
-   `harness_profile` with the property definitions above
-   (`create_missing_options: true` for selects). On `team`, define `kind` options
-   `Board` / `HQ` / `Group` only (no `Sub-team`). Prefer sequential creates when
-   several types share new property names (`members`, `skills_page`, …) so keys
-   stay clean aliases rather than colliding opaque ids.
-2. On existing Agent types: `add_property` for org/runtime fields above
-   (`board_member`, `linked_projects`, `memory_pages`, `messaging_group`,
-   `map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`);
-   keep `harness_profile` / `subagents`; `remove_property` legacy `harness`
-   select when ready.
+1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`,
+   `harness_profile`, `browser`, `computer`, and `tool_profile` with the
+   property definitions above (`create_missing_options: true` for selects). On
+   `team`, define `kind` options `Board` / `HQ` / `Group` only (no `Sub-team`).
+   Prefer **sequential** creates when several types share new property names
+   (`members`, `skills_page`, `access_needed`, `computer_surface`, …) so keys
+   stay clean aliases rather than colliding opaque ids. Name new selects
+   carefully (`Browser source`, `Tool approvals`) when a shorter name already
+   exists with a different format.
+2. On existing Agent / Team / Subteam types: `add_property` for org/runtime
+   fields above including featured `browser`, `computer`, `tool_profile`
+   objects links; also `board_member`, `linked_projects`, `memory_pages`,
+   `messaging_group`, `map_path`, `delegation_enabled`, `terminal_backend`,
+   `computer_surface`; keep `harness_profile` / `subagents`; `remove_property`
+   legacy `harness` select when ready.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
-   `skills_page`, `routing_summary`. On Project: `execution_policy`,
-   `lead_agent`, `related_projects`, `overview`, and child hub page links.
+   `skills_page`, `routing_summary` (+ runtime catalog links). On Project:
+   `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
+   hub page links.
 4. `API-create-template` with `template_for`: `agent` | `team` | `subteam` |
-   `subagent` | `harness` | `harness_profile` | `project` and body markdown from
-   **`type-templates.md`**.
+   `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
+   `tool_profile` | `project` and body markdown from **`type-templates.md`**.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (**Local
-   router**, Coding, Data fetching, …); create Subagent spawn configs; link most
-   agents to Local router + `subagents` (and Subagent.`parent_agent`).
+   router**, Coding, Data fetching, …); create Browser / Computer / Tool
+   profile catalogs (tables above); create Subagent spawn configs; link most
+   agents to Local router + runtime catalogs + `subagents` (and
+   Subagent.`parent_agent`).
 7. Migrate existing inventory with `set_type` as above (including legacy Sub-team
    `team` objects → `subteam`). Fill properties from the org map; leave unknown
    urls / people empty.

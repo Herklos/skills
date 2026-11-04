@@ -56,6 +56,9 @@ Outline only:
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…",
       "delegation_enabled": true,
+      "browser": ["<browserCatalogObjectId>"],
+      "computer": ["<computerCatalogObjectId>"],
+      "tool_profile": ["<toolProfileCatalogObjectId>"],
       "terminal_backend": "cua",
       "computer_surface": "cua-spaces",
       "map_path": "Agents → Engineering HQ → Development → Lee"
@@ -132,6 +135,94 @@ Decline via hermes-profiles `models.md` (Local decision model). Leave `decision_
 empty on Coding / Data fetching (Subagent stacks).
 
 Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
+
+## Create a Browser catalog entry
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "browser",
+    "name": "Cua Spaces Chromium",
+    "properties": {
+      "slug": "cua-spaces-chromium",
+      "lifecycle": "live",
+      "access_needed": true,
+      "browser_source": "local-chromium",
+      "browser_identity": "dedicated-throwaway",
+      "headed": false,
+      "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
+      "notes": "Chromium inside Cua Space with desktop stack."
+    },
+    "markdown": "## When to use\nInteractive pages while computer is Cua Spaces.\n"
+  }
+}
+```
+
+## Create a Computer catalog entry
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "computer",
+    "name": "Cua Spaces dedicated",
+    "properties": {
+      "slug": "cua-spaces-dedicated",
+      "lifecycle": "live",
+      "access_needed": true,
+      "computer_surface": "cua-spaces",
+      "computer_scope": "dedicated",
+      "permission_mode": "standard",
+      "desktop_enabled": true,
+      "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
+      "notes": "Org default. terminal.backend cua; desktop true."
+    },
+    "markdown": "## When to use\nDefault computer for live agents.\n"
+  }
+}
+```
+
+## Create a Tool profile catalog entry
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "tool_profile",
+    "name": "Standard interactive",
+    "properties": {
+      "slug": "standard-interactive",
+      "lifecycle": "live",
+      "intent": "Default interactive agent: web, terminal, file, memory, delegation",
+      "enabled_toolsets": "web,terminal,file,memory,delegation",
+      "disabled_toolsets": "",
+      "tool_approvals": "smart",
+      "cron_approvals": "deny",
+      "hard_deny": "none",
+      "terminal_backend": "cua",
+      "timeout_seconds": 180
+    },
+    "markdown": "## When to use\nOrg default tool access.\n"
+  }
+}
+```
+
+Link catalogs on Agent / Team / Subteam:
+
+```json
+{
+  "op": "set_properties",
+  "set": {
+    "browser": ["<browserObjectId>"],
+    "computer": ["<computerObjectId>"],
+    "tool_profile": ["<toolProfileObjectId>"]
+  }
+}
+```
 
 ## Create a Subagent (spawn route)
 
@@ -276,7 +367,8 @@ parent HQ `subteams` property. Prefer this over `team` + `kind: Sub-team`.
 ```
 
 Filter inventory with `"type": "agent"`, `"team"`, `"subteam"`, `"subagent"`,
-`"harness"`, `"harness_profile"`, or `"project"` (support docs often stay `"page"`).
+`"harness"`, `"harness_profile"`, `"browser"`, `"computer"`, `"tool_profile"`,
+or `"project"` (support docs often stay `"page"`).
 
 ## Archive
 

@@ -14,15 +14,17 @@ Type default template dumps (Agent / Team / Subteam / Project): **`type-template
 Title: `{Name} – {Role}`
 
 **Set as properties** (do not rely on markdown alone): `role`, `team`,
-`reports_to`, `lifecycle`, `harness_profile`, `subagents`, `autonomy`,
-`short_description`, `hermes_profile`, `board_member`, `linked_projects`,
-`memory_pages`, `messaging_group`, `map_path`, `delegation_enabled`,
-`terminal_backend`, `computer_surface`. See `object-types.md`.
+`reports_to`, `lifecycle`, `harness_profile`, `subagents`, `browser`,
+`computer`, `tool_profile`, `autonomy`, `short_description`, `hermes_profile`,
+`board_member`, `linked_projects`, `memory_pages`, `messaging_group`,
+`map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`. See
+`object-types.md`.
 
 Body (narrative only):
 
 1. **Suggested runtime** (paste from `suggested-runtime.md`, date the heading;
-   point structured facts at properties + harness_profile)
+   point structured facts at properties + harness_profile + browser / computer /
+   tool_profile catalogs)
 2. **Full System Prompt** fenced block (copy into the bot)
 3. Optional notes that do not fit properties
 
@@ -40,7 +42,7 @@ children via `memory_pages` after create.
 
 Set as properties: `kind` (`HQ` / `Board` / `Group`), `chief`, `members`,
 `subteams`, `mission`, `routing_summary`, optional `messaging_group` /
-`skills_page`.
+`skills_page`, optional `browser` / `computer` / `tool_profile` team defaults.
 
 ```markdown
 # {Name} HQ
@@ -61,7 +63,8 @@ Link: chief, group, skills, transition notes, **`subteam`** children via the
 Type **`subteam`**. Title: `{Domain} – {HQ short name}` or `{Name} Subteam`.
 
 Set as properties: `parent_team`, `chief`, `lifecycle`, `mission`, `members`,
-`routing_summary`, optional `messaging_group` / `skills_page`.
+`routing_summary`, optional `messaging_group` / `skills_page`, optional
+`browser` / `computer` / `tool_profile` domain defaults.
 
 ```markdown
 # {Name} Subteam
@@ -155,9 +158,9 @@ Follow **Agents → {Shared Rules title}** in full.
 - Models: from profile (primary + backups); optional local overrides; aux {…}; Subagents (type `subagent` → model_map {task_key…}) | default worker {…}; MoA {off|preset}
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
-- Browser: {none|source + identity}
-- Computer: {none | Cua Spaces (default) | host desktop | Bot Screen} · dedicated|shared
-- Tools: {toolsets}; approvals {smart|manual|off}; terminal {cua (preferred)|local|…}/{cwd}
+- Browser: {linked Browser catalog name | none|source + identity}
+- Computer: {linked Computer catalog | none | Cua Spaces (default) | host desktop | Bot Screen} · dedicated|shared
+- Tools: {linked Tool profile | toolsets}; approvals {smart|manual|off}; terminal {cua (preferred)|local|…}/{cwd}
 - Limits: max_turns {…}; tool_output {…}; compression {…}
 - Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
 - Workspace/display: project {…}; skin {…}; tool_progress {…}

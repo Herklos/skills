@@ -12,10 +12,11 @@ current default.
 Companion shapes (HQ / Group / Skill / prompt skeleton): `page-templates.md`.
 Property keys: `object-types.md`.
 
-Dumped / authored **2026-11-04**; property-complete pass **2026-11-04** (v1.18.0):
-Agent / Team / Project / Subteam live; Subteam default template live. Prefer
-properties for mission / members / routing / short description / autonomy /
-map path; template bodies keep Suggested runtime + Full System Prompt and
+Dumped / authored **2026-11-04**; property-complete pass **2026-11-04** (v1.18.0);
+runtime catalogs **2026-11-04** (v1.19.0): Browser / Computer / Tool profile
+types + Agent/Team/Subteam link props. Prefer properties for mission / members /
+routing / short description / autonomy / map path / browser / computer /
+tool_profile; template bodies keep Suggested runtime + Full System Prompt and
 optional long notes.
 
 ---
@@ -34,8 +35,9 @@ Set Autonomy / Short description / Memory pages / Map path as **properties**
 - 2: {Harness} · {model} · {effort}
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
 **Subagents / delegation:** Agent.`delegation_enabled` + Agent.`subagents`. Parent Local router answers light/peer asks itself; model_map routes when specialized work is needed.
-**Terminal / computer:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces).
-**Personality / Memory / Browser / Tools / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
+**Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults None / Cua Spaces dedicated / Standard interactive).
+**Terminal / computer selects:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces; keep aligned with linked Computer / Tool profile).
+**Personality / Memory / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## Full System Prompt (copy into the bot)
 ```
@@ -47,7 +49,8 @@ Follow **Agents → Agent Template – Shared Rules** in full.
 
 # Tools and systems
 - Harness profile: {name} (primary + backups from that object)
-- Models / personality / memory / browser / computer / tools / security / workspace: see Suggested runtime + Agent properties
+- Browser / Computer / Tool profile: {linked catalog names}
+- Models / personality / memory / security / workspace: see Suggested runtime + Agent properties
 
 # Escalation
 {chief → Primary → Human}
@@ -163,6 +166,47 @@ object to Agent.`subagents`.
 
 ---
 
+## Browser default (`template_for`: `browser`)
+
+```markdown
+## When to use
+(Set properties: slug, access_needed, browser_source, browser_identity, headed.
+Body for apply notes.)
+
+## Apply
+Map to hermes-profiles browser-and-computer.md. Anytype does not push configs.
+```
+
+---
+
+## Computer default (`template_for`: `computer`)
+
+```markdown
+## When to use
+(Set properties: slug, access_needed, computer_surface, computer_scope,
+permission_mode, desktop_enabled. Body for apply notes.)
+
+## Apply
+Map to hermes-profiles browser-and-computer.md (Cua Spaces default). Anytype
+does not push configs.
+```
+
+---
+
+## Tool profile default (`template_for`: `tool_profile`)
+
+```markdown
+## When to use
+(Set properties: slug, intent, enabled/disabled toolsets, tool_approvals,
+cron_approvals, terminal_backend, timeout_seconds.)
+
+## Apply
+Map to hermes-profiles runtime-limits-and-tools.md. Pair with linked Browser /
+Computer when those toolsets are enabled. Anytype does not push configs.
+```
+
+---
+
 ## Project default (`template_for`: `project`)
 
 Set `one_liner`, `overview`, `execution_policy`, `lead_agent`,
@@ -190,8 +234,9 @@ TODO), Product, Design, Marketing (also link via `technical_page` / …).
 ## Recreate a default template (MCP)
 
 1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
-   `subagent` | `harness` | `harness_profile` | `project`, name `{Type} default`,
-   and body blocks from the matching section above (`heading_2` + `paragraph`).
+   `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
+   `tool_profile` | `project`, name `{Type} default`, and body blocks from the
+   matching section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -200,7 +245,7 @@ TODO), Product, Design, Marketing (also link via `technical_page` / …).
 ## Drift check
 
 1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `project`.
+   `harness_profile`, `browser`, `computer`, `tool_profile`, `project`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of
