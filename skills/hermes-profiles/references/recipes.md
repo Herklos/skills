@@ -120,6 +120,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Approvals / privacy / checkpoints / backup | `security.md` |
 | cwd / projects / repo scan | `workspace.md` |
 | Skins / display chrome / fonts | `display.md` |
+| Voice / STT / TTS | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
 
 ## Decision guide: what to edit where
@@ -136,6 +137,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Approvals, privacy, pairing, checkpoints, backup | `security.md` |
 | cwd, projects, repo scan | `workspace.md` |
 | Skins, display chrome, fonts | `display.md` |
+| Voice mode, STT, TTS, messaging `/voice` | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
 | Main / aux / fallback / MoA | `models.md` |
 | Task-specific subagent routes | `delegation.md` |

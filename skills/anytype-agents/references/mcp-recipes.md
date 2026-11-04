@@ -61,6 +61,15 @@ Outline only:
       "tool_profile": ["<toolProfileCatalogObjectId>"],
       "terminal_backend": "cua",
       "computer_surface": "cua-spaces",
+      "voice_enabled": false,
+      "voice_auto_tts": false,
+      "voice_chat_mode": "off",
+      "messaging_voice_mode": "off",
+      "stt_provider": "local",
+      "stt_model": "base",
+      "tts_provider": "edge",
+      "tts_voice": "en-US-AriaNeural",
+      "tts_speed": 1,
       "map_path": "Agents → Engineering HQ → Development → Lee"
     },
     "markdown": "## Full System Prompt (copy into the bot)\n```\n# Role\nYou are Lee…\n```\n"
@@ -115,24 +124,32 @@ Slugs: `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | 
       "backup_1_effort": "high",
       "backup_2_harness": ["<grokObjectId>"],
       "backup_2_model": "Grok 4.5",
-      "backup_2_effort": "high"
+      "backup_2_effort": "high",
+      "stt_provider": "none",
+      "tts_provider": "none"
     },
     "markdown": "## When to use\n…\n\n## Stack summary\n…\n"
   }
 }
 ```
 
-For **Local router** (parent decision stack), also set Hermes ids:
+For **Local router** (parent decision stack), also set Hermes ids + voice stack:
 
 ```json
 "decision_provider": "llamacpp",
 "decision_model": "d1-2b-q4_k_m",
 "primary_model": "d1-2B-GGUF Q4_K_M",
-"primary_effort": "medium"
+"primary_effort": "medium",
+"stt_provider": "local",
+"stt_model": "base",
+"tts_provider": "edge",
+"tts_voice": "en-US-AriaNeural",
+"tts_speed": 1
 ```
 
-Decline via hermes-profiles `models.md` (Local decision model). Leave `decision_*`
-empty on Coding / Data fetching (Subagent stacks).
+Decline via hermes-profiles `models.md` (Local decision model) and `voice.md`.
+Leave `decision_*` empty on Coding / Data fetching (Subagent stacks); set their
+STT/TTS providers to `none`.
 
 Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 

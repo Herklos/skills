@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.13.0
+version: 1.14.0
 license: MIT
 metadata:
   category: agents
@@ -36,6 +36,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
 | `references/workspace.md` | `terminal.cwd`, projects, repo scan, worktrees |
 | `references/display.md` | Fonts, `display.*`, skins, ui-preferences |
+| `references/voice.md` | Voice mode, STT, TTS (`voice.*` / `stt.*` / `tts.*`), messaging `/voice` |
 | `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
@@ -55,7 +56,10 @@ Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/com
 Cua Spaces (default computer): https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces  
 Cron: https://hermes-agent.nousresearch.com/docs/user-guide/features/cron  
 Delegation: https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation  
-Advanced delegation: https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation
+Advanced delegation: https://hermes-agent.nousresearch.com/docs/plugins/advanced-delegation  
+Voice mode: https://hermes-agent.nousresearch.com/docs/user-guide/features/voice-mode  
+Voice & TTS: https://hermes-agent.nousresearch.com/docs/user-guide/features/tts  
+Voice guide: https://hermes-agent.nousresearch.com/docs/guides/use-voice-mode-with-hermes
 
 ## Resolve home
 
@@ -96,6 +100,7 @@ Do not print `.env` secret values into chat.
 | Toolsets / limits | Enabled tools, approvals, terminal backend (`cua` preferred), output and turn caps |
 | Security | Approvals/YOLO floor, privacy redaction, pairing, checkpoints, backup |
 | Workspace / display | `terminal.cwd`, projects, repo scan, skins, `display.*`, Desktop prefs |
+| Voice | Mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord VC |
 | Scheduled tasks | Per-profile `cron/` jobs (`cronjob_manage` / `/cron` / `hermes cron`); Bot routines |
 
 `HERMES_HOME` isolates Hermes data. `terminal.cwd` sets the gateway/cron working directory
@@ -269,6 +274,14 @@ Full guide: `references/security.md`. Approvals/`cron_mode`, `security.*`, `priv
 ### Workspace and display
 
 Full guides: `references/workspace.md` (`terminal.cwd`, projects, repo scan) and `references/display.md` (skins, `display.*`, fonts, ui-preferences). Personality overlay remains in `soul-templates.md`.
+
+### Voice (STT / TTS / mic loop)
+
+Full guide: `references/voice.md`. Defaults: `stt.provider: local` + `tts.provider: edge`.
+Keys: `voice.*`, `stt.*`, `tts.*`. Session: `/voice on|off|tts|status`; Discord VC:
+`/voice join|leave`. Anytype: Harness profile holds STT/TTS stack; Agent holds
+enablement / modes (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`,
+`messaging_voice_mode`).
 
 ### Scheduled tasks (cron)
 

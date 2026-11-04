@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.19.0
+version: 1.20.0
 license: MIT
 metadata:
   category: agents
@@ -24,11 +24,15 @@ prompt or messaging group. Verify runtime separately after doc changes. Model
 stacks live on **Harness profile** objects; agents link `harness_profile` so one
 profile edit covers many agents. Browser / computer / tool access live on
 reusable **Browser**, **Computer**, and **Tool profile** catalog objects;
-agents, teams, and subteams link them the same way. **Most agents use Local
-router** (local model as parent brain). Spawn routes live on **Subagent**
-objects (Agent.`subagents` / Subagent.`parent_agent`) with richer profiles
-(Coding, Data fetching, …); the local parent routes when needed and answers
-peers itself otherwise. Decline into Hermes via `hermes-profiles`
+agents, teams, and subteams link them the same way. **Voice** (STT/TTS stack)
+lives on **Harness profile**; Agent holds enablement / modes
+(`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`)
+and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
+`voice.md`. **Most agents use Local router** (local model as parent brain;
+default voice stack local Whisper + Edge TTS). Spawn routes live on
+**Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
+profiles (Coding, Data fetching, …); the local parent routes when needed and
+answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 `delegation.md`.
 
 ## References (load when needed)
@@ -131,13 +135,13 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults Browser **None**, Computer **Cua Spaces dedicated**, Tool profile **Standard interactive**), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`), optional `linked_projects` / `memory_pages` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults Browser **None**, Computer **Cua Spaces dedicated**, Tool profile **Standard interactive**), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `messaging_group`
 5. Create memory children as `page` (at least Skills; chiefs often also Memory & Decisions, Operating Notes, Resources, Lessons Learned); link via `memory_pages`
 6. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 7. Point the system prompt at Shared Rules (short pointer, not a full paste, when token economy matters)
-8. Fill **Suggested runtime** from `suggested-runtime.md` for narrative apply notes; prefer properties + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`) over markdown-only Browser / Computer / Tools bullets
+8. Fill **Suggested runtime** from `suggested-runtime.md` for narrative apply notes; prefer properties + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields) over markdown-only Browser / Computer / Tools / Voice bullets
 9. Tell the user Anytype is updated; **copy the Full System Prompt into the runtime bot** and verify groups/routines separately
-10. If the runtime is Hermes, continue with skill `hermes-profiles` and apply Suggested runtime using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `cron.md`)
+10. If the runtime is Hermes, continue with skill `hermes-profiles` and apply Suggested runtime using its refs (`models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`)
 
 ### Create or update a Team / HQ
 
@@ -169,10 +173,14 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. **Harness** (catalog): type `harness` with `slug` in
    `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | `local-model`
 2. **Harness profile** (stack): type `harness_profile` with `intent`, `primary_harness` +
-   `primary_model` + `primary_effort`, and ordered backups (`backup_1_*`, `backup_2_*`)
+   `primary_model` + `primary_effort`, ordered backups (`backup_1_*`, `backup_2_*`), and
+   optional voice stack (`stt_provider` / `stt_model` / `tts_provider` / `tts_voice` /
+   `tts_speed` / `voice_notes`). **Local router** org default: STT `local`/`base` + TTS
+   `edge`/`en-US-AriaNeural`. Subagent-only stacks leave STT/TTS as `none`
 3. Bodies from `type-templates.md`; link profiles from Agents → Shared
 4. Point agents (and Subagents) at a profile via `harness_profile` (no Agent `harness` select)
-5. After editing a shared profile, re-apply models into each linked agent's live runtime
+5. After editing a shared profile, re-apply models **and voice** into each linked agent's
+   live runtime (`hermes-profiles` `models.md` + `voice.md`)
 
 ### Create or update Browser / Computer / Tool profile
 

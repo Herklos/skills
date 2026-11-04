@@ -15,9 +15,10 @@ Title: `{Name} – {Role}`
 
 **Set as properties** (do not rely on markdown alone): `role`, `team`,
 `reports_to`, `lifecycle`, `harness_profile`, `subagents`, `browser`,
-`computer`, `tool_profile`, `autonomy`, `short_description`, `hermes_profile`,
-`board_member`, `linked_projects`, `memory_pages`, `messaging_group`,
-`map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`. See
+`computer`, `tool_profile`, `voice_enabled`, `autonomy`, `short_description`,
+`hermes_profile`, `board_member`, `linked_projects`, `memory_pages`,
+`messaging_group`, `map_path`, `delegation_enabled`, `terminal_backend`,
+`computer_surface`, voice modes / optional `stt_*` / `tts_*`. See
 `object-types.md`.
 
 Body (narrative only):
@@ -161,6 +162,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Browser: {linked Browser catalog name | none|source + identity}
 - Computer: {linked Computer catalog | none | Cua Spaces (default) | host desktop | Bot Screen} · dedicated|shared
 - Tools: {linked Tool profile | toolsets}; approvals {smart|manual|off}; terminal {cua (preferred)|local|…}/{cwd}
+- Voice: {off|on}; auto TTS {on|off}; chat {off|chained|gpt-live}; messaging {off|voice_only|all}; STT/TTS from harness profile or overrides
 - Limits: max_turns {…}; tool_output {…}; compression {…}
 - Security: redact {on|off}; auth {allowlist|pairing|open}; checkpoints {on|off}
 - Workspace/display: project {…}; skin {…}; tool_progress {…}

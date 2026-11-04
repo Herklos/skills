@@ -37,6 +37,7 @@ Set Autonomy / Short description / Memory pages / Map path as **properties**
 **Subagents / delegation:** Agent.`delegation_enabled` + Agent.`subagents`. Parent Local router answers light/peer asks itself; model_map routes when specialized work is needed.
 **Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults None / Cua Spaces dedicated / Standard interactive).
 **Terminal / computer selects:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces; keep aligned with linked Computer / Tool profile).
+**Voice:** Agent.`voice_enabled` / `voice_auto_tts` / `voice_chat_mode` / `messaging_voice_mode`; STT/TTS from Harness profile (Local router: local+edge) or Agent overrides.
 **Personality / Memory / Limits / Security / Workspace:** fill from hermes-profiles references when applying via Hermes (see suggested-runtime.md).
 
 ## Full System Prompt (copy into the bot)
@@ -118,13 +119,15 @@ Intent and agent roles this stack fits.
 - Decision (Hermes main, when parent): {provider} · {model id}
 - Backup 1: {Harness} · {model} · {effort}
 - Backup 2: {Harness} · {model} · {effort}
+- Voice: STT {provider}/{model} · TTS {provider}/{voice} · speed {1} (or none)
 
 ## Apply notes
-Editing this profile updates the intended models for every Agent linked via
-`harness_profile`. Re-apply into each live runtime (Claude / Codex / Grok / …)
-separately. Anytype does not push configs automatically. For Local router,
-decline `decision_provider` / `decision_model` via hermes-profiles `models.md`
-(Local decision model / llamacpp).
+Editing this profile updates the intended models (and voice stack) for every
+Agent linked via `harness_profile`. Re-apply into each live runtime (Claude /
+Codex / Grok / Hermes / …) separately. Anytype does not push configs
+automatically. For Local router, decline `decision_provider` / `decision_model`
+via hermes-profiles `models.md` (Local decision model / llamacpp) and voice via
+`voice.md` (default local+edge).
 ```
 
 Example stacks: **Local router** (`llamacpp` / `d1-2b-q4_k_m` medium → Grok 4.5

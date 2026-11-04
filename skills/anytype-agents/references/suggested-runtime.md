@@ -5,11 +5,13 @@ configures the bot; they do **not** auto-apply.
 
 **Prefer properties for structured facts:** Agent.`harness_profile`,
 `hermes_profile`, `delegation_enabled`, `browser`, `computer`, `tool_profile`,
-`terminal_backend`, `computer_surface`, `subagents`, plus Harness profile
-`decision_*` / primary / backups. Keep this body section for narrative apply
-notes and fields that do not yet have a property. Do not treat markdown bullets
-as the only source of truth for Browser / Computer / Tools / Terminal when the
-matching catalog links are set.
+`terminal_backend`, `computer_surface`, `subagents`, voice fields
+(`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`,
+optional `stt_*` / `tts_*`), plus Harness profile `decision_*` / primary /
+backups / voice stack. Keep this body section for narrative apply notes and
+fields that do not yet have a property. Do not treat markdown bullets as the
+only source of truth for Browser / Computer / Tools / Terminal / Voice when the
+matching properties or catalog links are set.
 
 For Hermes, map fields with skill `hermes-profiles`:
 
@@ -24,6 +26,7 @@ For Hermes, map fields with skill `hermes-profiles`:
 | Security / privacy / restoration | `security.md` |
 | Workspace | `workspace.md` |
 | Display / skins | `display.md` |
+| Voice / STT / TTS | `voice.md` |
 | Scheduled tasks | `cron.md` |
 
 Paste under the agent title (date the heading when you revise it).
@@ -72,6 +75,15 @@ Paste under the agent title (date the heading when you revise it).
 - Notifications: off | on | verbose
 - External provider: none | retaindb | byterover | honcho | hindsight | … (one)
 - Notes: {shared across profiles via provider? / reset policy}
+**Voice (STT / TTS):** (prefer Agent voice fields + Harness profile STT/TTS stack)
+- Enabled: no | yes (Agent.`voice_enabled`)
+- Auto TTS: no | yes (Agent.`voice_auto_tts` → `voice.auto_tts`)
+- Chat mode: off | chained | gpt-live (Agent.`voice_chat_mode`)
+- Messaging mode: off | voice_only | all (Agent.`messaging_voice_mode` → `/voice`)
+- STT: {local|groq|openai|…} · model {base|…}  (Agent override or Harness profile)
+- TTS: {edge|elevenlabs|openai|…} · voice {en-US-AriaNeural|…} · speed {1}
+- Org default stack: local / base + edge / en-US-AriaNeural
+- Apply: hermes-profiles `voice.md`
 **Browser access:** (prefer Agent.`browser` → type `browser` catalog)
 - Catalog: {None | Cua Spaces Chromium | Local Chromium throwaway | Operator real profile | …}
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)

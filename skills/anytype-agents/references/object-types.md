@@ -54,6 +54,7 @@ Featured properties (API keys):
 | `browser` | objects | Link to one **Browser** catalog object |
 | `computer` | objects | Link to one **Computer** catalog object |
 | `tool_profile` | objects | Link to one **Tool profile** catalog object |
+| `voice_enabled` | checkbox | Intended to use Hermes voice mode (featured) |
 | `board_member` | checkbox | Board seat |
 | `linked_projects` | objects | Projects this agent works |
 
@@ -71,6 +72,15 @@ Other properties:
 | `delegation_enabled` | checkbox | Parent may spawn Subagents |
 | `terminal_backend` | select | `cua` \| `local` \| `docker` \| `ssh` \| `other` (org default: `cua`; keep aligned with linked Tool profile) |
 | `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (org default: `cua-spaces`; keep aligned with linked Computer) |
+| `voice_auto_tts` | checkbox | Hermes `voice.auto_tts` |
+| `voice_chat_mode` | select | `off` \| `chained` \| `gpt-live` (Desktop voice chat) |
+| `messaging_voice_mode` | select | `off` \| `voice_only` \| `all` (Telegram/Discord `/voice`) |
+| `stt_provider` | select | Shared with Harness profile; optional agent override |
+| `stt_model` | text | Optional agent override (e.g. `base`) |
+| `tts_provider` | select | Shared with Harness profile; optional agent override |
+| `tts_voice` | text | Provider-specific voice id (e.g. `en-US-AriaNeural`) |
+| `tts_speed` | number | Optional; default `1` |
+| `voice_notes` | text | Apply notes |
 
 Also includes shared `tag`, `links`, `backlinks`.
 
@@ -78,6 +88,13 @@ Prefer catalog links (`browser`, `computer`, `tool_profile`) as the structured
 source for Suggested runtime Browser / Computer / Tools / Terminal detail. Keep
 `terminal_backend` / `computer_surface` selects consistent with those links for
 quick filters.
+
+**Voice:** Harness profile holds the shared STT/TTS stack. Agent holds enablement
+/ modes and may override `stt_*` / `tts_*`. Prefer properties over markdown-only
+Voice bullets. Hermes apply: `hermes-profiles` → `voice.md`. Org fill: most
+agents `voice_enabled=false` / modes `off` with local+edge stack filled for
+later enable; Foyer personal assistants may set `voice_enabled=true` +
+`voice_chat_mode=chained` + `messaging_voice_mode=voice_only`.
 
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 
@@ -234,6 +251,12 @@ every linked agent's intended primary / backups.
 | `backup_2_model` | text | Second backup model |
 | `backup_2_effort` | select | `low` \| `medium` \| `high` |
 | `notes` | text | When to use this profile |
+| `stt_provider` | select | `local` \| `groq` \| `openai` \| `mistral` \| `xai` \| `elevenlabs` \| `deepinfra` \| `none` (featured). Display name **STT provider** |
+| `stt_model` | text | e.g. `base`, `whisper-large-v3-turbo` |
+| `tts_provider` | select | `edge` \| `elevenlabs` \| `openai` \| `minimax` \| `mistral` \| `gemini` \| `xai` \| `deepinfra` \| `neutts` \| `kittentts` \| `piper` \| `nous` \| `none` (featured). Display name **TTS provider** |
+| `tts_voice` | text | Provider voice id (featured), e.g. `en-US-AriaNeural` |
+| `tts_speed` | number | Global TTS speed (default `1`) |
+| `voice_notes` | text | When / how to apply voice for agents on this profile |
 
 Also `tag`, `links`, `backlinks`. Put longer rationale and apply notes in the body.
 
@@ -242,13 +265,17 @@ Also `tag`, `links`, `backlinks`. Put longer rationale and apply notes in the bo
 `primary_harness` + `primary_model`). Apply with skill `hermes-profiles`
 `models.md` (**Local decision model**). Do not invent values; read the profile.
 
+**Voice stack:** parent profiles (Local router) set STT/TTS defaults agents
+inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as `none`.
+Apply with `hermes-profiles` → `voice.md`.
+
 **Example profiles:**
 
-| Profile | Primary / decision | Backup 1 | Backup 2 | Typical use |
-|---------|--------------------|----------|-----------|-------------|
-| **Local router** | Local model · `llamacpp` / `d1-2b-q4_k_m` · medium | Grok · 4.5 · medium | Claude · Haiku 5.5 · medium | **Most Agents** (parent decision brain + quick peer answers) |
-| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high | Subagent routes (`deep`, `fast`, …); leave `decision_*` empty |
-| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium | Subagent routes (`fetch`, …); leave `decision_*` empty |
+| Profile | Primary / decision | Backup 1 | Backup 2 | Voice | Typical use |
+|---------|--------------------|----------|-----------|-------|-------------|
+| **Local router** | Local model · `llamacpp` / `d1-2b-q4_k_m` · medium | Grok · 4.5 · medium | Claude · Haiku 5.5 · medium | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent decision brain + quick peer answers) |
+| Coding | Claude · Sonnet 5.5 · high | Codex · Sol 6.1 · high | Grok · 4.5 · high | STT/TTS `none` | Subagent routes (`deep`, `fast`, …); leave `decision_*` empty |
+| Data fetching | Codex · Terra 6.1 · high | Claude · Haiku 5.5 · medium | Grok · 4.5 · medium | STT/TTS `none` | Subagent routes (`fetch`, …); leave `decision_*` empty |
 
 Parent Agents usually link **Local router**. Subagents link Coding / Data fetching
 (or other specialized stacks). The local parent picks a Subagent `task_key` when
@@ -256,9 +283,9 @@ needed and answers directly otherwise.
 
 **Default template name:** `Harness profile default`. Body: `type-templates.md`.
 
-Apply: when an agent's Suggested runtime or live bot models change, update the
-**Harness profile** object, then re-apply to each linked agent's runtime (Anytype
-does not auto-push into Claude/Codex/Grok/…).
+Apply: when an agent's Suggested runtime or live bot models / voice change,
+update the **Harness profile** object, then re-apply to each linked agent's
+runtime (Anytype does not auto-push into Claude/Codex/Grok/Hermes/…).
 
 ## Browser (`api_key`: `browser`)
 
@@ -521,10 +548,12 @@ object; re-set only what is missing after the type change.
    exists with a different format.
 2. On existing Agent / Team / Subteam types: `add_property` for org/runtime
    fields above including featured `browser`, `computer`, `tool_profile`
-   objects links; also `board_member`, `linked_projects`, `memory_pages`,
-   `messaging_group`, `map_path`, `delegation_enabled`, `terminal_backend`,
-   `computer_surface`; keep `harness_profile` / `subagents`; `remove_property`
-   legacy `harness` select when ready.
+   objects links and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
+   `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
+   `board_member`, `linked_projects`, `memory_pages`, `messaging_group`,
+   `map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`;
+   keep `harness_profile` / `subagents`; `remove_property` legacy `harness`
+   select when ready. On Harness profile: add STT/TTS stack fields above.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
    `skills_page`, `routing_summary` (+ runtime catalog links). On Project:
    `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
