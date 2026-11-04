@@ -53,7 +53,8 @@ Agents
 │   ├── Skills (team)
 │   └── Specialist agent pages
 │       ├── Subagents (type `subagent`; 0..n per agent)
-│       ├── Skills (agent)
+│       ├── Skills (agent Query)
+│       ├── Logs (agent Query)
 │       └── Memory children
 └── Drafts
 
@@ -91,16 +92,17 @@ Org inventory uses custom keys **`agent`**, **`team`**, **`subteam`**,
 for spawn routes (decline to Hermes `model_map`). Project PM uses **`epic`** /
 **`user_story`** / **`task`** with per-project Queries named Roadmap / Backlog /
 TODO (`project-pm.md`). Supporting docs: Shared Rules as **`prompt`**; memory as
-**`memory`**; procedures as **`skill`**; Skills indexes as **`query`**; other
-hubs may stay **`page`**. Spaces also expose `note`, `collection`, `query`,
-`template`, media types. See `object-types.md` + `memory-and-skills.md` for
-property keys, default templates, create and `set_type` migration.
+**`memory`**; procedures as **`skill`**; per-action summaries as **`log`**;
+Skills / Logs indexes as **`query`**; other hubs may stay **`page`**. Spaces
+also expose `note`, `collection`, `query`, `template`, media types. See
+`object-types.md` + `memory-and-skills.md` for property keys, default
+templates, create and `set_type` migration.
 
 ## Runtime vs docs
 
 | Layer | Store |
 |-------|-------|
-| Org, prompt text-as-docs, memory pages, skill procedures | Anytype |
+| Org, prompt text-as-docs, memory pages, skill procedures, logs | Anytype |
 | Hermes runtime home | `$HERMES_HOME/profiles/<slug>` (`hermes-profiles`) |
 | Other harnesses | Their own configs; prompt copied from the agent page |
 

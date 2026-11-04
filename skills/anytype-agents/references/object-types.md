@@ -7,8 +7,9 @@ feature properties, and start from body templates. Discover live keys with
 Groups (welcome pages) and other hub scaffolding stay type `page` unless the
 space defines otherwise. **Shared Rules**, system/welcome prompts, and prompt
 libraries use type **`prompt`** (see `prompts.md`). Agent support notes use
-type **`memory`**; procedures use type **`skill`**; Skills indexes are
-**Queries** (see `memory-and-skills.md`).
+type **`memory`**; procedures use type **`skill`**; per-action summaries use
+type **`log`**; Skills and Logs indexes are **Queries** (see
+`memory-and-skills.md`).
 
 ## Type keys
 
@@ -24,6 +25,9 @@ type **`memory`**; procedures use type **`skill`**; Skills indexes are
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
 | `prompt` | Prompts | System prompts, group welcomes, Shared Rules, libraries, drafts (`prompts.md`) |
+| `memory` | Memories | Durable agent notes (`memory-and-skills.md`) |
+| `skill` | Skills | Procedures / templates / guides (`memory-and-skills.md`) |
+| `log` | Logs | Per-action activity summaries (`memory-and-skills.md`) |
 | `project` | Projects | Portfolio roots under the Projects hub (built-in type, extended) |
 | `epic` | Epics | Large delivery themes under a project (Roadmap Query) |
 | `user_story` | User stories | Backlog stories under a project (Backlog Query) |
@@ -77,6 +81,7 @@ Other properties:
 | `short_description` | text | One-liner mission |
 | `memory_pages` | objects | Typed **Memory** children (decisions, lessons, resources, …) |
 | `skills_page` | objects | Skills **Query** for this agent |
+| `logs_page` | objects | Logs **Query** for this agent (per-action summaries) |
 | `messaging_group` | objects | Group page / chat roster |
 | `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
 | `delegation_enabled` | checkbox | Parent may spawn Subagents |
@@ -625,8 +630,9 @@ object; re-set only what is missing after the type change.
 ## Bootstrap types in a new space
 
 1. `API-create-type` for `agent`, `team`, `subteam`, `subagent`, `harness`,
-   `harness_profile`, `browser`, `computer`, `tool_profile`, and `prompt` with
-   the property definitions above (`create_missing_options: true` for selects).
+   `harness_profile`, `browser`, `computer`, `tool_profile`, `prompt`,
+   `memory`, `skill`, and `log` with the property definitions above
+   (`create_missing_options: true` for selects).
    On `team`, define `kind` options `Board` / `HQ` / `Group` only (no
    `Sub-team`). Prefer **sequential** creates when several types share new
    property names (`members`, `skills_page`, `access_needed`,
@@ -638,20 +644,22 @@ object; re-set only what is missing after the type change.
    Agent `system_prompt`, and Agent voice fields (`voice_enabled`,
    `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` /
    `tts_*`); also `board_member`, `linked_projects`, `memory_pages`,
-   `messaging_group`, `map_path`, `delegation_enabled`, `terminal_backend`,
-   `computer_surface`; keep `harness_profile` / `subagents`; `remove_property`
-   legacy `harness` select when ready. On Page: `welcome_prompt`. On Harness
-   profile: add STT/TTS stack fields above. Prompt bootstrap detail:
-   `prompts.md`.
+   `skills_page`, `logs_page`, `messaging_group`, `map_path`,
+   `delegation_enabled`, `terminal_backend`, `computer_surface`; keep
+   `harness_profile` / `subagents`; `remove_property` legacy `harness` select
+   when ready. On Page: `welcome_prompt`. On Harness profile: add STT/TTS stack
+   fields above. Prompt / Memory / Skill / Log bootstrap detail: `prompts.md`
+   + `memory-and-skills.md`.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
    `skills_page`, `routing_summary` (+ runtime catalog links). On Project:
    `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
    hub page links.
 4. `API-create-template` with `template_for`: `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `project` | `epic` | `user_story` and body markdown from
-   **`type-templates.md`**. Extend built-in `task` with Kind (+ `spike`) and
-   project links (`project-pm.md`); keep Task's built-in default template.
+   `tool_profile` | `prompt` | `memory` | `skill` | `log` | `project` |
+   `epic` | `user_story` and body markdown from **`type-templates.md`**.
+   Extend built-in `task` with Kind (+ `spike`) and project links
+   (`project-pm.md`); keep Task's built-in default template.
 5. `API-update-type` body `{ "default_template": "<templateId>" }` per type.
 6. Create the seven Harness catalog objects; create Harness profiles (**Local
    router**, Coding, Data fetching, …); create Tool profile catalogs (table
@@ -720,6 +728,22 @@ place).
 **Default template:** Skill default. Indexes are **Queries**, not `skill_kind=index`.
 Full playbook: `memory-and-skills.md`.
 
+## Log (`api_key`: `log`)
+
+Small per-action summary of what an agent did. Distinct from durable Memory and
+from skill usage counters (still forbidden).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `owner_agent` | objects | Owning Agent (featured; required) |
+| `logged_at` | date | When the action happened (featured) |
+| `summary` | text | One or two sentences (featured) |
+| `notes` | text | Optional |
+
+**Default template:** Log default. Agent indexes via `logs_page` → Query
+filtered by `owner_agent`, sorted by `logged_at` desc. Full playbook:
+`memory-and-skills.md`.
+
 ## What stays `page`
 
 - Agents / Projects hub roots (optional)
@@ -729,4 +753,5 @@ Full playbook: `memory-and-skills.md`.
 
 Shared Rules and prompt libraries are type **`prompt`**. Memory children are
 type **`memory`**. Procedures / Skill Template / guides are type **`skill`**.
-Skills indexes are type **`query`**.
+Per-action summaries are type **`log`**. Skills and Logs indexes are type
+**`query`**.

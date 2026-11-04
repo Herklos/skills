@@ -1,8 +1,9 @@
-# Memory + Skill types
+# Memory + Skill + Log types
 
 Durable agent notes live as typed **`memory`** objects. Runnable procedures live
-as typed **`skill`** objects. Skills indexes are **Queries** of `skill` (not
-typed skills). Editing Anytype still does not push into live Hermes; remind
+as typed **`skill`** objects. Per-action activity summaries live as typed
+**`log`** objects. Skills indexes and Logs indexes are **Queries** (not typed
+skills/logs). Editing Anytype still does not push into live Hermes; remind
 separately.
 
 Property keys and create recipes: this file. Type inventory: `object-types.md`.
@@ -14,11 +15,14 @@ Body shapes: `page-templates.md` / `type-templates.md`.
 |----------|--------|---------|
 | `memory` | Memories | Memory & Decisions, Lessons Learned, Resources, Operating Notes, playbooks, other agent support notes |
 | `skill` | Skills | Procedures, Skill Template, how-to guides |
+| `log` | Logs | Small per-action summaries of what an agent did |
 
-**Default templates:** `Memory default`, `Skill default`.
+**Default templates:** `Memory default`, `Skill default`, `Log default`.
 
 Skills **indexes** are type **`query`** filtered over `skill` (Agent / Team /
-Subteam / Global). Point at them via `skills_page`.
+Subteam / Global). Point at them via `skills_page`. Logs **indexes** are type
+**`query`** filtered over `log` by `owner_agent`. Point at them via
+`logs_page`.
 
 ## Memory properties
 
@@ -55,12 +59,26 @@ Subteam / Global). Point at them via `skills_page`.
 
 Do **not** add Times used / Last used (Shared Rules forbid usage logging).
 
+## Log properties
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `owner_agent` | objects | Owning Agent (featured; required) |
+| `logged_at` | date | When the action happened (featured) |
+| `summary` | text | One or two sentences: what the agent did (featured) |
+| `notes` | text | Optional extra detail |
+
+Object **name** should match or shorten `summary` (e.g. `Migrated Skills indexes to Queries`). Body holds optional Context / Outcome.
+
+Logs are **activity summaries**, not skill usage counters. Shared Rules still forbid Times used / Last used on skills.
+
 ## Link properties on other types
 
 | On type | Key | Format | Points to |
 |---------|-----|--------|-----------|
 | `agent` | `memory_pages` | objects | Memory objects (not Skills indexes) |
 | `agent` | `skills_page` | objects | Skills **Query** for this agent |
+| `agent` | `logs_page` | objects | Logs **Query** for this agent |
 | `team` | `skills_page` | objects | HQ Skills Query |
 | `subteam` | `skills_page` | objects | Domain Skills Query |
 
@@ -72,6 +90,8 @@ Do **not** add Times used / Last used (Shared Rules forbid usage logging).
 | skill procedure | keep hyphen `skill_key` as object name (e.g. `run-qa`) |
 | skill template / guide | keep existing title when `set_type` in place |
 | Skills Query | `{OwnerShort} – Skills` or `Skills – Global` / `{HQ} – Skills` |
+| log | short action summary (also set `summary`) |
+| Logs Query | `{OwnerShort} – Logs` |
 
 ## Resolution order
 
@@ -127,6 +147,45 @@ Patch Agent / Team / Subteam: `skills_page=[<queryId>]`.
 Global Query example: `skill_scope IN ("global")` (optionally AND
 `skill_status IN ("active")`).
 
+## Create Log + Logs Query
+
+After a meaningful action (handoff, migrate, ship, decide), create a Log:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "create_missing_options": true,
+  "body": {
+    "type": "log",
+    "name": "Migrated Skills indexes to Queries",
+    "properties": {
+      "owner_agent": ["<agentId>"],
+      "logged_at": "2026-11-04",
+      "summary": "Migrated Skills indexes to Queries for live agents."
+    },
+    "markdown": "## Summary\nMigrated Skills indexes to Queries for live agents.\n\n## Context\nMemory + Skill redesign.\n\n## Outcome\nAgent.skills_page linked; old indexes Binned.\n\n## Notes\n"
+  }
+}
+```
+
+Ensure a Logs Query exists for that agent (created once with the agent):
+
+```json
+{
+  "space_id": "<spaceId>",
+  "name": "Lee – Logs",
+  "type": "log",
+  "filter": "owner_agent IN (\"<agentId>\")",
+  "sorts": [{ "property": "logged_at", "direction": "desc" }]
+}
+```
+
+Patch Agent: `logs_page=[<queryId>]`. New Log objects appear automatically via
+the filter.
+
+Keep entries short. Prefer one Log per discrete action, not a running diary
+inside Memory.
+
 ## Migrate in place
 
 Prefer `set_type` (keeps id and links), then properties + rename:
@@ -174,14 +233,25 @@ index page (not permanent unless approved).
 }
 ```
 
+```json
+{
+  "space_id": "<spaceId>",
+  "type": "log",
+  "limit": 100,
+  "fields": ["name", "logged_at", "summary", "owner_agent"]
+}
+```
+
 ## Bootstrap in a new space
 
-1. `API-create-type` `memory` and `skill` (`create_missing_options: true`); reuse
-   shared `lifecycle`, `owner_agent`, `notes` via `"property"` keys when present
-2. `API-create-template` Memory default / Skill default; set `default_template`
+1. `API-create-type` `memory`, `skill`, and `log` (`create_missing_options: true`);
+   reuse shared `lifecycle`, `owner_agent`, `notes` via `"property"` keys when present
+2. `API-create-template` Memory default / Skill default / Log default; set
+   `default_template`
 3. On Agent: ensure `memory_pages`; `add_property` **Skills page** (`skills_page`)
-   reusing the Team/Subteam property key when possible
-4. Migrate live memory pages + procedures; convert indexes to Queries
+   and **Logs page** (`logs_page`) reusing shared property keys when possible
+4. Migrate live memory pages + procedures; convert indexes to Queries; create
+   Logs Query per live agent and set `logs_page`
 
 ## Out of scope
 

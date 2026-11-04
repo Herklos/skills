@@ -1,10 +1,10 @@
 # Page templates (generic)
 
 Use these shapes when creating or auditing **bodies**. Inventory objects use
-types `agent`, `team`, `subteam`, `prompt`, `memory`, `skill`, and `project`
-(see `object-types.md` + `prompts.md` + `memory-and-skills.md`). Skills indexes
-are Queries. Shared Rules is type `prompt`. Prefer duplicating a live peer in
-the same space over inventing a new layout.
+types `agent`, `team`, `subteam`, `prompt`, `memory`, `skill`, `log`, and
+`project` (see `object-types.md` + `prompts.md` + `memory-and-skills.md`).
+Skills and Logs indexes are Queries. Shared Rules is type `prompt`. Prefer
+duplicating a live peer in the same space over inventing a new layout.
 
 Suggested runtime field list: **`suggested-runtime.md`**.
 Filled samples: **`examples.md`**. MCP create/patch: **`mcp-recipes.md`**.
@@ -18,7 +18,7 @@ Title: `{Name} – {Role}`
 `reports_to`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`,
 `browser`, `computer`, `tool_profile`, `voice_enabled`, `autonomy`,
 `short_description`, `hermes_profile`, `board_member`, `linked_projects`,
-`memory_pages`, `skills_page`, `messaging_group`, `map_path`,
+`memory_pages`, `skills_page`, `logs_page`, `messaging_group`, `map_path`,
 `delegation_enabled`, `terminal_backend`, `computer_surface`, voice modes /
 optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
 `memory-and-skills.md`.
@@ -39,9 +39,10 @@ Body outline:
 
 Skip `## Short Description`, `**Autonomy:**`, and prose-only map lines when
 `short_description`, `autonomy`, and `map_path` properties are set. Link Memory
-objects via `memory_pages` and the Skills Query via `skills_page` after create
-(`memory-and-skills.md`). Create the Prompt object first (`prompts.md`); do not
-keep a Full System Prompt / SOUL fence on the Agent.
+objects via `memory_pages`, the Skills Query via `skills_page`, and the Logs
+Query via `logs_page` after create (`memory-and-skills.md`). Create the Prompt
+object first (`prompts.md`); do not keep a Full System Prompt / SOUL fence on
+the Agent.
 
 ## HQ page
 
@@ -117,6 +118,19 @@ Set as properties: `skill_kind`, `skill_key`, `skill_scope`, `skill_status`,
 
 Skip Metadata tables once properties are set. Skip usage-logging fields if
 Shared Rules forbid them. Owner Skills **Query** lists the skill automatically.
+
+## Log (type `log`)
+
+Set as properties: `owner_agent`, `logged_at`, `summary` (`memory-and-skills.md`).
+Name the object after the short summary. Body:
+
+1. Summary (mirrors `summary` property)
+2. Context (optional)
+3. Outcome (optional)
+4. Notes
+
+Owner Logs **Query** (`logs_page`) lists the entry automatically. One Log per
+discrete action.
 
 ## Project page
 

@@ -19,11 +19,12 @@ types + Agent/Team/Subteam link props. Per-HQ Browser/Computer pairs
 HQ; Subteams/Agents inherit; Board/Primary empty. Prompt type **2026-11-04**
 (v1.25.0): system/welcome/shared_rules/library/draft. Memory + Skill types
 **2026-11-04** (v1.26.0): agent notes as `memory`; procedures as `skill`;
-Skills indexes as Queries via `skills_page`. Prefer properties for
-mission / members / routing / short description / autonomy / map path / browser /
-computer / tool_profile / `system_prompt` / `memory_pages` / `skills_page`;
-template bodies keep Suggested runtime + System prompt pointer (canonical text
-on linked Prompt).
+Skills indexes as Queries via `skills_page`. Log type **2026-11-04** (v1.27.0):
+per-action summaries as `log`; Logs Queries via Agent.`logs_page`. Prefer
+properties for mission / members / routing / short description / autonomy /
+map path / browser / computer / tool_profile / `system_prompt` /
+`memory_pages` / `skills_page` / `logs_page`; template bodies keep Suggested
+runtime + System prompt pointer (canonical text on linked Prompt).
 
 ---
 
@@ -349,13 +350,33 @@ matching `owner_*` as properties (`memory-and-skills.md`). Template body:
 
 ---
 
+## Log default (`template_for`: `log`)
+
+Set `owner_agent`, `logged_at`, `summary` as properties
+(`memory-and-skills.md`). Template body:
+
+```markdown
+## Summary
+One or two sentences: what the agent did.
+
+## Context
+Optional: trigger, request, or task that led to this action.
+
+## Outcome
+Optional: result, links created, or follow-ups.
+
+## Notes
+```
+
+---
+
 ## Recreate a default template (MCP)
 
 1. `API-create-template` with `template_for` = `agent` | `team` | `subteam` |
    `subagent` | `harness` | `harness_profile` | `browser` | `computer` |
-   `tool_profile` | `prompt` | `memory` | `skill` | `project` | `epic` |
-   `user_story`, name `{Type} default`, and body blocks from the matching
-   section above (`heading_2` + `paragraph`).
+   `tool_profile` | `prompt` | `memory` | `skill` | `log` | `project` |
+   `epic` | `user_story`, name `{Type} default`, and body blocks from the
+   matching section above (`heading_2` + `paragraph`).
 2. `API-list-templates` with that `type` → note the new id.
 3. `API-update-type` on the type: `{ "default_template": "<templateId>" }`.
 4. Verify: create a throwaway object of that type with no `template` arg and
@@ -365,7 +386,7 @@ matching `owner_*` as properties (`memory-and-skills.md`). Template body:
 
 1. `API-list-templates` for `agent`, `team`, `subteam`, `subagent`, `harness`,
    `harness_profile`, `browser`, `computer`, `tool_profile`, `prompt`,
-   `memory`, `skill`, `project`, `epic`, `user_story`.
+   `memory`, `skill`, `log`, `project`, `epic`, `user_story`.
 2. `API-get-object` each default (`format: "md"`).
 3. Diff against this file. Update the skill dump when the live org intentionally
    changes the defaults; update live templates when the skill is the source of
