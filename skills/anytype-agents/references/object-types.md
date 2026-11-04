@@ -81,7 +81,6 @@ Other properties:
 |-----|--------|-------|
 | `autonomy` | select | `read-only` \| `propose` \| `change-with-gates` |
 | `hermes_profile` | text | Hermes home slug under `~/.hermes/profiles/<slug>` when applying via `hermes-profiles` |
-| `primary_model` | text | Optional agent-local override note; prefer the linked Harness profile |
 | `short_description` | text | One-liner mission |
 | `memory_pages` | objects | Typed **Memory** children (decisions, lessons, resources, …) |
 | `skills_page` | objects | Skills **Query** for this agent |
@@ -129,6 +128,10 @@ Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 **Do not** use a select `harness` on Agent. Legacy spaces may still have an old
 `harness` select (`hermes` / `grok` / …); migrate by linking `harness_profile`
 and removing `harness` from the Agent type (`remove_property`).
+
+**Do not** use Agent.`primary_model`. Models live on the linked **Harness
+profile** (`model_*` / `fallback_*`). Remove leftover `primary_model` text
+properties with `remove_property` when present.
 
 **Default template name:** `Agent default`. Full dumped body:
 `type-templates.md`. Also: `page-templates.md`; runtime fields:
