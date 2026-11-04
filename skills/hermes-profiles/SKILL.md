@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.17.0
+version: 1.18.0
 license: MIT
 metadata:
   category: agents
@@ -262,7 +262,7 @@ Full guide: `references/memory.md`. Keys: `memory.*`, `hermes -p <slug> memory s
 
 ### Browser and computer use
 
-Full guide: `references/browser-and-computer.md`. **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). When Anytype links a per-HQ Computer/Browser pair (`anytype-agents` `hq-runtime-pair.md` + `cua-hq-spaces.md`), pin Hermes `settings.space` from Computer.`cua_space` (full id e.g. `local:engineering-hq`) and use local Chromium throwaway inside that Space (see **Anytype per-HQ pair → Hermes** in the ref). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
+Full guide: `references/browser-and-computer.md`. **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). When Anytype links a per-HQ pair (`{HQ} – Cua Spaces` + `{HQ} – Hermes Chromium`; `hq-runtime-pair.md` + `cua-hq-spaces.md`), pin Hermes `settings.space` from Computer.`cua_space` and enable Hermes-managed local Chromium throwaway (see **Anytype per-HQ pair → Hermes**). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
 
 ### Tools, terminal, limits
 

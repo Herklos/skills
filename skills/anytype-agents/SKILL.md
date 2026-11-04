@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.28.0
+version: 1.29.0
 license: MIT
 metadata:
   category: agents
@@ -27,7 +27,7 @@ stacks live on **Harness profile** objects; agents link `harness_profile` so one
 profile edit covers many agents. Browser / computer / tool access live on
 reusable **Browser**, **Computer**, and **Tool profile** catalog objects;
 agents, teams, and subteams link them the same way. **Browser / Computer are
-per-HQ:** each HQ owns one dedicated Cua Spaces computer and one Cua Chromium
+per-HQ:** each HQ owns one dedicated Cua Spaces computer and one Hermes Chromium
 browser; Subteams and Agents under that HQ link the same pair. Board and
 Primary leave both empty (`computer_surface: none` on Primary). **Voice** (STT/TTS stack)
 lives on **Harness profile**; Agent holds enablement / modes
@@ -53,7 +53,7 @@ answers peers itself otherwise. Decline into Hermes via `hermes-profiles`
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
 | `references/mcp-recipes.md` | MCP search/create/patch/archive patterns |
-| `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Cua Chromium Browser create, link, migrate |
+| `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Hermes Chromium Browser create, link, migrate |
 | `references/cua-hq-spaces.md` | Create live Cua Space per HQ Computer; store full id in Computer.`cua_space` |
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
 | `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, Group `welcome_prompt`, migrate |
@@ -150,7 +150,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local router**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `skills_page` / `logs_page` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local router), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `linked_projects` / `memory_pages` / `skills_page` / `logs_page` / `messaging_group`
 5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps Suggested runtime + a short System prompt pointer (no Full System Prompt fence)
 6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, and a Logs **Query**; link via `memory_pages` + `skills_page` + `logs_page` (`memory-and-skills.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
@@ -208,12 +208,13 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    playbook in `hq-runtime-pair.md`. When adding an HQ, create one Computer
    (`{hq-slug}-cua-spaces`, `computer_surface: cua-spaces`,
    `computer_scope: dedicated`, `desktop_enabled: true`) and one Browser
-   (`{hq-slug}-cua-chromium`, `browser_source: local-chromium`,
+   (`{hq-slug}-hermes-chromium`, `browser_source: local-chromium`,
    `browser_identity: dedicated-throwaway`). Name them `{HQ name} – Cua Spaces`
-   and `{HQ name} – Cua Chromium`. **Then create the live Cua Space**
-   (`cua spaces create linux --on local --name {hq-slug}-hq`) and set
-   Computer.`cua_space` to the full id (e.g. `local:engineering-hq`); playbook
-   `cua-hq-spaces.md`. Link that pair on the HQ, every Subteam under it, and
+   and `{HQ name} – Hermes Chromium`. **Then create the live Cua Space**
+   (`cua spaces create linux --on local --kind container --runtime runc
+   --name {hq-slug}-hq`) and set Computer.`cua_space` to the full id
+   (e.g. `local:engineering-hq`); playbook `cua-hq-spaces.md`. Link that pair
+   on the HQ, every Subteam under it, and
    every Agent under it. Board and Primary leave `browser` / `computer` empty
    (Primary also `computer_surface: none`). Do not create shared org-wide None /
    Host / Bot Screen catalog rows unless the user asks for an exception.

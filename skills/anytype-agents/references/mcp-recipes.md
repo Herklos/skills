@@ -207,18 +207,18 @@ Primary leave both empty.
   "create_missing_options": true,
   "body": {
     "type": "browser",
-    "name": "Engineering HQ – Cua Chromium",
+    "name": "Engineering HQ – Hermes Chromium",
     "properties": {
-      "slug": "engineering-cua-chromium",
+      "slug": "engineering-hermes-chromium",
       "lifecycle": "live",
       "access_needed": true,
       "browser_source": "local-chromium",
       "browser_identity": "dedicated-throwaway",
       "headed": false,
-      "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
-      "notes": "Chromium inside the Engineering HQ Cua Space."
+      "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser",
+      "notes": "Hermes-managed local Chromium (throwaway) for Engineering HQ. Pair with the HQ Cua Space Computer."
     },
-    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces.\n"
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; Space placement follows Computer desktop.\n"
   }
 }
 ```

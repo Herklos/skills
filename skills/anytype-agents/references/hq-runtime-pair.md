@@ -1,7 +1,7 @@
 # Per-HQ Computer + Browser pair
 
 On-demand playbook for the org convention: **one Cua Spaces Computer and one
-Cua Chromium Browser per HQ**. Subteams and Agents under that HQ link the same
+Hermes Chromium Browser per HQ**. Subteams and Agents under that HQ link the same
 pair. Board and Primary leave both empty.
 
 Load when creating an HQ, adding a Subteam/Agent under an HQ, migrating away
@@ -16,7 +16,7 @@ Hermes**).
 
 | Owner | Computer | Browser | Agent.`computer_surface` |
 |-------|----------|---------|--------------------------|
-| Each HQ (`team` kind HQ) | `{HQ name} – Cua Spaces` | `{HQ name} – Cua Chromium` | (on members) `cua-spaces` |
+| Each HQ (`team` kind HQ) | `{HQ name} – Cua Spaces` | `{HQ name} – Hermes Chromium` | (on members) `cua-spaces` |
 | Subteam under that HQ | same Computer id | same Browser id | (on members) `cua-spaces` |
 | Agent under that HQ / Subteam | same Computer id | same Browser id | `cua-spaces` |
 | Board | empty | empty | n/a on Team |
@@ -33,7 +33,7 @@ Data fetching / Read-only). This playbook is Browser + Computer only.
 | Kind | Display name | `slug` |
 |------|--------------|--------|
 | Computer | `{HQ name} – Cua Spaces` | `{hq-slug}-cua-spaces` |
-| Browser | `{HQ name} – Cua Chromium` | `{hq-slug}-cua-chromium` |
+| Browser | `{HQ name} – Hermes Chromium` | `{hq-slug}-hermes-chromium` |
 
 `hq-slug` examples: `engineering`, `product`, `growth`, `finance`, `legal-hr`,
 `foyer`. Keep ASCII kebab-case; match the HQ's short id used in notes.
@@ -54,7 +54,9 @@ Data fetching / Read-only). This playbook is Browser + Computer only.
 | `docs_url` | `https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces` |
 | `notes` | Dedicated Cua Space for this HQ; `terminal.backend: cua`; desktop true. Linked from HQ, Subteams, Agents. |
 
-**Browser** (`type: browser`):
+**Browser** (`type: browser`): Hermes-managed local Chromium (throwaway).
+Not a separate Cua browser product. With Computer `desktop_enabled: true`,
+Hermes places browser work inside that HQ Space.
 
 | Key | Value |
 |-----|-------|
@@ -63,8 +65,8 @@ Data fetching / Read-only). This playbook is Browser + Computer only.
 | `browser_source` | `local-chromium` |
 | `browser_identity` | `dedicated-throwaway` |
 | `headed` | `false` |
-| `docs_url` | `https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces` |
-| `notes` | Chromium inside this HQ's Cua Space. Pair with the HQ Computer. |
+| `docs_url` | `https://hermes-agent.nousresearch.com/docs/user-guide/features/browser` |
+| `notes` | Hermes browser toolset; local throwaway Chromium. Pair with the HQ Computer. |
 
 ## Create the pair (MCP)
 
@@ -101,18 +103,18 @@ AnyBlock document form and rejects that shortcut).
   "create_missing_options": true,
   "body": {
     "type": "browser",
-    "name": "Engineering HQ – Cua Chromium",
+    "name": "Engineering HQ – Hermes Chromium",
     "properties": {
-      "slug": "engineering-cua-chromium",
+      "slug": "engineering-hermes-chromium",
       "lifecycle": "live",
       "access_needed": true,
       "browser_source": "local-chromium",
       "browser_identity": "dedicated-throwaway",
       "headed": false,
-      "docs_url": "https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces",
-      "notes": "Chromium inside the Engineering HQ Cua Space."
+      "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser",
+      "notes": "Hermes-managed local Chromium (throwaway) for Engineering HQ. Pair with the HQ Cua Space Computer."
     },
-    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces.\n"
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; Space placement follows Computer desktop.\n"
   }
 }
 ```

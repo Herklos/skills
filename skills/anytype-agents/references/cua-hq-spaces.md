@@ -62,17 +62,35 @@ Pattern: Space name = `{hq-slug}-hq`. Matches hermes-profiles suggested pin.
 
 ## Create one Space (CLI preferred)
 
-Named local Spaces persist until deleted. `--durable` is only for `--on auto`
-(recreate on another machine if the host goes away). For a single Mac, local +
-stable `--name` is enough.
+**Org default:** local **Docker container** (`--kind container --runtime runc`)
+with a stable `--name`. Named Spaces keep id `local:{name}` across recreate.
+`--durable` is only for `--on auto` (recreate on another machine if the host
+goes away).
+
+Requires Docker running (OrbStack / Docker Desktop). Verify with `docker info`.
 
 ```bash
-# Prefer existing
+# Prefer existing (and ready, not missing)
+cua sb ls | grep engineering-hq
 cua spaces ls --json | jq -r '.spaces[] | select(.name=="engineering-hq") | .id'
 
 # Create if missing (canonical Linux image; desktop features come with spacesd)
-cua spaces create linux --on local --name engineering-hq --json
+cua spaces create linux --on local --kind container --runtime runc \
+  --name engineering-hq --json
 # → {"spaces":[{"id":"local:engineering-hq","name":"engineering-hq", ...}]}
+
+# Confirm Docker owns it
+docker ps --filter name=engineering-hq --format '{{.Names}}\t{{.Status}}'
+cua sb exec engineering-hq -- uname -a
+```
+
+If `cua sb ls` shows `STATUS missing`, the registry row survived but the
+container did not. Delete and recreate:
+
+```bash
+cua spaces delete engineering-hq --force
+cua spaces create linux --on local --kind container --runtime runc \
+  --name engineering-hq --json
 ```
 
 MCP equivalent (when relay auth is healthy):
@@ -86,8 +104,9 @@ MCP equivalent (when relay auth is healthy):
 }
 ```
 
-If MCP returns relay auth errors, use the CLI. Refresh with `cua auth login`
-when the access token is near expiry.
+Pass kind/runtime via CLI when MCP omits them. If MCP returns relay auth
+errors, use the CLI. Refresh with `cua auth login` when the access token is
+near expiry.
 
 Multi-machine durable (optional):
 
@@ -117,8 +136,9 @@ cua spaces create linux --on auto --durable --name engineering-hq --json
 
 1. Create Anytype Computer + Browser (`hq-runtime-pair.md`)
 2. Link pair on HQ / Subteams / Agents
-3. **This file:** `cua spaces create linux --on local --name {hq-slug}-hq`
-4. Set Computer.`cua_space` to the returned id
+3. **This file:** `cua spaces create linux --on local --kind container
+   --runtime runc --name {hq-slug}-hq`
+4. Set Computer.`cua_space` to the returned id (`local:{hq-slug}-hq`)
 5. Hermes apply later: pin `plugins.entries.cua-spaces.settings.space` to
    Computer.`cua_space` (or its short name), `desktop: true`,
    `delete_on_exit: false` (`browser-and-computer.md`)
@@ -132,16 +152,17 @@ For each HQ Computer missing `cua_space`:
 2. Create `{hq-slug}-hq` if absent
 3. Patch `cua_space=local:{hq-slug}-hq`
 
-Org fill (2026-11-04): six Spaces created and linked:
+Org fill (2026-11-04): six Docker container/runc Spaces created and linked
+(same ids after recreate when containers went missing):
 
-| Computer | `cua_space` |
-|----------|-------------|
-| Engineering HQ – Cua Spaces | `local:engineering-hq` |
-| Product HQ – Cua Spaces | `local:product-hq` |
-| Growth HQ – Cua Spaces | `local:growth-hq` |
-| Finance HQ – Cua Spaces | `local:finance-hq` |
-| Legal & HR HQ – Cua Spaces | `local:legal-hr-hq` |
-| Foyer HQ – Cua Spaces | `local:foyer-hq` |
+| Computer | `cua_space` | kind / runtime |
+|----------|-------------|----------------|
+| Engineering HQ – Cua Spaces | `local:engineering-hq` | container / runc |
+| Product HQ – Cua Spaces | `local:product-hq` | container / runc |
+| Growth HQ – Cua Spaces | `local:growth-hq` | container / runc |
+| Finance HQ – Cua Spaces | `local:finance-hq` | container / runc |
+| Legal & HR HQ – Cua Spaces | `local:legal-hr-hq` | container / runc |
+| Foyer HQ – Cua Spaces | `local:foyer-hq` | container / runc |
 
 ## Verify
 

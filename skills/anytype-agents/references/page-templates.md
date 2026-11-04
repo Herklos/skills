@@ -188,7 +188,7 @@ Follow **Agents → {Shared Rules title}** in full.
 - Models: from profile (`model.*` + fallbacks + aux); optional local overrides; Subagents (type `subagent` → model_map {task_key…}) | default worker {…}; MoA {off|preset}
 - Personality: SOUL {…}; overlay {none|name}; customs {…}
 - Memory: built-in {on|off}; approval {on|off}; provider {none|name}
-- Browser: {linked Browser catalog name | {HQ} – Cua Chromium | empty on Board/Primary}
+- Browser: {linked Browser catalog name | {HQ} – Hermes Chromium | empty on Board/Primary}
 - Computer: {linked Computer catalog | {HQ} – Cua Spaces | empty on Board/Primary | host / Bot Screen exception} · dedicated|shared
 - Tools: {linked Tool profile | toolsets}; approvals {smart|manual|off}; terminal {cua (preferred)|local|…}/{cwd}
 - Voice: {off|on}; auto TTS {on|off}; chat {off|chained|gpt-live}; messaging {off|voice_only|all}; STT/TTS from harness profile or overrides

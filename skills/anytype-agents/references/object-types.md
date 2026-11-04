@@ -341,11 +341,13 @@ playbook: `hq-runtime-pair.md`.
 
 | Name pattern | slug pattern | Typical props |
 |--------------|--------------|---------------|
-| `{HQ name} – Cua Chromium` | `{hq-slug}-cua-chromium` | `browser_source: local-chromium`, `browser_identity: dedicated-throwaway`, `access_needed: true`, `headed: false` |
+| `{HQ name} – Hermes Chromium` | `{hq-slug}-hermes-chromium` | `browser_source: local-chromium`, `browser_identity: dedicated-throwaway`, `access_needed: true`, `headed: false` |
 
-Example: `Engineering HQ – Cua Chromium` / `engineering-cua-chromium`. Pair with
-the same HQ's Computer. Do not mint shared None / Local throwaway / Operator
-rows unless the user asks for an exception surface.
+Example: `Engineering HQ – Hermes Chromium` / `engineering-hermes-chromium`. Pair with
+the same HQ's Computer. The Browser object describes **Hermes** browser settings
+(`tools enable browser`, local throwaway Chromium); Space placement follows the
+paired Computer's `desktop_enabled`. Do not mint shared None / Local throwaway /
+Operator rows unless the user asks for an exception surface.
 
 **Default template name:** `Browser default`. Body: `type-templates.md`.
 
@@ -428,7 +430,7 @@ Hermes apply: `runtime-limits-and-tools.md`. Pair with linked Browser / Computer
 when those toolsets are enabled.
 
 **Fill conventions (org):**
-- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Cua Chromium`
+- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium`
   pair for that HQ, its Subteams, and its Agents
 - Board + Primary → leave `browser` / `computer` empty (Primary
   `computer_surface: none`)
@@ -536,7 +538,7 @@ template id from `API-list-templates` when you need a specific one; pass
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…",
       "delegation_enabled": true,
-      "browser": ["<engineeringHqCuaChromiumBrowserId>"],
+      "browser": ["<engineeringHqHermesChromiumBrowserId>"],
       "computer": ["<engineeringHqCuaSpacesComputerId>"],
       "tool_profile": ["<codingOrStandardToolProfileId>"],
       "terminal_backend": "cua",

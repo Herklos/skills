@@ -15,7 +15,7 @@ Property keys: `object-types.md`.
 Dumped / authored **2026-11-04**; property-complete pass **2026-11-04** (v1.18.0);
 runtime catalogs **2026-11-04** (v1.19.0): Browser / Computer / Tool profile
 types + Agent/Team/Subteam link props. Per-HQ Browser/Computer pairs
-**2026-11-04** (v1.22.0): one `{HQ} – Cua Spaces` + `{HQ} – Cua Chromium` per
+**2026-11-04** (v1.22.0): one `{HQ} – Cua Spaces` + `{HQ} – Hermes Chromium` per
 HQ; Subteams/Agents inherit; Board/Primary empty. Prompt type **2026-11-04**
 (v1.25.0): system/welcome/shared_rules/library/draft. Memory + Skill types
 **2026-11-04** (v1.26.0): agent notes as `memory`; procedures as `skill`;
@@ -43,7 +43,7 @@ Set Autonomy / Short description / Memory pages / Map path as **properties**
 **auxiliary (from profile):** vision / compression / web_extract / skills_hub / title_generation (auto unless set)
 **Catalog harnesses:** claude | codex | grok | github-copilot | muse | nvidia-nim | local-model
 **Subagents / delegation:** Agent.`delegation_enabled` + Agent.`subagents`. Parent Local router answers light/peer asks itself; model_map routes when specialized work is needed.
-**Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults owning HQ Cua Chromium / HQ Cua Spaces / Standard interactive; Primary leaves browser+computer empty).
+**Browser / Computer / Tools:** Agent.`browser` / `computer` / `tool_profile` (catalog links; defaults owning HQ Hermes Chromium / HQ Cua Spaces / Standard interactive; Primary leaves browser+computer empty).
 **Terminal / computer selects:** Agent.`terminal_backend` / `computer_surface` (defaults cua / cua-spaces; Primary `computer_surface: none`; keep aligned with linked Computer / Tool profile).
 **Voice:** Agent.`voice_enabled` / `voice_auto_tts` / `voice_chat_mode` / `messaging_voice_mode`; STT/TTS from Harness profile (Local router: local+edge) or Agent overrides.
 **System prompt:** Agent.`system_prompt` → Prompt object (`prompt_kind=system`).

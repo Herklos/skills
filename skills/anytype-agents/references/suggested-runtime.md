@@ -84,9 +84,9 @@ Paste under the agent title (date the heading when you revise it).
 - Org default stack: local / base + edge / en-US-AriaNeural
 - Apply: hermes-profiles `voice.md`
 **Browser access:** (prefer Agent.`browser` → type `browser` catalog)
-- Catalog: {{HQ name} – Cua Chromium | empty on Board/Primary | exception surface …}
+- Catalog: {{HQ name} – Hermes Chromium | empty on Board/Primary | exception surface …}
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)
-- Source: local Chromium (HQ Cua Chromium) | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
+- Source: local Chromium (HQ Hermes Chromium) | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
 - Identity: dedicated throwaway | dedicated persistent | team/shared persistent | operator real profile
 - Headed: no | yes · Notes: {vault logins? cron needs cookies?}
 **Computer access:** (prefer Agent.`computer` → type `computer` catalog)
