@@ -392,6 +392,22 @@ pages with `set_type` → `group` (`object-types.md`). Hermes apply:
 Omit `template` to use **Subteam default** when the type has one. Patch the
 parent HQ `subteams` property. Prefer this over `team` + `kind: Sub-team`.
 
+Also ensure the HQ has a **Subteams** Query (create once per HQ):
+
+```json
+{
+  "space_id": "<spaceId>",
+  "name": "Engineering – Subteams",
+  "type": "subteam",
+  "filter": "parent_team IN (\"<engineeringHqObjectId>\")",
+  "sorts": [{ "property": "name", "direction": "asc" }]
+}
+```
+
+Then `set_properties` Team.`subteams_page: ["<queryId>"]`. Replace any static
+Sub-teams / Domains / Notion-map body section with a short pointer + link to
+the Query (`page-templates.md`).
+
 ## Create a project portfolio root
 
 ```json

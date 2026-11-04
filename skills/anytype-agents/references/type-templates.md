@@ -26,11 +26,13 @@ Agent.`agenda_page` (Calendar on `next_run`). Group type **2026-11-04**
 (v1.30.4): messaging rooms as `group` (welcome Prompt + platform fields);
 Team `kind: Group` deprecated. HQ standing **2026-11-04** (v1.31.0): Team
 `standing_instructions` → Prompt library; slim HQ bodies; short system Prompt
-section. Prefer properties for mission / members / routing / short description /
+section. HQ Subteams Query **2026-11-04** (v1.31.1): Team.`subteams_page` →
+Query filtered by `parent_team` (replace static Sub-teams / Domains tables).
+Prefer properties for mission / members / routing / short description /
 autonomy / map path / browser / computer / tool_profile / `system_prompt` /
 `memory_pages` / `skills_page` / `logs_page` / `agenda_page` /
-`messaging_group` / `standing_instructions`; template bodies keep Suggested
-runtime + System prompt pointer (canonical text on linked Prompt).
+`messaging_group` / `standing_instructions` / `subteams_page`; template bodies
+keep Suggested runtime + System prompt pointer (canonical text on linked Prompt).
 
 ---
 
@@ -80,13 +82,19 @@ For Board / HQ. Domains under an HQ use **Subteam default** (type `subteam`).
 Messaging rooms use **Group default** (type `group`), not Team `kind: Group`.
 
 Set `kind`, `chief`, `members`, `subteams`, `mission`, `routing_summary`,
-`standing_instructions` as properties. Template body:
+`standing_instructions`, `subteams_page` as properties. Template body:
 
 ```markdown
-## Map notes
-(Optional detail beyond `routing_summary` / `subteams` / `members`.)
+## Subteams
+Canonical domain roster is the linked **Subteams page** Query
+(Team.`subteams_page`; filter `parent_team` = this HQ).
+
+## Standing instructions
 Standing instructions (gates, principles, routing) live on the linked
 **Standing instructions** Prompt (Team.`standing_instructions`).
+
+## HQ coordination
+(Optional chief / group / skills / transition links.)
 ```
 
 ---

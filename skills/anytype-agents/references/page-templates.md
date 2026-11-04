@@ -54,24 +54,33 @@ pointer.
 
 Set as properties: `kind` (`HQ` / `Board`), `chief`, `members`,
 `subteams`, `mission`, `routing_summary`, `standing_instructions` (→ Prompt
-library), optional `messaging_group` (typed Group) / `skills_page`, optional
-`browser` / `computer` / `tool_profile` team defaults.
+library), `subteams_page` (→ Subteams Query), optional `messaging_group`
+(typed Group) / `skills_page`, optional `browser` / `computer` /
+`tool_profile` team defaults.
 
 ```markdown
 # {Name} HQ
 
-## Map notes
-Subteams / domains via properties. Standing instructions (gates, principles,
-routing) live on the linked **Standing instructions** Prompt
-([{Name} HQ – Standing instructions](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
-Group, Skills, and Transition plan links stay here as needed.
+## Subteams
+Canonical domain roster is the linked **Subteams page** Query
+([{Name short} – Subteams](anytype://object?objectId=<queryId>&spaceId=<spaceId>)),
+filtered by `parent_team` = this HQ.
+
+## Standing instructions
+Canonical gates and routing live on the linked **Standing instructions** Prompt
+([{Name} – Standing instructions](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
+
+## HQ coordination
+(Chief / Group / Skills / Transition plan links as needed.)
 ```
 
-Do **not** keep a second full Rules / Delivery / Routing dump on the HQ once
+Do **not** keep a static Sub-teams / Domains / Sub-domains table, per-domain
+empty headings, or Notion-map path lists once `subteams_page` is set. Do
+**not** keep a second full Rules / Delivery / Routing dump once
 `standing_instructions` is set. Full playbook: `hq-standing-instructions.md`.
 
 Link: chief, group, skills, transition notes, **`subteam`** children via the
-`subteams` property (not `team` + `kind: Sub-team`).
+`subteams` property **and** the Subteams Query (not `team` + `kind: Sub-team`).
 
 ## Subteam page
 

@@ -2,8 +2,9 @@
 
 Long HQ gates, principles, and routing live on a typed **`prompt`**
 (`prompt_kind=library`, `audience=org`) linked from Team.`standing_instructions`.
-HQ bodies stay short (map notes + pointer). Agent system Prompts keep a short
-mandatory section; they do **not** paste the full library (token economy).
+HQ bodies stay short (Subteams Query pointer + Standing instructions pointer).
+Agent system Prompts keep a short mandatory section; they do **not** paste the
+full library (token economy).
 
 Shared Rules still apply org-wide. Standing instructions add HQ-specific detail;
 they do not override Shared Rules.
@@ -19,7 +20,7 @@ system Prompt (bloat). Pattern:
 
 1. One library Prompt per HQ / Board (canonical standing text)
 2. Team.`standing_instructions` → that Prompt (featured)
-3. Slim HQ body: Map notes + pointer to the linked Prompt
+3. Slim HQ body: Subteams Query (`subteams_page`) + pointer to the Standing Prompt
 4. Short `# HQ standing instructions (mandatory)` in every system Prompt
 5. Shared Rules rule pointing agents at HQ Standing instructions
 6. Consumption details in this skill (not in every Prompt)
@@ -87,15 +88,21 @@ Then:
 ```markdown
 # {Name} HQ
 
-## Map notes
-Subteams / domains via properties. Standing instructions live on the linked
-**Standing instructions** Prompt
-([{Name} HQ – Standing instructions](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
+## Subteams
+Canonical domain roster is the linked **Subteams page** Query
+([{Name short} – Subteams](anytype://object?objectId=<queryId>&spaceId=<spaceId>)).
+
+## Standing instructions
+Canonical gates and routing live on the linked **Standing instructions** Prompt
+([{Name} – Standing instructions](anytype://object?objectId=<promptId>&spaceId=<spaceId>)).
+
+## HQ coordination
 Group, Skills, and Transition plan links stay here as needed.
 ```
 
 Do **not** keep a second full Rules / Delivery / Routing dump on the HQ once the
-library Prompt is linked.
+library Prompt is linked. Do **not** keep a static Sub-teams / Domains /
+Notion-map table once Team.`subteams_page` points at the filtered Query.
 
 ## Resolve which HQ standing Prompt to open
 
@@ -151,7 +158,8 @@ same meaning.)
 2. Create `{Name} – Standing instructions` Prompt (`prompt_kind=library`).
 3. Move the prose into the Prompt body (preserve meaning; tighten lightly).
 4. Set Team.`standing_instructions`.
-5. Slim HQ body to Map notes + pointer.
+5. Slim HQ body to Subteams Query pointer + Standing instructions pointer
+   (remove static Sub-teams / Domains / Notion-map sections).
 6. Patch Shared Rules + every live system Prompt with the short mandatory
    section (append after Agenda when present).
 7. Do **not** apply Hermes SOUL until the user asks.
@@ -181,11 +189,15 @@ Filter Teams missing the link:
 ## Bootstrap in a new space
 
 1. On Team: `add_property` **Standing instructions** (`standing_instructions`,
-   objects, featured). Reuse shared objects-format keys when possible.
+   objects, featured) and **Subteams page** (`subteams_page`, objects,
+   featured). Reuse shared objects-format keys when possible.
 2. Create one library Prompt per HQ / Board; set `standing_instructions`.
-3. Keep HQ default template body as Map notes + pointer (`type-templates.md`).
-4. Include `# HQ standing instructions (mandatory)` in system Prompt skeleton.
-5. Add the Shared Rules line above.
+3. Create `{HQ short} – Subteams` Query (`type: subteam`,
+   `filter: parent_team IN ("<hqId>")`); set `subteams_page`.
+4. Keep HQ default template body as Subteams + Standing pointers
+   (`type-templates.md`).
+5. Include `# HQ standing instructions (mandatory)` in system Prompt skeleton.
+6. Add the Shared Rules line above.
 
 ## Out of scope
 

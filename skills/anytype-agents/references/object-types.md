@@ -152,13 +152,17 @@ use type **`group`** (do not create new `team` with `kind: Group`).
 | `skills_page` | objects | HQ Skills **Query** |
 | `routing_summary` | text | One-line routing |
 | `standing_instructions` | objects | HQ/Board **Standing instructions** Prompt (`prompt_kind=library`) (featured). Full playbook: `hq-standing-instructions.md` |
+| `subteams_page` | objects | HQ **Subteams** Query filtered by `parent_team` (featured). Prefer this over a static Sub-teams / Domains body table |
 | `browser` | objects | Optional team-default **Browser** catalog link |
 | `computer` | objects | Optional team-default **Computer** catalog link |
 | `tool_profile` | objects | Optional team-default **Tool profile** catalog link |
 
 Also `tag`, `links`, `backlinks`. Put long gates / principles / routing prose on
 the linked Standing instructions Prompt; keep the filterable one-liner in
-`routing_summary`. HQ body stays Map notes + pointer. Agent-level runtime links
+`routing_summary`. Child domains appear on the **Subteams** Query
+(`subteams_page`, filter `parent_team IN ("<hqId>")`); keep Team.`subteams` in
+sync for featured membership. HQ body stays Map notes + Subteams Query pointer
+(no static Sub-teams / Domains / Notion-map tables). Agent-level runtime links
 override team defaults when both are set.
 
 **Default template name:** `Team default`. Full dumped body: `type-templates.md`.
@@ -698,8 +702,10 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    Log / Schedule / Group bootstrap detail: `prompts.md` +
    `memory-and-skills.md` + `agenda-and-schedules.md` + Group section below.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
-   `skills_page`, `routing_summary`, `standing_instructions` (+ runtime catalog
-   links). On Project:
+   `skills_page`, `subteams_page`, `routing_summary`, `standing_instructions`
+   (+ runtime catalog links). Create `{HQ} – Subteams` Query
+   (`type: subteam`, `filter: parent_team IN ("<hqId>")`) and link
+   `subteams_page`. On Project:
    `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
    hub page links.
 4. `API-create-template` with `template_for`: `agent` | `team` | `group` |

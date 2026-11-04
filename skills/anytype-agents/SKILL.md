@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.31.0
+version: 1.31.1
 license: MIT
 metadata:
   category: agents
@@ -168,9 +168,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Create type **`team`** with `kind` (`Board` / `HQ`) and `lifecycle`. Do **not** use `kind: Group` (deprecated; use typed **`group`**)
 2. Set `chief`, `members`, `subteams`, `mission`, `routing_summary`, optional `messaging_group` (→ typed Group) / `skills_page`, plus optional `browser` / `computer` / `tool_profile` team defaults
 3. Create a **Standing instructions** Prompt (`prompt_kind=library`, `audience=org`) with gates / principles / routing; set Team.`standing_instructions` (`hq-standing-instructions.md`)
-4. Body from `page-templates.md` / **Team default**: Map notes + pointer only (avoid duplicating mission/members/routing already in properties; do not keep a second Rules dump)
-5. Link from Agents
-6. Update roster/routing and the linked Group welcome Prompt if membership changes
+4. Create `{HQ short} – Subteams` Query (`type: subteam`, `filter: parent_team IN ("<hqId>")`); set Team.`subteams_page`
+5. Body from `page-templates.md` / **Team default**: Subteams Query pointer + Standing instructions pointer + HQ coordination (no static Sub-teams / Domains / Notion-map tables; no second Rules dump)
+6. Link from Agents
+7. Update roster/routing and the linked Group welcome Prompt if membership changes
 
 ### Create or update a Group
 
@@ -338,7 +339,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|schedule|group|project`
 - **New specialist:** draft vs live → create `agent` + Local router `harness_profile` → link `browser` / `computer` / `tool_profile` catalog → optional `subagent`s (Coding / Data fetching) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → Suggested runtime + pointer body → Memory objects + Skills Query + Logs Query + Agenda Query (`memory-and-skills.md` + `agenda-and-schedules.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
-- **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim Map notes body → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
+- **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Group:** create `group` + welcome Prompt → set `members` / platform fields → link Agent/HQ `messaging_group` → Hermes apply via `messaging-groups.md` when asked
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
