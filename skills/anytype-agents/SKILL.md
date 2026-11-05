@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.47.0
+version: 1.48.0
 license: MIT
 metadata:
   category: agents
@@ -63,6 +63,7 @@ profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
 | `references/prompts.md` | Prompt type (system / welcome / shared_rules / library / draft), Agent.`system_prompt`, optional Team/Subteam/Subagent.`system_prompt`, Group `welcome_prompt`, body cleanup, migrate |
 | `references/memory-and-skills.md` | Memory + Skill + Log types, Agent.`memory_pages` / `skills_page` / `logs_page`, Skills / Logs Queries, migrate |
+| `references/shared-memory.md` | Human profile (About), atomic memories, Exclusions / forget, Operating Guide, daily capture, Shared Rules versioning + drift, onboarding prompt |
 | `references/suggestions.md` | Suggestion type, Agent.`suggestions_page`, Agathe weekly + ad-hoc feedback loop, approval path |
 | `references/agenda-and-schedules.md` | Schedule type, Agent.`agenda_page` Agenda Query (Calendar on `next_run`), migrate + Hermes cron bind |
 | `references/hq-standing-instructions.md` | Team.`standing_instructions` → Prompt library; slim HQ bodies; short system Prompt + Shared Rules pointer |
