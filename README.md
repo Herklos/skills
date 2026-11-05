@@ -4,8 +4,8 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.27.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.37.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.28.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.38.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -32,6 +32,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Gateway**: start/stop/install one messaging gateway per profile (one bot token each)
 - **Suggestions gate**: apply Anytype harness / Subagent / model changes only after an accepted `suggestion` (or explicit ask)
 - **Analytics**: Agent.`analytics_enabled` → enable **langfuse** on apply (`anytype-apply.md`); copy `HERMES_LANGFUSE_*` from default when needed
+- **Delegation safety (Local parent):** always set `model_map.default`; SOUL/Shared Rules require `option` on every `delegate_task`; rebuild schema with `/delegation model_map --now` or `/new`
 
 **References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `anytype-apply`, `recipes`, `troubleshooting`.
 

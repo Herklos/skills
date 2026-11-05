@@ -100,7 +100,7 @@ delegation:
   max_iterations: 250
   backends:
     model_map:
-      default: fast                   # optional: unrouted tasks; else parent main model
+      default: fast                   # REQUIRED on Local parent: unrouted children use this (never inherit lfm3)
       options:
         - name: fast                  # what the agent picks
           description: Cheap and quick; lookups, summaries, simple edits.
@@ -145,6 +145,24 @@ In chat (after plugin install):
 ```
 
 Schema is built at session start. Mid-chat mode changes need `/new` or `--now`.
+
+### Org enforcement (Local parent + model_map) — mandatory
+
+Three mitigations after unrouted children inherited parent **lfm3**
+(Octave `deleg_e2211d4e`, 2026-11-05):
+
+1. **`model_map.default`** — always set to a live Subagent `task_key` on Local
+   parents (`hermes -p <slug> config set delegation.backends.model_map.default <key>`).
+   Unrouted `delegate_task` must not fall through to lfm3.
+2. **Always pass `option`** — SOUL + Shared Rules (rule 26): every spawn sets
+   `option` to a route matching Subagent `task_key`, with full `goal` + `context`.
+3. **Rebuild tool schema** — after any `model_map` / mode change, `/delegation model_map --now`
+   or `/new` (and `hermes -p <slug> sessions refresh-prompts` after SOUL edits).
+   Stale sessions can omit the `option` enum even when config is correct.
+
+Verify: `hermes -p <slug> delegation config --show` prints `default: <key>`.
+Child `manifest.json` / `task_json` must show the route model, not `lfm3`, when
+the parent intended a Subagent.
 
 ### Profile routes (`profile_routes`)
 
@@ -313,12 +331,18 @@ Steps:
 5. `hermes -p <slug> plugins install advanced-delegation`
 6. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
    one option per Subagent `task_key` (include route `fallback_providers`)
-7. Prefer leaving unrouted / no-spawn work on the **parent local decision model**.
-   Only set `model_map.default` if you want a child fallback when the parent still
-   calls `delegate_task` without an option. Keep parent top-level
-   `fallback_providers` empty on Local parent.
-8. `hermes -p <slug> delegation config --show` and confirm each route's
-   fallbacks match the Subagent harness order
+7. **Always set `model_map.default`** to one live Subagent `task_key` when the
+   parent is Local (lfm3). Light peer answers still stay on the parent without
+   spawning; but if the parent calls `delegate_task` without `option`, children
+   must **not** inherit lfm3 (set `default` to the most common route: `web` /
+   `deep` / `fast`). Keep parent top-level `fallback_providers` empty on Local
+   parent.
+8. Enforce in SOUL + Shared Rules: every `delegate_task` sets **`option`** to a
+   live route matching Subagent `task_key`, with full `goal` + `context`.
+9. After route edits: `/delegation model_map --now` or `/new` so the `option`
+   enum is on the tool schema (built at session start).
+10. `hermes -p <slug> delegation config --show` and confirm each route's
+   fallbacks match the Subagent harness order and that **`default:`** is set.
 
 Example declined from three Subagents (Coding + Data fetching profiles):
 

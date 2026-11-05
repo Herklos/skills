@@ -53,7 +53,15 @@ After apply, write back `hermes_profile` on the Agent if it was empty.
    - Decline Subagent / route harness `fallback_1_*` + `fallback_2_*` into that
      option's `fallback_providers` (ordered). Parent Local parent still keeps
      top-level `fallback_providers: []`.
-   - Prefer **no** `model_map.default` so unrouted work stays on parent lfm3
+   - **Always set `model_map.default`** to one live Subagent `task_key` when the
+     parent is Local (lfm3). Unrouted `delegate_task` calls otherwise inherit
+     parent lfm3 (incident: Octave `deleg_e2211d4e`). Prefer the most common
+     child route (`web` for veille/research; `deep` or `fast` for coding packs).
+   - SOUL / Shared Rules must require: every `delegate_task` sets **`option`** to
+     a live route matching Subagent `task_key`; full `goal` + `context`.
+   - After writing `model_map`: tell the user (or run if interactive) to rebuild
+     the tool schema with `/delegation model_map --now` or `/new`. Schema is
+     built at session start; stale sessions omit the `option` enum.
    - Resolve display labels → runtime ids (see **Model label map**)
 8. **Cron** only for Agenda rows with `lifecycle=live`, kind `recurring|oneshot`,
    non-empty `schedule_expr`. Skip `event` / `draft` / `archived` / empty expr.
@@ -96,10 +104,11 @@ After apply, write back `hermes_profile` on the Agent if it was empty.
     - When `analytics_enabled` is false/unset: do **not** auto-disable langfuse
       (opt-in only; user may `plugins disable langfuse` manually).
 13. **Verify** `hermes profile describe <slug>`, `delegation config --show`
-    (route fallbacks present), `cron list` vs Agenda Schedules, `skills list`
-    for `org/…`, `config get voice.voice_chat_mode`,
+    (routes + **`default:`** set + route fallbacks), `cron list` vs Agenda
+    Schedules, `skills list` for `org/…`, `config get voice.voice_chat_mode`,
     `plugins list | grep langfuse` when analytics was requested, `doctor`,
-    `sessions refresh-prompts`. Note open sessions need a turn to pick up SOUL.
+    `sessions refresh-prompts`. Note open sessions need a turn to pick up SOUL
+    and **`/delegation model_map --now` or `/new`** after route changes.
 14. **Messaging** only when user asks (`messaging-groups.md`); tokens never
     auto-cloned. If Group.`platform_chat_id` is empty, set mention gates only
     and leave allowlists empty (do not invent chat ids).
@@ -148,7 +157,8 @@ hermes -p <slug> config get local_runtime.enabled
 hermes -p <slug> config get voice.voice_chat_mode
 hermes -p <slug> fallback list         # Local parent: expect none
 hermes -p <slug> moa list              # Local parent: expect Active (off), local slots, no stock cloud
-hermes -p <slug> delegation config --show   # each route has fallback_providers when Subagent had fallback_*
+hermes -p <slug> delegation config --show   # default: set; each route has fallback_providers when Subagent had fallback_*
+# After route changes: /delegation model_map --now  OR  /new  (in an open chat)
 hermes -p <slug> tools list | grep -E 'browser|computer|delegation|cronjob'
 hermes -p <slug> cron list             # names match Schedule.schedule_key; ids written back
 hermes -p <slug> skills list | grep org/
@@ -165,7 +175,7 @@ When the user asks for a **proper / full** Agent ↔ Hermes sync, cover all of:
 |--------|---------|--------|
 | Identity | Prompt + `short_description` | `SOUL.md` + `profile describe` / `display_name` |
 | Local parent | Harness profile | `model.*` + `auxiliary.approval` + `local_runtime`; empty parent fallbacks; MoA off |
-| Subagents | `task_key` + harness + `fallback_*` | `model_map` options + per-route `fallback_providers` |
+| Subagents | `task_key` + harness + `fallback_*` | `model_map` options + **`default`** + per-route `fallback_providers`; SOUL/Shared Rules require `option` on spawn |
 | Agenda | live Schedules | `hermes cron` + `hermes_job_*` writeback |
 | Skills | active procedures on Skills Query | `skills/org/<key>/SKILL.md` (additive) |
 | Voice | `voice_*` modes | `voice.auto_tts` / `voice.voice_chat_mode` |

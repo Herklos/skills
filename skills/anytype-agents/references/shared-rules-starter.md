@@ -64,6 +64,13 @@ Before delivery, routing, merge, design, legal, finance, or cross-HQ work: open 
 
 15) Improvement suggestions (mandatory; type `suggestion`)
 When a model, Subagent route, Skill, harness profile, tool profile, Memory, or Prompt does not fit the task, file an Anytype **suggestion** (or ask the Memory Keeper): owner_agent, proposed_by, suggestion_kind (model_fit|new_subagent|new_skill|harness|tool|memory|prompt|other), suggestion_status draft|proposed, summary + Evidence/Proposed action body. It appears under Agent → Suggestions Query (`suggestions_page`). Approval: owning agent + chief; org-wide/harness/Shared Rules → Primary. Do not auto-apply into Hermes.
+
+16) Hermes delegation routes (mandatory when spawning Subagents)
+When you call `delegate_task` (or any fan-out that creates a child run):
+- Always set **`option`** to a live `model_map` route name that matches a Subagent `task_key` (e.g. `deep`, `web`, `fast`).
+- Never spawn without `option`. Unrouted children inherit the parent model (often local **lfm3**) unless `model_map.default` is set; still pick the right route.
+- Pass a full self-contained `goal` + `context` (the child has no parent chat history).
+- After any change to delegation / `model_map` on your Hermes profile: `/delegation model_map --now` or `/new` so the `option` enum is on the tool schema for this session.
 ```
 
 ## Rollout checklist (Primary)
