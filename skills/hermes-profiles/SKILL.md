@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.32.0
+version: 1.33.0
 license: MIT
 metadata:
   category: agents
@@ -40,7 +40,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent; **Anytype Agenda → Hermes** bind |
 | `references/messaging-groups.md` | Multi-bot Telegram/Discord rooms; Anytype typed **Group** → Hermes decline (tokens, allowlists, mention gates) |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
-| `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (ordered fast path, model label map, write discipline, gaps) |
+| `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (create-if-missing inventory, ordered fast path, model label map, write discipline, gaps) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Stubs (redirect only): `models-and-delegation.md`, `workspace-and-display.md`.
@@ -360,6 +360,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **New specialist:** `create` → `setup` → set `terminal.cwd` → edit SOUL → optional `display.personality` → `doctor` (see `recipes.md`)
 - **Twin of existing:** `create <new> --clone-from <src>` (add `--clone-all` only if needed)
 - **Empty orchestrator:** `create <slug> --no-skills`
+- **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
 - **Multi-bot group:** `messaging-groups.md` (tokens + allowlist + mention gates + welcome paste)
 - **Share package:** `export` / `import` or `profile install <git-url>`

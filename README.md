@@ -4,7 +4,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.32.0 | Lifecycle and config for Hermes Agent profiles |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.33.0 | Lifecycle and config for Hermes Agent profiles |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.43.1 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
 

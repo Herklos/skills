@@ -24,6 +24,22 @@ hermes profile show forge-sandbox
 
 Messaging tokens stay off the clone unless `--clone-channels` (ask first).
 
+## 2b. Create missing profiles from Anytype inventory
+
+When live Hermes-runtime Agents have `hermes_profile` set but no
+`~/.hermes/profiles/<slug>/` (common after an Anytype structure fix):
+
+```bash
+# after inventory (anytype-apply.md → Create missing profiles)
+hermes profile create firmin --clone-from ambre \
+  --description "Sales & Acquisition under Kléber. Draft only…"
+# then: Local parent config sets, replace SOUL from system Prompt,
+# describe, voice modes, sessions refresh-prompts
+```
+
+Skip Osaurus-runtime Agents and archived Agents. Full checklist:
+`anytype-apply.md` → **Create missing profiles**.
+
 ## 3. Narrow orchestrator (no bundled skills)
 
 ```bash
@@ -136,7 +152,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
 | Multi-bot Telegram / Discord groups | `messaging-groups.md` |
-| Anytype Agent → live Hermes apply | `anytype-apply.md` |
+| Anytype Agent → live Hermes apply / create-if-missing | `anytype-apply.md` |
 
 ## Decision guide: what to edit where
 

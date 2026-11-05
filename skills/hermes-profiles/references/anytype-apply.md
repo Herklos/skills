@@ -10,12 +10,63 @@ First successful apply (P → Hermes `default`, 2026-11-04) is the template belo
 
 | Anytype | Hermes |
 |---------|--------|
-| Agent.`hermes_profile` filled | `hermes -p <slug>` |
+| Agent.`hermes_profile` filled **and** dir exists | `hermes -p <slug>` |
 | Primary / empty + Bot Mode title **P** | id **`default`** (`$HERMES_HOME`, not `profiles/p`) |
 | Missing slug but `~/.hermes/profiles/<name>` exists | set Agent.`hermes_profile` then apply |
-| No dir | `hermes profile create <slug> --clone-from <src>` (no `--clone-channels` unless asked) |
+| Slug filled but **no** `~/.hermes/profiles/<slug>/` | **create-if-missing** (section below), then apply |
+| No slug and no dir | invent slug from Agent name (lowercase ASCII), create, write back `hermes_profile` |
 
 After apply, write back `hermes_profile` on the Agent if it was empty.
+
+## Create missing profiles (inventory → create)
+
+When the user asks to create missing Hermes agents/profiles (or after an org
+structure fix that minted Anytype Agents without homes):
+
+1. **Inventory**
+   - Anytype: `type: agent`, fields `name`, `lifecycle`, `hermes_profile`,
+     `runtime`, `short_description`, `harness_profile`, `system_prompt`.
+   - Hermes: `hermes profile list` + `ls ~/.hermes/profiles`.
+   - **Create** only when: `lifecycle=live`, Agent.`runtime` is the **Hermes**
+     catalog object, and `~/.hermes/profiles/<slug>/` is missing (slug from
+     `hermes_profile`, else derive from the Agent short name).
+   - **Skip** `lifecycle=archived` / `draft` unless the user names them.
+   - **Skip** Agent.`runtime` = **Osaurus** (or Grok Bot / Noodle). Foyer
+     agents may still carry a `hermes_profile` string as documentation; do
+     **not** create a Hermes home for them (use `osaurus-agents` instead).
+2. **Create**
+   ```bash
+   hermes profile create <slug> --clone-from <peer> \
+     --description "<Agent.short_description>"
+   ```
+   - Prefer a same-HQ Local-parent peer (Growth → `ambre` / `kleber`; Eng →
+     `marcel` / `etienne`; …). Never `--clone-channels` unless asked.
+   - Clone copies the peer’s **SOUL.md**; replace it in the next step.
+3. **Minimum post-create (always)**
+   - Local parent: `model.provider=llamacpp`, `model.default=LFM3-1.7B-Q8_0`,
+     `model.base_url=http://127.0.0.1:18434/v1`, `local_runtime.enabled=true`,
+     `auxiliary.approval` = `llamacpp` / `d1-2b-q4_k_m`, org `timezone`
+     (e.g. `Europe/Paris`). Drop leftover `providers.ollama-launch` /
+     `model.api_key` if present.
+   - `SOUL.md` ← linked system Prompt (`format=md`), strip
+     `# {Name} – System prompt` / `## Prompt` / `## Notes` wrappers.
+   - `hermes profile describe <slug> --text "<short_description>"`.
+   - Voice modes even when off: `voice.auto_tts`, `voice.voice_chat_mode`;
+     stack keys are nested (`stt.local.model`, `tts.edge.voice`), not
+     `stt.model` / `tts.voice`.
+   - `memories/MEMORY.md` = Anytype Memory titles only (pointers).
+   - `hermes -p <slug> sessions refresh-prompts`.
+4. **Full apply** (Subagents → `model_map`, tools, cron, org skills, messaging)
+   only when the user asks; follow the fast path below. Create-if-missing alone
+   does not install messaging tokens or start a dedicated gateway beyond the
+   multiplexed roster.
+5. Write back Agent.`hermes_profile` when it was empty. Report remaining gaps
+   (empty Agenda, no Subagent decline, Group without `platform_chat_id`, …).
+
+Example (2026-11-05): Growth structure fix left Firmin/`firmin` and
+Bérénice/`berenice` with filled `hermes_profile` but no dirs; created via
+`--clone-from ambre`, then Local parent + SOUL + describe. Foyer Sidonie /
+Philippe / Blanche / Bob stayed Osaurus-only.
 
 ## Fast path (ordered)
 
