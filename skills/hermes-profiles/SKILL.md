@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.37.0
+version: 1.38.0
 license: MIT
 metadata:
   category: agents
@@ -311,7 +311,10 @@ Full guide: `references/messaging-groups.md`. One bot token + gateway per
 member profile. Allowlist the platform chat id on each profile; prefer
 `require_mention` + `exclusive_bot_mentions`. Intended rooms live as Anytype
 typed **Group** objects (`anytype-agents` `object-types.md`); decline into
-Hermes only when the user asks to apply.
+Hermes only when the user asks to apply. On Anytype, **join the HQ/domain
+Group first** for new specialists (every live Agent needs `messaging_group`);
+mint a new Group only for a new HQ or a distinct domain room. Groups are not
+`delegation.backend` modes (`delegation.md`).
 
 ### Anytype suggestions → Hermes apply
 
@@ -364,7 +367,8 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
 - **Fleet Bot Mode avatars:** quit Desktop → `profiles.set_asset` → `ui_meta` photo/custom → seed `bot-meta-v2` with 256 data URLs (`avatars.md`; recipe **5b**)
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
-- **Multi-bot group:** `messaging-groups.md` (tokens + allowlist + mention gates + welcome paste)
+- **Multi-bot group:** `messaging-groups.md` (Anytype join-HQ-first + tokens + allowlist + mention gates + welcome paste)
+- **Delegation mode:** one of `model_map` / `profile_routes` / `default` via Agent.`delegation_backend` (`delegation.md`); distinct from messaging Groups
 - **Share package:** `export` / `import` or `profile install <git-url>`
 - **Anytype → Hermes apply:** `anytype-apply.md` (SOUL + Local parent + model_map routes + **default** + option enforcement + tools + cron + org skills + voice modes + analytics/langfuse + describe)
 - **Delegation safety:** Local parent `model_map.default` required; SOUL/Shared Rules require `option` on every `delegate_task`; rebuild schema with `/delegation model_map --now` or `/new` (`delegation.md`)

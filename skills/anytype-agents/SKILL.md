@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.44.0
+version: 1.45.0
 license: MIT
 metadata:
   category: agents
@@ -184,12 +184,39 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 ### Create or update a Group
 
+**Groups are human-visible messaging rooms.** They are not Hermes `model_map` /
+`profile_routes` (those are spawn backends on the Agent). Every **live** Agent
+must have `messaging_group` set. Prefer one room per HQ (or per clear domain
+room like Veille / Wedding / Ana) over one room per specialist.
+
+**Join first (default for new specialists under an existing HQ):**
+
+1. Find the HQ (or domain) Group via `type: group` + `parent_team` / name search
+2. Add the Agent to Group.`members` and to HQ.`members` when they report there
+3. Append the Agent's `hermes_profile` slug to Group.`hermes_profiles` (comma list)
+4. Set Agent.`messaging_group` → that Group id (and keep Agent.`team` on the HQ or Subteam)
+5. Rewrite the Group welcome Prompt (delete stale body blocks, then `insert_blocks`;
+   `mcp-recipes.md` → Rewrite a Group welcome). Name Clovis/Denise/Joachim-style
+   joiners in Team + sub-team bullets
+6. Hermes apply only when the user asks (`hermes-profiles` `messaging-groups.md`)
+
+**Mint a new Group only when** the room has a distinct audience (new HQ, or a
+domain that already owns its own chat such as Veille & Technology, Wedding, Ana /
+Kitchen). Do not create three specialist Groups for three Eng hires under
+Engineering HQ.
+
+**New Group create steps:**
+
 1. Create type **`group`** (or `set_type` a legacy Group `page` in place) with `lifecycle`, `parent_team`, `members`, `slug`, optional `mission` / `routing_summary`
 2. Create a **Prompt** (`prompt_kind=welcome`, `owner_group`, `audience=group`); set Group.`welcome_prompt` (`prompts.md`)
 3. Set platform intent: `platform`, optional `platform_chat_id`, `hermes_profiles` (comma slugs), `require_mention`, `exclusive_bot_mentions`, `notes`
 4. Point Agent.`messaging_group` (and HQ/Subteam.`messaging_group` when the room is theirs) at this Group
 5. Body from **Group default** / `page-templates.md` (Members + Welcome pointer only; no second welcome fence)
 6. Hermes apply (tokens, allowlists, gateways) only via `hermes-profiles` `messaging-groups.md` when the user asks
+
+**Inventory gap check:** search `type: agent` with `lifecycle = "live"` and
+`fields` including `messaging_group`. Any live Agent with empty `messaging_group`
+should join the owning HQ Group (or the domain Group if one already exists).
 
 ### Create or update a Subteam
 
@@ -400,12 +427,13 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 ## Common recipes (summary)
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|runtime|vault_grant|prompt|memory|skill|log|suggestion|schedule|group|project`
-- **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `runtime` (Hermes / Osaurus / …) + `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query + Suggestions Query (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
+- **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `runtime` (Hermes / Osaurus / …) + `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query + Suggestions Query (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`) → link HQ / Subteam → **join HQ/domain Group** (`messaging_group` required when live) → prompt copy reminder
 - **HQ structure fix:** revive Subteams → create missing agents (draft-only = `propose`) → wire HQ/Group members + hermes_profiles → welcome rewrite → Prompt snips + Operating Notes + Primary org-map `set_cell` → verify; **no Hermes apply** unless asked (`mcp-recipes.md`)
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
 - **New Suggestion:** create `suggestion` with `owner_agent` + kind/status → appears on Suggestions Query / Inbox → approve agent+chief (P org-wide); no Hermes auto-apply (`suggestions.md`)
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
-- **New Group:** create `group` + welcome Prompt → set `members` / platform fields → link Agent/HQ `messaging_group` → Hermes apply via `messaging-groups.md` when asked
+- **New Group:** prefer join HQ/domain Group first; mint `group` + welcome Prompt only for a new HQ or distinct domain room → set `members` / `hermes_profiles` / platform fields → link Agent/HQ `messaging_group` → welcome rewrite → Hermes apply via `messaging-groups.md` when asked
+- **Missing messaging_group:** live Agents without a Group → add to HQ Group members + hermes_profiles + Agent.`messaging_group` + welcome rewrite (Eng pattern: Clovis/Denise/Joachim → Engineering Group)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it

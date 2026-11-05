@@ -24,23 +24,35 @@ Related: `models.md` for main / auxiliary / fallback / MoA. The parent **routing
 no Subagent is needed, and picks named `model_map` routes (from Anytype Subagent
 objects) for specialized work. Exceptions: Foyer and CLASQUIN (no Subagents).
 
-### Two layers: routing model vs task-specific models
+### Three layers: rooms vs routing model vs task routes
 
 | Layer | Where | Role |
 |-------|--------|------|
+| **Messaging Group** | Anytype typed `group` + Agent.`messaging_group` | Human-visible Telegram/Discord room roster. **Not** a delegation backend. See `messaging-groups.md` |
 | **Routing model** | Parent `model.*` (main brain) | Plans the work and **chooses** a named route per `delegate_task` item (`option` or `profile`) |
 | **Task-specific models** | `delegation.backends.model_map.options` | Named routes (`fast`, `deep`, `local`, …) the parent may pick; each is a full provider·model (+ optional reasoning / tier) |
 | **Single worker (no routes)** | `delegation.model` / `provider` with `backend: default` | Every child uses one model; no per-task choice |
+| **Profile personas** | `delegation.backends.profile_routes` | Child runs **as** another Hermes profile (SOUL, skills, creds) |
 
 There is no separate `routing_model` config key. The parent session's main model
 **is** the router. Give orchestrators a capable main model; put cheap/heavy
 workers in `model_map` routes.
+
+**One active delegation backend at a time** (`default` | `model_map` |
+`profile_routes`). Switching modes keeps the other mode's `backends.*` block
+for later. Messaging Groups stay linked and unchanged when you switch backends.
 
 Subagents are **not** separate profiles (unless you use `profile_routes`). They
 are fresh child runs with isolated context; only the final summary returns.
 Parent must pass full `goal` + `context` (children know nothing of prior chat).
 Repo context files may still inject into the child system prompt; `SOUL.md` does
 not (except under `profile_routes`, where the child runs **as** that profile).
+
+**Anytype mode select:** Agent.`delegation_backend` is the intended Hermes
+`delegation.backend`. Prefer `model_map` for Local-parent + Subagent role packs;
+use `profile_routes` when the parent should hand work to teammate **Agents**
+(strong-fit: Sidonie, Kléber, Henri, Noémie, Geneviève). Filling
+`profile_route_targets` does not replace Group membership.
 
 ### Install advanced-delegation (per profile that delegates)
 
@@ -183,6 +195,14 @@ delegation:
 ```
 
 Only list profiles this parent may use. Unlisted profiles cannot be picked.
+
+**Anytype decline (org):** when Agent.`delegation_backend=profile_routes`, build
+the allowlist from Agent.`profile_route_targets` (each target's
+`hermes_profile` → route `name`, `short_description` → `description`) and
+Agent.`profile_routes_default` → `default`. Keep linked Subagents for docs;
+Hermes activates one backend at a time (`model_map` block may stay in YAML
+inactive). Strong-fit parents (2026-11-05): `sidonie`, `kleber`, `henri`,
+`noemie`, `genevieve`. After apply: `/delegation profile_routes --now` or `/new`.
 
 | Backend | Behavior |
 |---------|----------|
@@ -377,10 +397,11 @@ to the ids your runtime actually accepts (`models.md`).
 
 | Need | Configure |
 |------|-----------|
+| Shared human chat room for HQ/domain bots | Anytype typed **Group** + Agent.`messaging_group` (`messaging-groups.md`); join HQ Group before minting a new room |
 | Parallel research / isolated workers | `tools enable delegation` + `delegate_task` |
 | **Local parent router (org default)** | Anytype Local parent → `model.*` LFM3-1.7B-Q8_0 (llamacpp) + `auxiliary.approval` d1; answer peers without spawning |
 | **Routing model** (who picks routes) | Parent `model.*` — see `models.md` |
-| **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options` |
+| **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options`; set Agent.`delegation_backend=model_map` |
 | Routes from Anytype Subagent objects | Decline table above; keep Agent.`subagents` in sync |
-| Child uses another profile's persona | `delegation.backend: profile_routes` (+ plugin) |
+| Child uses another **Agent profile's** persona | `delegation.backend: profile_routes` (+ plugin); Anytype `delegation_backend=profile_routes` + `profile_route_targets` |
 | One cheap worker for every child | `delegation.backend: default` + `delegation.model` |

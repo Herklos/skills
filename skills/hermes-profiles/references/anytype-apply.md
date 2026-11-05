@@ -227,7 +227,8 @@ When the user asks for a **proper / full** Agent ↔ Hermes sync, cover all of:
 |--------|---------|--------|
 | Identity | Prompt + `short_description` | `SOUL.md` + `profile describe` / `display_name` |
 | Local parent | Harness profile | `model.*` + `auxiliary.approval` + `local_runtime`; empty parent fallbacks; MoA off |
-| Subagents | `task_key` + harness + `fallback_*` | `model_map` options + **`default`** + per-route `fallback_providers`; SOUL/Shared Rules require `option` on spawn |
+| Subagents | `task_key` + harness + `fallback_*` | When `delegation_backend=model_map` (or unset): `model_map` options + **`default`** + per-route `fallback_providers`; SOUL/Shared Rules require `option` on spawn |
+| Profile routes | `delegation_backend=profile_routes` + `profile_route_targets` (+ optional `profile_routes_default`) | `delegation.backend: profile_routes`; allowlist from teammate Agents' `hermes_profile` + `short_description`; require `profile` on spawn |
 | Agenda | live Schedules | `hermes cron` + `hermes_job_*` writeback |
 | Skills | active procedures on Skills Query | `skills/org/<key>/SKILL.md` (additive) |
 | Voice | `voice_*` modes | `voice.auto_tts` / `voice.voice_chat_mode` |

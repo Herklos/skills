@@ -16,11 +16,34 @@ Platform setup details: official Telegram / Discord messaging docs. Lifecycle:
 | Hermes **profile** | One bot home (`~/.hermes/profiles/<slug>/`) |
 | Platform group/channel | Telegram supergroup / Discord channel the bots join |
 | Gateway | One process per profile (`hermes -p <slug> gateway …`) |
+| Delegation backend | Separate: `model_map` / `profile_routes` / `default` on the Agent (`delegation.md`). Groups are rooms, not spawn modes |
 
 Anytype does **not** create the Telegram/Discord room or start gateways. It
 stores who belongs, the welcome text, and intended platform settings. Apply
 into Hermes when the user asks (standing redesign rule: wait until they say
 apply).
+
+## Anytype: join HQ Group vs create a new room
+
+Every **live** Agent should have Agent.`messaging_group` filled. Prefer joining
+the owning HQ (or existing domain) Group over minting one room per specialist.
+
+**Join (default for new specialists under an HQ that already has a Group):**
+
+1. Search `type: group` for the HQ / domain room
+2. Patch Group.`members` (+ HQ.`members` when they report there)
+3. Append slug to Group.`hermes_profiles` (comma list)
+4. Set Agent.`messaging_group` → Group id
+5. Rewrite welcome Prompt (delete stale blocks → `insert_blocks`)
+6. Defer Hermes token/allowlist/gateway apply until the user asks
+
+**Create a new typed Group only when** there is a new HQ, or a domain that
+already owns a distinct chat (Veille & Technology, Wedding, Ana, Kitchen, …).
+Example: Clovis / Denise / Joachim joined **Engineering Group** rather than
+getting three new rooms; Octave stays on Veille & Technology Group.
+
+Gap inventory: `type: agent`, `lifecycle = "live"`, fields include
+`messaging_group`. Empty → join HQ or domain Group.
 
 ## Create a multi-bot group (Hermes)
 

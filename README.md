@@ -4,9 +4,9 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.37.0 | Lifecycle and config for Hermes Agent profiles |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.38.0 | Lifecycle and config for Hermes Agent profiles |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.44.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Prompts, suggestions, and Projects via Anytype MCP |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.45.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -21,7 +21,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Lifecycle** via the `hermes` CLI: create, clone, list, show, describe, rename, delete, export/import, install distributions, aliases, sticky `profile use`
 - **Identity**: durable `SOUL.md`, optional `/personality` overlay, custom presets
 - **Models**: main / decision / routing model (including local `llamacpp`), auxiliary tasks, fallback providers, MoA
-- **Delegation**: `advanced-delegation` + `model_map` / profile routes so a parent routes specialized work to Subagents
+- **Delegation**: `advanced-delegation` + one active mode (`model_map` / `profile_routes` / `default`); Anytype `delegation_backend` + `profile_route_targets` for teammate personas; distinct from messaging Groups
 - **Memory**: per-profile `MEMORY.md` / `USER.md`, write approval, optional external provider
 - **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + **one dedicated Chrome real profile per Browser** (`is_real` / `browser_engine` / unique `real_profile_pin`); host desktop and Linux Bot Screen as exceptions; **sign-in** via real profile / Hermes vault / password manager / persistent / CDP (never paste passwords in chat; respect Anytype `vault_grant`)
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
@@ -30,7 +30,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Bot Mode avatars**: fleet photo install via `profiles.set_asset` + seed Desktop `bot-meta-v2` with 256 data URLs (`avatars.md`); bare file copies / clear-only get overwritten by SVG backfill
 - **Voice**: mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord voice channel. Defaults: local Whisper + Edge TTS
 - **Cron**: scheduled jobs and Bot routines per profile; Anytype Agenda → Hermes bind when asked
-- **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group
+- **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group; join HQ/domain Group first for new specialists
 - **Gateway**: start/stop/install one messaging gateway per profile (one bot token each)
 - **Suggestions gate**: apply Anytype harness / Subagent / model changes only after an accepted `suggestion` (or explicit ask)
 - **Analytics**: Agent.`analytics_enabled` → enable **langfuse** on apply (`anytype-apply.md`); copy `HERMES_LANGFUSE_*` from default when needed
@@ -68,7 +68,7 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 | `vault_grant` | **Capability only:** which Agents may use which site / login identity (no passwords; Shared Rule 27) |
 | `prompt` | System / welcome / shared_rules / library / draft text; Agents and Groups link them |
 | `memory` / `skill` / `log` / `suggestion` / `schedule` | Memory pages, skill catalog, activity logs, improvement feedback, Agenda jobs |
-| `group` | Messaging room roster + welcome Prompt + platform gates |
+| `group` | Messaging room roster + welcome Prompt + platform gates (join HQ Group before minting per-specialist rooms) |
 | `project` | Portfolio root with status, owning team, execution policy, child hub links; featured `avatar` (optional) |
 
 Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Project → Global. Suggestions index via Agent.`suggestions_page` (Shared Rule 25; Agathe weekly + ad-hoc).

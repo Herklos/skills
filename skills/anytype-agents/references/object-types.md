@@ -72,7 +72,10 @@ Featured properties (API keys):
 | `reports_to` | objects | Link to chief / Primary agent |
 | `lifecycle` | select | `draft` \| `live` \| `archived` |
 | `harness_profile` | objects | Link to one **Harness profile** (source of `model.*` / fallbacks / aux). **Default for most agents: Local parent** |
-| `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start |
+| `subagents` | objects | Zero or more **Subagent** spawn configs this agent may start (`model_map` routes when `delegation_backend=model_map`) |
+| `delegation_backend` | select | `model_map` \| `profile_routes` \| `default` (featured). Active Hermes `delegation.backend`. One mode at a time |
+| `profile_route_targets` | objects | Teammate **Agents** this parent may spawn via Hermes `profile_routes` (featured). Decline: each target's `hermes_profile` → route `name`, `short_description` → `description` |
+| `profile_routes_default` | objects | Optional default teammate Agent when `delegation_backend=profile_routes` (featured) |
 | `system_prompt` | objects | Link to one **Prompt** (`prompt_kind=system`; canonical SOUL / system text) |
 | `browser` | objects | Link to one **Browser** catalog object |
 | `computer` | objects | Link to one **Computer** catalog object |
@@ -98,7 +101,7 @@ Other properties:
 | `memory_review_off` | checkbox | When true, Memory Keeper (Agathe) skips this agent in Sunday hygiene (featured) |
 | `messaging_group` | objects | Typed **Group** (chat roster) |
 | `map_path` | text | `Agents → HQ → [Subteam →] Agent` |
-| `delegation_enabled` | checkbox | Parent may spawn Subagents |
+| `delegation_enabled` | checkbox | Parent may spawn Subagents / profile routes |
 | `terminal_backend` | select | `cua` \| `local` \| `docker` \| `ssh` \| `other` (org default: `cua`; keep aligned with linked Tool profile) |
 | `computer_surface` | select | `cua-spaces` \| `host` \| `bot-screen` \| `none` (org default: `cua-spaces`; keep aligned with linked Computer) |
 | `voice_auto_tts` | checkbox | Hermes `voice.auto_tts` |
@@ -132,16 +135,24 @@ false). Org fill: Primary true; specialists false until asked. Shared project
 keys live on the default profile `.env` (`HERMES_LANGFUSE_*`).
 
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
+When `delegation_backend=profile_routes`, keep Agent.`profile_route_targets` /
+`profile_routes_default` in sync with teammate Agents (targets must have
+`hermes_profile` filled). Hermes activates **one** backend at a time; Subagent
+objects may stay linked for documentation while `profile_routes` is active.
 
 **Recommended parent pattern (most agents):**
 1. Agent.`harness_profile` → **Local parent** (chat = llamacpp `LFM3-1.7B-Q8_0` / none; approvals
    = llamacpp `d1-2b-q4_k_m`; route picking also uses parent `model.*`)
 2. Several Subagents with richer profiles (Chiefs, Coding, Reviewing, Browser,
-   Web/MCP, Deep think) for specialized work
+   Web/MCP, Deep think) for specialized work → `delegation_backend=model_map`
 3. Parent answers peers / light questions itself when no Subagent route is needed
    (no “quick answer” Subagent required)
-4. Exceptions: **Foyer** agents → **Foyer** profile, no Subagents; **Arnold** →
-   **CLASQUIN** (Claude subscription), no Subagents
+4. **Strong-fit teammate persona handoff** → `delegation_backend=profile_routes`
+   + `profile_route_targets` (Sidonie → Philippe/Blanche/Bob; Kléber → Growth
+   four; Henri → Product leads; Noémie → Customer three; Geneviève → Jerome).
+   Messaging Groups stay the human-visible room.
+5. Exceptions: **Arnold** → **CLASQUIN** (Claude subscription), no Subagents;
+   other Foyer specialists (Philippe/Blanche/Bob) usually no spawn
 
 **Do not** use a select `harness` on Agent. Legacy spaces may still have an old
 `harness` select (`hermes` / `grok` / …); migrate by linking `harness_profile`
@@ -878,6 +889,12 @@ Messaging roster for a shared Telegram / Discord / … room. Distinct from Team
 (`kind` Board/HQ) and Subteam. Hermes has no first-class Group object; decline
 platform settings via `hermes-profiles` → `messaging-groups.md`.
 
+**Not the same as delegation.** Groups are human-visible rooms. Hermes spawn
+backends (`model_map` / `profile_routes` / `default`) live on Agent
+`delegation_backend` and do not create chat rooms. A parent may use
+`profile_routes` toward teammates who share this Group, or `model_map` toward
+Subagent routes, while the Group stays the shared human chat.
+
 | Key | Format | Notes |
 |-----|--------|-------|
 | `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
@@ -899,6 +916,18 @@ Agent.`messaging_group` pointing here. Body keeps Members + Welcome pointer
 only (`page-templates.md` / **Group default**).
 
 **Default template name:** `Group default`. Body: `type-templates.md`.
+
+**When to join vs create**
+
+| Situation | Action |
+|-----------|--------|
+| New live specialist under an HQ that already has a Group | **Join** that Group: add to `members` + `hermes_profiles`, set Agent.`messaging_group`, rewrite welcome |
+| New HQ (or first room for that HQ) | **Create** typed `group` + welcome Prompt; link HQ.`messaging_group` |
+| Domain already owns its own room (Veille, Wedding, Ana, Kitchen, …) | Keep/join that domain Group; do not also force HQ Group membership for messaging |
+| Live Agent with empty `messaging_group` | Treat as a gap: join HQ or existing domain Group (inventory via search) |
+
+Prefer one Engineering Group for Eng specialists (Clovis / Denise / Joachim
+pattern) over one Group per hire. Octave stays on Veille & Technology Group.
 
 **Hermes decline:** one bot token + gateway per member profile; allowlist
 `platform_chat_id`; apply mention gates from the checkboxes; paste welcome from
