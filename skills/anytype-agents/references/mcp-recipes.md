@@ -484,10 +484,109 @@ pages with `set_type` + `linked_projects` (and `kind: implementation` for TODO).
 
 `set_properties` values live under `set`. Keeps id and links.
 
+## HQ structure fix ops
+
+Playbook: SKILL.md → **HQ structure fix**. Typical ops for one HQ pass.
+
+### Revive a dormant Subteam
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<subteamId>",
+  "expected_etag": "<etag>",
+  "create_missing_options": true,
+  "ops": [
+    {
+      "op": "set_properties",
+      "set": {
+        "lifecycle": "live",
+        "members": ["<agentId>"],
+        "chief": ["<hqChiefId>"],
+        "mission": "… under chief. Draft-only specialist; no send/sign/money.",
+        "routing_summary": "Domain via specialist → chief.",
+        "browser": ["<hqBrowserId>"],
+        "computer": ["<hqComputerId>"],
+        "tool_profile": ["<standardToolProfileId>"]
+      }
+    }
+  ]
+}
+```
+
+### Append a structure-fix snip (Prompt or Operating Notes)
+
+Omit `after`/`before`/`inside` to append at end of the document:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<promptOrMemoryId>",
+  "expected_etag": "<etag>",
+  "ops": [
+    {
+      "op": "insert_blocks",
+      "markdown": "# Growth structure fix 2026-11-05\nFirmin owns Sales…\nDraft only; send/deals pass chief → Primary."
+    }
+  ]
+}
+```
+
+### Rewrite a Group welcome (delete stale, then insert)
+
+1. `outline: true` → collect block ids of the old welcome body (keep Prompt/Notes
+   scaffolding if present).
+2. `delete_block` each stale id (batch in one `ops` array).
+3. `insert_blocks` with the new welcome markdown.
+
+`replace_text` needs exact in-block text (markup included) and fails on
+markdown-link destinations; prefer delete + insert for wholesale welcome rewrites.
+
+### Update Primary org-map table cell
+
+1. Outline Primary system Prompt → find the org-map `table` block id.
+2. Get that block with `ids: "full"` if you need row/col ids; or use first-cell /
+   header text locators:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<primaryPromptId>",
+  "expected_etag": "<etag>",
+  "ops": [
+    {
+      "op": "set_cell",
+      "table_id": "<tableBlockIdOrSuffix>",
+      "row": "Kléber",
+      "col": "Scope and reporting",
+      "value": "Growth HQ chief; Board. Marketing (A, B); Sales (C draft); Partnerships (D draft)."
+    }
+  ]
+}
+```
+
+`row` / `col` may be ids or unique first-cell / header text (case-insensitive).
+
+### Wire HQ + Group after new agents
+
+```json
+{
+  "op": "set_properties",
+  "set": {
+    "members": ["<chiefId>", "<aId>", "<bId>", "<newId>"],
+    "routing_summary": "…",
+    "hermes_profiles": "chief,a,b,new"
+  }
+}
+```
+
+`hermes_profiles` on Group is a checklist string until Hermes apply
+(`hermes-profiles` → `messaging-groups.md`).
+
 ## Patch with etag
 
 1. `API-get-object` → note `etag`
-2. `API-patch-object` with `expected_etag` and a small op (`replace_text`, `insert_blocks`, `set_properties`, …)
+2. `API-patch-object` with `expected_etag` and a small op (`replace_text`, `insert_blocks`, `set_cell`, `set_properties`, …)
 3. On conflict, re-get and retry
 4. Use `dry_run: true` when unsure
 

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.35.0
+version: 1.36.0
 license: MIT
 metadata:
   category: agents
@@ -335,6 +335,37 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 2. Update roster, groups, shared-rule operational clauses, Primary org map
 3. `API-delete-object` archives to Bin; confirm the name first. Permanent delete only with explicit approval
 
+### HQ structure fix (Anytype-only roster sync)
+
+Use when the user pastes an HQ tree + Notion/Anytype page list and asks to sync
+Anytype to match (Product / Eng / Growth pattern). **Do not Hermes-apply** unless
+they ask. Skip archive/bots-to-archive sections when they say to ignore them.
+
+1. **Ledger** under `/tmp/<hq>-structure-fix/`: ids, agents ledger, prompt drafts,
+   MCP JSON payloads. Discover live ids by search (no hardcoding).
+2. **Subteams:** revive dormant domains with `lifecycle: live`, `members`,
+   `mission`, `routing_summary`, HQ Computer/Browser/Tool profile pair, `chief`
+   = HQ chief when there are no sous-chefs. Keep `parent_team` on the HQ.
+3. **Agents:** create missing specialists as full live packs (Prompt system +
+   4 Memories + Skills/Logs/Agenda/Suggestions Queries + role-pack Subagents
+   web/browser/deep unless Foyer/CLASQUIN). `reports_to` = HQ chief; `team` =
+   domain Subteam; `messaging_group` = HQ Group; hermes slug documented on
+   Agent.`hermes_profile` (string only until apply).
+4. **Draft-only roles:** `autonomy: propose`; HARD in Prompt + `short_description`
+   (no send, no sign, no money). Escalation specialist → chief → Primary.
+5. **Wire:** HQ.`members` + HQ.`subteams` + HQ.`routing_summary` / `mission`;
+   Subteam.`members`; Group.`members` + `hermes_profiles` (comma slugs) +
+   welcome Prompt rewrite (delete stale blocks, then `insert_blocks`). Rename
+   the Group when the HQ scope widens (e.g. Marketing Group → Growth Group).
+6. **Docs:** append dated `# … structure fix YYYY-MM-DD` snips via
+   `insert_blocks` on chief Prompt, peer specialist Prompts, and Primary Prompt;
+   append the same roster note to chief + Primary **Operating Notes** Memories;
+   update Primary org-map **table** with `set_cell` (row = owner name, col =
+   Scope and reporting). Prefer table + snip over rewriting the whole Prompt.
+7. **Verify:** search agents/Subteams/Group; re-get HQ members and welcome;
+   confirm draft rules and reports_to. Leave Hermes profiles/cron/gateway alone.
+8. MCP detail: `mcp-recipes.md` → **HQ structure fix ops**.
+
 ## Patch patterns
 
 - Prefer `API-patch-object` with `expected_etag` from a prior get
@@ -357,6 +388,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 - **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|suggestion|schedule|group|project`
 - **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query + Suggestions Query (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
+- **HQ structure fix:** revive Subteams → create missing agents (draft-only = `propose`) → wire HQ/Group members + hermes_profiles → welcome rewrite → Prompt snips + Operating Notes + Primary org-map `set_cell` → verify; **no Hermes apply** unless asked (`mcp-recipes.md`)
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
 - **New Suggestion:** create `suggestion` with `owner_agent` + kind/status → appears on Suggestions Query / Inbox → approve agent+chief (P org-wide); no Hermes auto-apply (`suggestions.md`)
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)

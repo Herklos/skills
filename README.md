@@ -5,7 +5,7 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.26.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.35.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.36.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -90,6 +90,7 @@ Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Pro
 
 - Orient: discover space → open Agents → read Shared Rules + roster
 - New specialist: create `agent` + Local parent → link owning HQ Computer/Browser pair + tool profile → role-pack Subagents → create Prompt + `system_prompt` → Memory + Skills/Logs/Agenda/Suggestions Queries → link HQ/Subteam
+- HQ structure fix: revive Subteams → create missing agents (draft-only = `propose`) → wire HQ/Group → Prompt snips + Operating Notes + Primary org-map `set_cell` → verify; no Hermes apply unless asked
 - New Suggestion: create `suggestion` → Inbox / owner Query → approve agent+chief (P org-wide)
 - Hermes apply: continue with `hermes-profiles` after accepted suggestion or explicit ask
 
