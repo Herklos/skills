@@ -112,7 +112,36 @@ hermes -p etienne gateway install
 Keep Agent.`messaging_group` pointing at the typed Group. Do not invent chat
 ids; leave `platform_chat_id` empty until a real id is known.
 
+## Fleet apply (groups that use messaging, Hermes still incomplete)
+
+When the user asks to apply messaging groups for agents that already have
+Anytype Groups but Hermes is still unconfigured:
+
+1. **Inventory** live Groups (`type: group`, `lifecycle=live`) and member
+   Agent.`hermes_profile` slugs (also Group.`hermes_profiles` comma list).
+2. **Per member profile** that exists under `~/.hermes/profiles/<slug>/`:
+   - Always set mention gates (and bot loop guard when missing):
+     ```bash
+     hermes -p <slug> config set telegram.require_mention true
+     hermes -p <slug> config set telegram.exclusive_bot_mentions true
+     hermes -p <slug> config set telegram.bots_require_mention true
+     # bot_loop_guard: enabled + max_events/window/cooldown if absent
+     ```
+   - Set allowlists **only** when Group.`platform_chat_id` is a real id.
+   - If `platform_chat_id` is empty: gates only; leave
+     `group_allowed_chats` / `allowed_chats` empty. **Do not invent** chat ids.
+3. **Tokens / gateways:** never auto-clone `TELEGRAM_BOT_TOKEN` or start a
+   dedicated gateway unless asked. Treat commented `# TELEGRAM_BOT_TOKEN=`
+   lines as **missing** (not configured). Report token + chat-id gaps.
+4. Verify gates with `hermes -p <slug> config get telegram` (or a YAML scan).
+   A profile can have `require_mention` set while still missing
+   `bots_require_mention`; check all three gates.
+
+Fleet example (2026-11-05): mention gates on ~50 Group member profiles; every
+live Group still lacked `platform_chat_id`; no live tokens written.
+
 ## Discord notes
+
 
 Same pattern: one bot application per profile, invite all bots to the server
 channel, allowlist channel ids per profile, prefer mention-gated behavior so

@@ -162,7 +162,9 @@ Philippe / Blanche / Bob stayed Osaurus-only.
     and **`/delegation model_map --now` or `/new`** after route changes.
 14. **Messaging** only when user asks (`messaging-groups.md`); tokens never
     auto-cloned. If Group.`platform_chat_id` is empty, set mention gates only
-    and leave allowlists empty (do not invent chat ids).
+    (`require_mention` + `exclusive_bot_mentions` + `bots_require_mention` +
+    bot_loop_guard) and leave allowlists empty (do not invent chat ids).
+    Commented `# TELEGRAM_BOT_TOKEN=` counts as missing; report token gaps.
 
 ## Model label map (resolve before writing routes)
 
@@ -184,8 +186,11 @@ Re-check the cache when labels drift. Prefer provider ids that exist in
 ## Config write discipline
 
 - Prefer `hermes -p <slug> config set` and `tools enable|disable` for single keys.
-- For `delegation.backends.model_map`, use the advanced-delegation store /
-  `hermes delegation config`, or a **surgical** YAML edit of only that subtree.
+- For `delegation.backends.model_map.options`, pass a **JSON array** as the
+  `config set` value (Hermes coerces it into a YAML list). Then set
+  `delegation.backends.model_map.default` and `delegation.backend model_map`.
+  Interactive `hermes delegation config` or a surgical YAML subtree edit also
+  work. See `delegation.md` → Fleet apply.
 - **Do not** `yaml.safe_dump` the whole `config.yaml` (strips comments and can
   drop default-expanded sections). Always backup first.
 - One writer per profile; gateway may already be running (OK for config/SOUL).
@@ -236,6 +241,24 @@ When the user asks for a **proper / full** Agent ↔ Hermes sync, cover all of:
 | Messaging | Group + `platform_chat_id` | allowlists only when chat id known; else gates + note |
 | Tools | Tool profile + surface | `tools enable/disable`; Primary disables browser/computer_use |
 | Timezone | Schedule.`timezone` / org | profile `timezone` (e.g. Europe/Paris) |
+
+## Fleet apply (many agents still unconfigured)
+
+When the user asks to apply **messaging groups** and/or **deferred delegation**
+for every agent that already uses them in Anytype but Hermes is still wrong:
+
+1. Messaging → `messaging-groups.md` **Fleet apply** (gates on all Group
+   members; allowlists only with real `platform_chat_id`).
+2. Delegation → `delegation.md` **Fleet apply** (`model_map` for Subagent
+   parents still missing options/default; skip `profile_routes` parents and
+   agents with zero Subagents).
+3. One ledger under `/tmp/hermes-…-apply/` (Anytype search dumps, plan JSON,
+   per-profile backups, results). Verify samples with
+   `delegation config --show` + telegram config get.
+4. Report gaps: empty `platform_chat_id`, missing tokens, `delegation_enabled`
+   without Subagents, empty stub `model_map` on non-delegating Foyer clones.
+
+Do **not** mint Telegram rooms, BotFather tokens, or chat ids during this pass.
 
 ## Gaps to report after each apply
 

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.46.0
+version: 1.47.0
 license: MIT
 metadata:
   category: agents
@@ -212,7 +212,7 @@ Engineering HQ.
 3. Set platform intent: `platform`, optional `platform_chat_id`, `hermes_profiles` (comma slugs), `require_mention`, `exclusive_bot_mentions`, `notes`
 4. Point Agent.`messaging_group` (and HQ/Subteam.`messaging_group` when the room is theirs) at this Group
 5. Body from **Group default** / `page-templates.md` (Members + Welcome pointer only; no second welcome fence)
-6. Hermes apply (tokens, allowlists, gateways) only via `hermes-profiles` `messaging-groups.md` when the user asks
+6. Hermes apply (tokens, allowlists, gateways) only via `hermes-profiles` `messaging-groups.md` when the user asks. If they ask to apply messaging for agents that still lack Hermes config and Group.`platform_chat_id` is empty: **gates only** (no invented chat ids/tokens). Fleet recipe: hermes-profiles `messaging-groups.md` → Fleet apply
 
 **Inventory gap check:** search `type: agent` with `lifecycle = "live"` and
 `fields` including `messaging_group`. Any live Agent with empty `messaging_group`
@@ -235,7 +235,7 @@ should join the owning HQ Group (or the domain Group if one already exists).
 3. Body from `type-templates.md` / **Subagent default** (no Full System Prompt fence)
 4. Add the Subagent id to the parent's Agent.`subagents` (keep both links)
 5. Document the route on the Subagent object + parent Agent.`subagents` (no Suggested runtime body section)
-6. If Hermes: decline into `model_map` via `hermes-profiles` `delegation.md`
+6. If Hermes: decline into `model_map` via `hermes-profiles` `delegation.md`. Fleet: when the user asks to apply deferred modes for parents that still lack Hermes routes, use `delegation.md` → Fleet apply (`config set` JSON options; skip `profile_routes` parents and Agents with zero Subagents)
 
 ### Create or update a Harness / Harness profile
 
@@ -433,6 +433,7 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New Suggestion:** create `suggestion` with `owner_agent` + kind/status → appears on Suggestions Query / Inbox → approve agent+chief (P org-wide); no Hermes auto-apply (`suggestions.md`)
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
 - **New Group:** prefer join HQ/domain Group first; mint `group` + welcome Prompt only for a new HQ or distinct domain room → set `members` / `hermes_profiles` / platform fields → link Agent/HQ `messaging_group` → welcome rewrite → Hermes apply via `messaging-groups.md` when asked
+- **Fleet messaging + deferred delegation:** when user asks to apply for agents that use Groups/Subagents but Hermes is still incomplete → hermes-profiles `anytype-apply.md` Fleet apply (gates without inventing `platform_chat_id`; `model_map` for Subagent parents; skip `profile_routes` strong-fit)
 - **Missing messaging_group:** live Agents without a Group → add to HQ Group members + hermes_profiles + Agent.`messaging_group` + welcome rewrite (Eng pattern: Clovis/Denise/Joachim → Engineering Group)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying

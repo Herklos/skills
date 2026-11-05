@@ -9,7 +9,9 @@ harness). Values guide whoever configures the bot; they do **not** auto-apply.
 `references/anytype-apply.md` (slug resolve including Primary→`default`, SOUL
 copy, Local parent, model label map, `model_map` from Subagents, tools,
 Agenda→cron, write discipline, verify + gaps report). Use this file as the
-property worksheet; use `anytype-apply.md` as the execution order.
+property worksheet; use `anytype-apply.md` as the execution order. **Fleet**
+(many agents still unconfigured): `anytype-apply.md` → Fleet apply +
+`messaging-groups.md` / `delegation.md` Fleet sections.
 
 **Properties are the source of truth:** Agent.`harness_profile`,
 `hermes_profile`, `delegation_enabled`, `analytics_enabled`, `browser`,
@@ -34,6 +36,8 @@ For Hermes, map fields with skill `hermes-profiles`:
 | Display / skins | `display.md` |
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks (Agenda / Schedule) | `cron.md` (+ anytype-agents `agenda-and-schedules.md`) |
+| Messaging groups | `messaging-groups.md` (Fleet apply when chat id empty) |
+| Fleet / multi-agent apply | `anytype-apply.md` → Fleet apply |
 
 Use as a private apply worksheet (date when you revise it). Do not commit this
 block to the Agent object body.
@@ -64,10 +68,10 @@ block to the Agent object body.
 - Plugin: **advanced-delegation** on this profile (Hermes >= 0.22.5) when using model_map / profile_routes
 - **Task-specific models** (prefer decline from Subagent objects; else hand-list):
   - `{task_key}` ← Subagent "{name}" · profile {Coding|Data fetching|…} · effort {…} — {intent}
-  - default for unrouted / no-spawn work: **parent main** (Local router); optional `model_map.default` only if you want a cheap child fallback
+  - **`model_map.default` required** on Local parent (prefer `web` if present, else `deep` / first `task_key`); unrouted children must not inherit lfm3
 - Alternatives: single worker {provider}·{model} (`backend: default`) | `profile_routes` ({profile}: {description})
 - Concurrency: max_concurrent_children {n} · max_iterations {n}
-- Setup: `hermes plugins install advanced-delegation` → decline Subagents via hermes-profiles `delegation.md` → `/delegation model_map`
+- Setup: `hermes plugins install advanced-delegation` → decline Subagents via hermes-profiles `delegation.md` (JSON `config set` options OK) → `/delegation model_map --now`
 **Scheduled tasks (Agenda):**
 - Canonical list: Agent.`agenda_page` → `{OwnerShort} – Agenda` Query of type `schedule` (anytype-agents `agenda-and-schedules.md`)
 - none yet | or summarize live/draft rows: `{schedule_key}` · `{schedule_kind}` · `{schedule_expr}` `{timezone}` · {intent} · deliver {target} · skills {…}
@@ -143,6 +147,7 @@ block to the Agent object body.
 - Reasoning shown: on|off · streaming: on|off · resume_display: full|minimal
 - UI language: en | … · Notes: {quiet Slack? Desktop fonts?}
 **Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
+- Group.`platform_chat_id` empty → Hermes gates only (`require_mention` + `exclusive_bot_mentions` + `bots_require_mention`); do not invent chat ids/tokens (`messaging-groups.md` Fleet apply)
 ```
 
 Filled-in sample: `examples.md` (Lee – Implementer).

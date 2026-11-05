@@ -143,8 +143,10 @@ effort/tier).
 ```bash
 hermes -p <slug> config set delegation.backend model_map
 hermes -p <slug> delegation config    # interactive route editor (uses hermes model pickers)
-# Or hand-set (YAML list as one value):
-# hermes -p <slug> config set delegation.backends.model_map.default fast
+# Non-interactive (preferred for fleet / scripts):
+hermes -p <slug> config set delegation.backends.model_map.default web
+# options: pass a JSON array as the value (Hermes coerces into YAML list):
+hermes -p <slug> config set delegation.backends.model_map.options   '[{"name":"web","description":"Web/MCP fetch","provider":"openai-codex","model":"gpt-6.1-terra","reasoning_effort":"high","fallback_providers":[{"provider":"anthropic","model":"claude-haiku-5-5"},{"provider":"xai-oauth","model":"grok-4.5"}]}]'
 ```
 
 In chat (after plugin install):
@@ -349,8 +351,11 @@ Steps:
    / `fallback_2_*` → that option's `fallback_providers`.
 4. `hermes -p <slug> tools enable delegation`
 5. `hermes -p <slug> plugins install advanced-delegation`
-6. `hermes -p <slug> delegation config` (or edit YAML) → `backend: model_map` with
-   one option per Subagent `task_key` (include route `fallback_providers`)
+6. Write `backend: model_map` with one option per Subagent `task_key` (include
+   route `fallback_providers`). Prefer non-interactive:
+   `hermes -p <slug> config set delegation.backends.model_map.options '<json>'`
+   then `…default <task_key>` then `…backend model_map`. Interactive
+   `delegation config` or a surgical YAML subtree edit also work.
 7. **Always set `model_map.default`** to one live Subagent `task_key` when the
    parent is Local (lfm3). Light peer answers still stay on the parent without
    spawning; but if the parent calls `delegate_task` without `option`, children
@@ -392,6 +397,51 @@ delegation:
 
 Provider/model strings above are illustrative; resolve each Harness profile label
 to the ids your runtime actually accepts (`models.md`).
+
+## Fleet apply (agents that use Subagents, Hermes still incomplete)
+
+When the user asks to apply deferred / delegation modes for parents that already
+have Anytype Subagents (or `delegation_backend`) but Hermes is wrong or empty:
+
+1. **Inventory**
+   - Anytype: live Agents with `delegation_enabled` + linked Subagents
+     (`type: subagent`, `parent_agent` / Agent.`subagents`).
+   - Hermes: scan each profile's `delegation.backend`, `model_map.options`,
+     `model_map.default`, and `profile_routes` allowlist.
+2. **Skip**
+   - Strong-fit **`profile_routes`** parents already applied (`sidonie`,
+     `kleber`, `henri`, `noemie`, `genevieve`). Do not overwrite with
+     `model_map`.
+   - Parents that already have `backend: model_map` with non-empty options and
+     a set `default` (unless the user asks to refresh routes).
+   - Agents with `delegation_enabled` but **zero** live Subagents (nothing to
+     decline; report as a gap: clovis / denise / joachim / marthe / adele
+     pattern).
+   - Foyer / CLASQUIN / `delegation_enabled=false` (no Subagent packs). Empty
+     stub `model_map` blocks left by clones (blanche / bob / philippe) are
+     harmless; leave unless asked to clear.
+3. **Per parent that needs `model_map`**
+   - `hermes -p <slug> tools enable delegation`
+   - `hermes -p <slug> plugins install advanced-delegation --enable`
+   - Build options from each Subagent (table above); resolve Harness display
+     labels → runtime ids (`anytype-apply.md` Model label map). Org providers:
+     `xai` → `xai-oauth`; models: Grok 4.5 → `grok-4.5`, Claude Code Sonnet 5.5
+     → `claude-sonnet-5-5`, Codex Terra/Sol 6.1 → `gpt-6.1-terra` /
+     `gpt-6.1-sol`, Haiku 5.5 → `claude-haiku-5-5`.
+   - Write with JSON via `config set` (see above), then set `default`, then
+     `backend: model_map`.
+   - **`model_map.default` preference:** `web` if that route exists, else
+     `deep`, else the first `task_key`. Coding packs often default to `deep`.
+   - Backup each `config.yaml` under `/tmp/…` before the first write.
+4. **Primary / `default`:** if routes exist but `model_map.default` is empty,
+   set it (org: `chiefs` when that route is present).
+5. **Verify** sample parents with `hermes -p <slug> delegation config --show`
+   (routes + default + plugin listed). Tell the user open chats need
+   `/delegation model_map --now` or `/new`.
+
+Fleet example (2026-11-05): 30 parents got `model_map` from live Subagents;
+Primary `default` gained `model_map.default=chiefs`; profile_routes five left
+alone; messaging gates applied in the same pass (`messaging-groups.md`).
 
 ## Decision guide
 
