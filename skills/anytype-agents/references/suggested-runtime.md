@@ -36,7 +36,7 @@ For Hermes, map fields with skill `hermes-profiles`:
 | Display / skins | `display.md` |
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks (Agenda / Schedule) | `cron.md` (+ anytype-agents `agenda-and-schedules.md`) |
-| Messaging groups | `messaging-groups.md` (Fleet apply when chat id empty) |
+| Messaging groups | `messaging-groups.md` (Bot Mode `groups.create` when chat id empty; Telegram only when asked) |
 | Fleet / multi-agent apply | `anytype-apply.md` → Fleet apply |
 
 Use as a private apply worksheet (date when you revise it). Do not commit this
@@ -146,8 +146,10 @@ block to the Agent object body.
 - Skin: default | slate | mono | … · tool_progress: off|new|all|verbose
 - Reasoning shown: on|off · streaming: on|off · resume_display: full|minimal
 - UI language: en | … · Notes: {quiet Slack? Desktop fonts?}
-**Gateway / messaging:** none | telegram | discord | … (token lives in runtime secrets, not on this page)
-- Group.`platform_chat_id` empty → Hermes gates only (`require_mention` + `exclusive_bot_mentions` + `bots_require_mention`); do not invent chat ids/tokens (`messaging-groups.md` Fleet apply)
+**Gateway / messaging:** hermes (Bot Mode hosted room, org default) | telegram | discord | … (external tokens live in runtime secrets, not on this page)
+- Prefer Group.`platform=hermes` + `platform_chat_id` = Hermes `room_id` (`anytype-<slug>`)
+- Empty `platform_chat_id` → create Bot Mode room via `groups.create` when the user asks (`messaging-groups.md`); do not invent Telegram groups/tokens
+- External path only when asked: gates + allowlists with a real platform chat id
 ```
 
 Filled-in sample: `examples.md` (Lee – Implementer).

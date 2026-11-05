@@ -58,6 +58,16 @@ groups** / **New Group Chat**, or room header **Manage members**.
 There is no `hermes group` CLI. Create via JSON-RPC `groups.create` on the
 gateway session WebSocket (host-scoped ticket), or the Desktop UI.
 
+### RPC path (agents / scripts)
+
+- Multiplex **`gateway.sock`** is control-plane only (status / routing). It does
+  **not** accept `groups.create`.
+- Use an interactive session WebSocket (typically `ws://127.0.0.1:9120/api/ws`)
+  with a **host-scoped** session ticket so sibling served profiles can be seated.
+- Call with `profile: "default"` (or any bot the multiplex already serves).
+- Persist results in `~/.hermes/state.db` table `hosted_rooms` (`room_id`,
+  `name`, `members_json`, `disbanded_at`).
+
 ### Constraints
 
 - **2–6 members** per room (`MIN_DISCUSSION_MEMBERS` / `MAX_DISCUSSION_MEMBERS`).
@@ -66,7 +76,8 @@ gateway session WebSocket (host-scoped ticket), or the Desktop UI.
 - When Anytype `hermes_profiles` has more than 6 slugs: seat the first 6 in the
   primary room, then create a **satellite B** room for overflow (include one
   bridge chief from the primary roster so the satellite stays tied to the HQ).
-  Record satellite room ids in Group.`notes`.
+  Record satellite room ids in Group.`notes`. Primary keeps `platform_chat_id`;
+  satellites are notes-only unless the user wants a second Anytype Group.
 
 ### Member shape (`groups.create`)
 
@@ -84,9 +95,6 @@ gateway session WebSocket (host-scoped ticket), or the Desktop UI.
   ]
 }
 ```
-
-Call with `profile: "default"` (or any served bot) on a **host-scoped**
-interactive session ticket so sibling served profiles can be seated.
 
 ### Verify
 

@@ -108,12 +108,14 @@ pointing here.
 
 ## Welcome
 Canonical welcome paste lives on the linked **Welcome prompt** property. Copy
-that Prompt into Telegram/Discord. Do not paste a second welcome fence here.
+that Prompt into the Hermes Bot Mode Group Chat (or Telegram/Discord only when
+asked). Do not paste a second welcome fence here.
 
 ## Hermes / platform
-Platform, Platform chat id, Require mention, Exclusive bot mentions, and Hermes
-profiles are properties. Apply into each member profile via hermes-profiles
-`messaging-groups.md` when asked (no auto-push).
+Prefer `platform=hermes` and `platform_chat_id` = Hermes hosted `room_id`.
+Require mention / Exclusive bot mentions apply to external platforms.
+`hermes_profiles` is the seat checklist (max 6 per Bot Mode room → satellite B).
+Apply via hermes-profiles `messaging-groups.md` when asked (no auto-push).
 ```
 
 ---

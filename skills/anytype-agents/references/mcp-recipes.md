@@ -360,10 +360,9 @@ Keep Subagent.`parent_agent` and Agent.`subagents` both ways. Decline into Herme
       "parent_team": ["<engineeringHqObjectId>"],
       "members": ["<agentId>", "…"],
       "welcome_prompt": ["<welcomePromptId>"],
-      "platform": ["telegram"],
+      "platform": ["hermes"],
+      "platform_chat_id": "anytype-engineering-group",
       "slug": "engineering",
-      "require_mention": true,
-      "exclusive_bot_mentions": true,
       "hermes_profiles": "etienne,arnold,simone"
     },
     "markdown": "## Members\nCanonical roster is the **Members** property.\n\n## Welcome prompt\nCanonical welcome paste lives on the linked **Welcome prompt** property.\n"
@@ -371,7 +370,11 @@ Keep Subagent.`parent_agent` and Agent.`subagents` both ways. Decline into Herme
 }
 ```
 
-Then patch HQ / Agent `messaging_group: ["<groupId>"]`. Migrate legacy Group
+Then patch HQ / Agent `messaging_group: ["<groupId>"]`. Prefer `platform=hermes`
+(Bot Mode). Mint the `hermes` select option **once, sequentially** (parallel
+`create_missing_options` duplicates the option → later `ambiguous_input`).
+Leave `platform_chat_id` empty until the Hermes room exists, or set it to the
+stable `anytype-<slug>` room id after `groups.create`. Migrate legacy Group
 pages with `set_type` → `group` (`object-types.md`). Hermes apply:
 `hermes-profiles` → `messaging-groups.md` (when asked).
 

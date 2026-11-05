@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.40.0
+version: 1.41.0
 license: MIT
 metadata:
   category: agents
@@ -368,8 +368,8 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Empty orchestrator:** `create <slug> --no-skills`
 - **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
 - **Fleet Bot Mode avatars:** quit Desktop → `profiles.set_asset` → `ui_meta` photo/custom → seed `bot-meta-v2` with 256 data URLs (`avatars.md`; recipe **5b**)
-- **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
-- **Multi-bot group:** `messaging-groups.md` (prefer Hermes Bot Mode hosted rooms; Anytype join-HQ-first; optional Telegram tokens/allowlists only when asked)
+- **Messaging (external platform):** unique token in that profile `.env` → `gateway start` / `install` (only when user asks for Telegram/Discord)
+- **Multi-bot group:** `messaging-groups.md` (prefer Hermes Bot Mode hosted rooms via `groups.create` / Desktop; Anytype join-HQ-first; optional Telegram tokens/allowlists only when asked)
 - **Fleet messaging + deferred delegation:** `anytype-apply.md` → Fleet apply; Bot Mode `groups.create` when chat id empty; `model_map` via JSON `config set` for Subagent parents still unconfigured (`delegation.md` Fleet apply); skip `profile_routes` parents
 - **Delegation mode:** one of `model_map` / `profile_routes` / `default` via Agent.`delegation_backend` (`delegation.md`); distinct from messaging Groups
 - **Share package:** `export` / `import` or `profile install <git-url>`

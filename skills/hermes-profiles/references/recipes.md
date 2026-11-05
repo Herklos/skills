@@ -102,16 +102,14 @@ Never reuse the same bot token across two profiles.
 
 ## 8b. Multi-bot messaging group
 
-Full guide: `messaging-groups.md`. Summary:
+Full guide: `messaging-groups.md`. **Org default: Hermes Bot Mode hosted room.**
 
-1. One distinct bot token per member profile `.env`
-2. Create a Telegram **supergroup** (or Discord channel); add every bot
-3. Allowlist the chat id on each profile (`telegram.group_allowed_chats`)
-4. Set `require_mention` + `exclusive_bot_mentions` (and bot loop guard)
-5. Start one gateway per profile
-6. Paste welcome from the Anytype Group's `welcome_prompt`
+1. Confirm Anytype Group `hermes_profiles` (comma slugs); split at 6 → primary + satellite B
+2. Create hosted room(s) via Desktop **Manage groups** / **New Group Chat**, or JSON-RPC `groups.create` on the gateway session WebSocket (host-scoped ticket). No `hermes group` CLI. Room id convention: `anytype-<group-slug>`
+3. Write back Anytype `platform=hermes` + `platform_chat_id=<room_id>` (+ `notes` for satellites)
+4. Paste welcome from the Group's `welcome_prompt` into the Bot Mode room once
 
-Do not apply from Anytype until the user asks.
+**External Telegram/Discord only when the user asks:** one token per profile `.env`, platform room, allowlists, mention gates. Do not invent Telegram groups for the org Bot Mode default.
 
 ## 9. Rename and re-hook gateway
 
@@ -159,7 +157,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Skins / display chrome / fonts | `display.md` |
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
-| Multi-bot Telegram / Discord groups | `messaging-groups.md` |
+| Multi-bot rooms (Bot Mode preferred; Telegram/Discord when asked) | `messaging-groups.md` |
 | Anytype Agent → live Hermes apply / create-if-missing | `anytype-apply.md` |
 | Bot Mode custom photo avatars | `avatars.md` |
 
@@ -179,7 +177,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Skins, display chrome, fonts | `display.md` |
 | Voice mode, STT, TTS, messaging `/voice` | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
-| Multi-bot room allowlists / mention gates | `messaging-groups.md` |
+| Multi-bot Bot Mode rooms / external allowlists | `messaging-groups.md` |
 | Main / aux / fallback / MoA | `models.md` |
 | Task-specific subagent routes | `delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |

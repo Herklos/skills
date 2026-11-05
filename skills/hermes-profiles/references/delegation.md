@@ -28,7 +28,7 @@ objects) for specialized work. Exceptions: Foyer and CLASQUIN (no Subagents).
 
 | Layer | Where | Role |
 |-------|--------|------|
-| **Messaging Group** | Anytype typed `group` + Agent.`messaging_group` | Human-visible Telegram/Discord room roster. **Not** a delegation backend. See `messaging-groups.md` |
+| **Messaging Group** | Anytype typed `group` + Agent.`messaging_group` | Human-visible room roster (org default = Hermes Bot Mode hosted Group Chat; Telegram/Discord only when asked). **Not** a delegation backend. See `messaging-groups.md` |
 | **Routing model** | Parent `model.*` (main brain) | Plans the work and **chooses** a named route per `delegate_task` item (`option` or `profile`) |
 | **Task-specific models** | `delegation.backends.model_map.options` | Named routes (`fast`, `deep`, `local`, …) the parent may pick; each is a full provider·model (+ optional reasoning / tier) |
 | **Single worker (no routes)** | `delegation.model` / `provider` with `backend: default` | Every child uses one model; no per-task choice |

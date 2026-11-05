@@ -160,11 +160,15 @@ Philippe / Blanche / Bob stayed Osaurus-only.
     `plugins list | grep langfuse` when analytics was requested, `doctor`,
     `sessions refresh-prompts`. Note open sessions need a turn to pick up SOUL
     and **`/delegation model_map --now` or `/new`** after route changes.
-14. **Messaging** only when user asks (`messaging-groups.md`); tokens never
-    auto-cloned. If Group.`platform_chat_id` is empty, set mention gates only
-    (`require_mention` + `exclusive_bot_mentions` + `bots_require_mention` +
-    bot_loop_guard) and leave allowlists empty (do not invent chat ids).
-    Commented `# TELEGRAM_BOT_TOKEN=` counts as missing; report token gaps.
+14. **Messaging** only when user asks (`messaging-groups.md`). **Org default:
+    Hermes Bot Mode hosted rooms** (`groups.create` / Desktop Manage groups;
+    2–6 members; satellite B for overflow). Write `platform=hermes` +
+    `platform_chat_id=<room_id>`. No Telegram tokens required for Bot Mode.
+    External Telegram/Discord only when asked: tokens never auto-cloned;
+    allowlists only with a real external chat id; if the user wants gates
+    without a room yet, set mention gates and leave allowlists empty.
+    Do not invent Telegram groups or chat ids. Commented `# TELEGRAM_BOT_TOKEN=`
+    counts as missing for the external path.
 
 ## Model label map (resolve before writing routes)
 
@@ -197,7 +201,8 @@ Re-check the cache when labels drift. Prefer provider ids that exist in
 
 ## Out of scope unless asked
 
-- Messaging tokens / allowlists / gateway install (gates alone OK when Group exists)
+- Messaging: Bot Mode `groups.create` / Desktop Manage groups, or external
+  tokens / allowlists / gateway install (prefer Bot Mode when asked)
 - Pasting full Memory bodies into `MEMORY.md`
 - Creating Hermes cron from Prompt cadence prose (only typed Schedule objects)
 - Applying draft/proposed suggestions
@@ -238,7 +243,7 @@ When the user asks for a **proper / full** Agent ↔ Hermes sync, cover all of:
 | Skills | active procedures on Skills Query | `skills/org/<key>/SKILL.md` (additive) |
 | Voice | `voice_*` modes | `voice.auto_tts` / `voice.voice_chat_mode` |
 | Analytics | `analytics_enabled` | langfuse plugin + `HERMES_LANGFUSE_*` (copy from default when needed) |
-| Messaging | Group + `platform_chat_id` | allowlists only when chat id known; else gates + note |
+| Messaging | Group + `platform=hermes` + `platform_chat_id` | Bot Mode `groups.create` → room_id writeback (preferred); external allowlists only when asked |
 | Tools | Tool profile + surface | `tools enable/disable`; Primary disables browser/computer_use |
 | Timezone | Schedule.`timezone` / org | profile `timezone` (e.g. Europe/Paris) |
 
@@ -247,18 +252,22 @@ When the user asks for a **proper / full** Agent ↔ Hermes sync, cover all of:
 When the user asks to apply **messaging groups** and/or **deferred delegation**
 for every agent that already uses them in Anytype but Hermes is still wrong:
 
-1. Messaging → `messaging-groups.md` **Fleet apply** (gates on all Group
-   members; allowlists only with real `platform_chat_id`).
+1. Messaging → `messaging-groups.md` **Fleet apply** (preferred Bot Mode path:
+   `groups.create` for empty `platform_chat_id`, satellite B when >6 slugs,
+   write back `platform=hermes` + room_id). External Telegram/Discord gates +
+   allowlists only when the user names that platform.
 2. Delegation → `delegation.md` **Fleet apply** (`model_map` for Subagent
    parents still missing options/default; skip `profile_routes` parents and
    agents with zero Subagents).
 3. One ledger under `/tmp/hermes-…-apply/` (Anytype search dumps, plan JSON,
    per-profile backups, results). Verify samples with
-   `delegation config --show` + telegram config get.
-4. Report gaps: empty `platform_chat_id`, missing tokens, `delegation_enabled`
-   without Subagents, empty stub `model_map` on non-delegating Foyer clones.
+   `delegation config --show` + `sqlite3 ~/.hermes/state.db` hosted_rooms query.
+4. Report gaps: empty `platform_chat_id`, missing Bot Mode seats, duplicate
+   Anytype `platform` select options, `delegation_enabled` without Subagents,
+   empty stub `model_map` on non-delegating Foyer clones.
 
-Do **not** mint Telegram rooms, BotFather tokens, or chat ids during this pass.
+Do **not** mint Telegram rooms, BotFather tokens, or invented chat ids during
+this pass. Prefer Hermes Bot Mode hosted rooms.
 
 ## Gaps to report after each apply
 
