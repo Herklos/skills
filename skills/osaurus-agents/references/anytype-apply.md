@@ -56,7 +56,7 @@ Apply on every agent create/update unless the user overrides that agent:
 | Self scheduling | `capabilities.self_scheduling_enabled` | `true` |
 | Browser use | `capabilities.browser_use_enabled` | `true` |
 | Charts | `capabilities.render_chart_enabled` | `true` |
-| Autonomous execution | `sandbox.enabled` (+ network/plugin_create as needed) | `true` |
+| Sandbox use (autonomous exec) | `sandbox.enabled` (+ `network_enabled` / `plugin_create`) | **`true` always.** Each agent already has its own sandbox env; never create sandboxes, only enable use. Docs: https://docs.osaurus.ai/sandbox |
 
 ## Model map (harness_profile → Osaurus)
 

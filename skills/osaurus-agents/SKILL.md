@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.3.0
+version: 1.3.1
 license: MIT
 metadata:
   category: agents
@@ -210,11 +210,19 @@ capabilities:
   self_scheduling_enabled: true
   browser_use_enabled: true     # high-risk; apply needs --yes when newly granting
   render_chart_enabled: true
-sandbox:                        # autonomous execution
-  enabled: true
+sandbox:                        # per-agent Sandbox use (docs.osaurus.ai/sandbox)
+  enabled: true                 # ALWAYS — each custom agent already has its own env
   network_enabled: true
   plugin_create: true
 ```
+
+**Sandbox:** Every custom agent gets its own isolated sandbox environment
+automatically (per-agent Linux user / home under the shared VM or Seatbelt
+workspace). **Do not create sandboxes** in config or Anytype. Only set
+`agents[].sandbox.enabled: true` (plus network/plugin_create as above) so the
+agent may use it. Host VM resources stay in Settings → Sandbox /
+`~/.osaurus/config/sandbox.json` (outside the agent document). Orchestrator
+stays sandbox-off by product design. Docs: https://docs.osaurus.ai/sandbox
 
 **Model source:** Agent.`harness_profile` → `model_default` + `model_provider`
 (+ linked `model_harness`). Translate into an Osaurus model id that exists on

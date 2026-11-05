@@ -1,6 +1,6 @@
 {
   "name": "agent-ops-skills",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Product-agnostic agent-ops skills: Hermes profiles, Osaurus agents, and Anytype multi-agent organization management via MCP.",
   "author": {
     "name": "Herklos",

@@ -270,17 +270,34 @@ schedules:
       …self-contained task…
 ```
 
-## Sandbox resources (not declarative config)
+## Sandbox (agent enable vs host resources)
 
-VM resources are **Settings → Sandbox** or `~/.osaurus/config/sandbox.json`
-(macOS 26+ Linux VM; macOS 15 Seatbelt has no VM resources):
+Docs: https://docs.osaurus.ai/sandbox
 
-```json
-{ "autoStart": true, "cpus": 2, "memoryGB": 2, "network": "outbound" }
+**Per agent (in the config document):** always enable use. Osaurus already
+provisions a distinct environment per custom agent; apply only toggles access:
+
+```yaml
+agents:
+  - name: Example
+    sandbox:
+      enabled: true
+      network_enabled: true
+      plugin_create: true
 ```
 
-`network`: `outbound` | `proxy` | `none`. Agent-level sandbox switches still go
-in `agents[].sandbox` in the document.
+Do **not** invent sandbox ids, create containers in YAML, or map Anytype
+Computer/Cua Spaces into Sandbox. A chat uses either sandbox or a working
+folder, never both while sandbox is on.
+
+**Host VM resources (not in the agent document):** Settings → Sandbox or
+`~/.osaurus/config/sandbox.json` (macOS 26+ Linux VM; macOS 15 Seatbelt):
+
+```json
+{ "autoStart": true, "cpus": 2, "memoryGB": 2, "network": "outbound", "perAgentEnvironments": true }
+```
+
+`network`: `outbound` | `proxy` | `none`.
 
 ## Server settings outside the document
 

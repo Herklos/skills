@@ -5,7 +5,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.31.0 | Lifecycle and config for Hermes Agent profiles |
-| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.3.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
+| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.3.1 | Define Osaurus agents via `osaurus config` / bundles / tools |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.42.0 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
@@ -106,7 +106,7 @@ Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)
 
 ## osaurus-agents
 
-Define **Osaurus** agents with declarative config (`osaurus config plan|apply`) or Osaurus Bundles (`osaurus import`). Mirrors hermes-profiles for the Osaurus platform: discover with `config export` / `import list`, plan before apply, secrets via `env:` / Keychain refs only. Anytype Team/Group map to chief `subagents` + standing prompt text + `channels` (chat ids required); org defaults (tools/memory/recall/db/self-sched/browser/charts/sandbox on, web_search off); model+runtime from harness_profile; Agenda→`schedules`; `osk-v1.…` access key when local admin routes require it.
+Define **Osaurus** agents with declarative config (`osaurus config plan|apply`) or Osaurus Bundles (`osaurus import`). Mirrors hermes-profiles for the Osaurus platform: discover with `config export` / `import list`, plan before apply, secrets via `env:` / Keychain refs only. Anytype Team/Group map to chief `subagents` + standing prompt text + `channels` (chat ids required); org defaults (tools/memory/recall/db/self-sched/browser/charts; sandbox.enabled always; web_search off); model+runtime from harness_profile; Agenda→`schedules`; `osk-v1.…` access key when local admin routes require it.
 
 **What it covers**
 
