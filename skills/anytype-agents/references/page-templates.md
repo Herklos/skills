@@ -18,10 +18,10 @@ Title: `{Name} – {Role}`
 
 **Set as properties** (do not rely on markdown alone): `role`, `team`,
 `reports_to`, `lifecycle`, `harness_profile`, `subagents`, `system_prompt`,
-`browser`, `computer`, `tool_profile`, `voice_enabled`, `autonomy`,
+`browser`, `computer`, `tool_profile`, `voice_enabled`, `analytics_enabled`, `autonomy`,
 `short_description`, `hermes_profile`, `board_member`,
 `memory_pages`, `skills_page`, `logs_page`, `agenda_page`, `suggestions_page`, `messaging_group`,
-`map_path`, `delegation_enabled`, `terminal_backend`, `computer_surface`, voice
+`map_path`, `delegation_enabled`, `analytics_enabled`, `terminal_backend`, `computer_surface`, voice
 modes / optional `stt_*` / `tts_*`. See `object-types.md` + `prompts.md` +
 `memory-and-skills.md` + `suggestions.md` + `agenda-and-schedules.md`.
 

@@ -77,11 +77,30 @@ After apply, write back `hermes_profile` on the Agent if it was empty.
 11. **Voice** align Agent modes even when off: `voice.auto_tts` ←
     `voice_auto_tts`; `voice.voice_chat_mode` ← `voice_chat_mode` (usually `off`).
     Only enable STT/TTS stack when `voice_enabled`. There is **no** `voice.enabled`.
-12. **Verify** `hermes profile describe <slug>`, `delegation config --show`
+12. **Analytics (Langfuse)** when Agent.`analytics_enabled` is true:
+    - `hermes -p <slug> plugins install langfuse --enable` (idempotent if already
+      present; ensure `plugins.enabled` lists `langfuse`).
+    - Required env on that profile's `.env`: `HERMES_LANGFUSE_PUBLIC_KEY` +
+      `HERMES_LANGFUSE_SECRET_KEY` (optional `HERMES_LANGFUSE_BASE_URL` for
+      self-hosted). Never print secret values into chat or ledgers.
+    - If the target is **not** `default` and those keys are missing on the target
+      `.env`, **copy** the matching lines from `~/.hermes/.env` (default profile)
+      into `~/.hermes/profiles/<slug>/.env`.
+    - If keys are still missing (including on default): record a gap and tell the
+      user to supply them via the Hermes CLI, which prompts interactively:
+      `hermes -p <slug> plugins install langfuse` (or paste into that profile
+      `.env`). Do **not** invent placeholders (`pk-lf-...` / `your-key` are
+      refused). Plugin fails open without real keys.
+    - Leave `plugins.entries.langfuse.settings.end_user_attribution` false/unset
+      unless the user asks.
+    - When `analytics_enabled` is false/unset: do **not** auto-disable langfuse
+      (opt-in only; user may `plugins disable langfuse` manually).
+13. **Verify** `hermes profile describe <slug>`, `delegation config --show`
     (route fallbacks present), `cron list` vs Agenda Schedules, `skills list`
-    for `org/…`, `config get voice.voice_chat_mode`, `doctor`,
+    for `org/…`, `config get voice.voice_chat_mode`,
+    `plugins list | grep langfuse` when analytics was requested, `doctor`,
     `sessions refresh-prompts`. Note open sessions need a turn to pick up SOUL.
-13. **Messaging** only when user asks (`messaging-groups.md`); tokens never
+14. **Messaging** only when user asks (`messaging-groups.md`); tokens never
     auto-cloned. If Group.`platform_chat_id` is empty, set mention gates only
     and leave allowlists empty (do not invent chat ids).
 
@@ -133,6 +152,7 @@ hermes -p <slug> delegation config --show   # each route has fallback_providers 
 hermes -p <slug> tools list | grep -E 'browser|computer|delegation|cronjob'
 hermes -p <slug> cron list             # names match Schedule.schedule_key; ids written back
 hermes -p <slug> skills list | grep org/
+hermes -p <slug> plugins list | grep langfuse   # when analytics_enabled
 hermes -p <slug> doctor
 hermes -p <slug> sessions refresh-prompts
 ```
@@ -149,6 +169,7 @@ When the user asks for a **proper / full** Agent ↔ Hermes sync, cover all of:
 | Agenda | live Schedules | `hermes cron` + `hermes_job_*` writeback |
 | Skills | active procedures on Skills Query | `skills/org/<key>/SKILL.md` (additive) |
 | Voice | `voice_*` modes | `voice.auto_tts` / `voice.voice_chat_mode` |
+| Analytics | `analytics_enabled` | langfuse plugin + `HERMES_LANGFUSE_*` (copy from default when needed) |
 | Messaging | Group + `platform_chat_id` | allowlists only when chat id known; else gates + note |
 | Tools | Tool profile + surface | `tools enable/disable`; Primary disables browser/computer_use |
 | Timezone | Schedule.`timezone` / org | profile `timezone` (e.g. Europe/Paris) |

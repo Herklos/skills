@@ -56,6 +56,7 @@ Outline only:
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…",
       "delegation_enabled": true,
+      "analytics_enabled": false,
       "browser": ["<browserCatalogObjectId>"],
       "computer": ["<computerCatalogObjectId>"],
       "tool_profile": ["<toolProfileCatalogObjectId>"],

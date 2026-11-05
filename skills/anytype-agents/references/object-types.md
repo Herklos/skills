@@ -76,6 +76,7 @@ Featured properties (API keys):
 | `computer` | objects | Link to one **Computer** catalog object |
 | `tool_profile` | objects | Link to one **Tool profile** catalog object |
 | `voice_enabled` | checkbox | Intended to use Hermes voice mode (featured) |
+| `analytics_enabled` | checkbox | When true, Hermes apply enables the **langfuse** observability plugin (featured). Opt-in; default false. Org: Primary (P) true; others leave false until asked |
 | `board_member` | checkbox | Board seat |
 
 Other properties:
@@ -120,6 +121,11 @@ Voice bullets. Hermes apply: `hermes-profiles` → `voice.md`. Org fill: most
 agents `voice_enabled=false` / modes `off` with local+edge stack filled for
 later enable; Foyer personal assistants may set `voice_enabled=true` +
 `voice_chat_mode=chained` + `messaging_voice_mode=voice_only`.
+
+**Analytics:** Agent.`analytics_enabled` gates Langfuse on Hermes apply
+(`hermes-profiles` → `anytype-apply.md`). Opt-in only (do not auto-disable when
+false). Org fill: Primary true; specialists false until asked. Shared project
+keys live on the default profile `.env` (`HERMES_LANGFUSE_*`).
 
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 
@@ -576,6 +582,7 @@ template id from `API-list-templates` when you need a specific one; pass
       "autonomy": "change-with-gates",
       "short_description": "Implements one Ready coding TODO…",
       "delegation_enabled": true,
+      "analytics_enabled": false,
       "browser": ["<engineeringHqHermesChromiumBrowserId>"],
       "computer": ["<engineeringHqCuaSpacesComputerId>"],
       "tool_profile": ["<codingOrStandardToolProfileId>"],
@@ -722,7 +729,7 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
    `board_member`, `memory_pages`, `skills_page`,
    `logs_page`, `agenda_page`, `suggestions_page`, `messaging_group`, `map_path`,
-   `delegation_enabled`, `terminal_backend`, `computer_surface`; keep
+   `delegation_enabled`, `analytics_enabled`, `terminal_backend`, `computer_surface`; keep
    `harness_profile` / `subagents`; `remove_property` legacy `harness` select,
    unused `primary_model`, and unused Agent `linked_projects` when ready
    (Project.`lead_agent` / `owning_team` + map_path cover agent↔project;

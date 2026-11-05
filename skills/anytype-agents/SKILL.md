@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.36.0
+version: 1.37.0
 license: MIT
 metadata:
   category: agents
@@ -34,7 +34,9 @@ Primary leave both empty (`computer_surface: none` on Primary). **Voice** (STT/T
 lives on **Harness profile**; Agent holds enablement / modes
 (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`)
 and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
-`voice.md`. **Most agents use Local parent** (chat = Ollama `lfm3` / effort
+`voice.md`. **Analytics** is Agent checkbox `analytics_enabled`: when true,
+Hermes apply enables the **langfuse** plugin (`hermes-profiles`
+`anytype-apply.md`). **Most agents use Local parent** (chat = Ollama `lfm3` / effort
 none; approvals = Hermes builtin llamacpp `d1-2b-q4_k_m`; voice stack local
 Whisper + Edge TTS). **lfm3 cannot run on llamacpp.** Spawn routes live on
 **Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
@@ -159,14 +161,14 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 1. Confirm HQ, reporting line, **Harness profile** (prefer **Local parent**; Foyer → **Foyer**; Arnold → **CLASQUIN**), Subagents, and draft vs live
 2. Drafts: place under the drafts hub; wait for approval before treating as live
 3. Create type **`agent`** (not `page`) using `references/object-types.md` + body from `page-templates.md`; leave `template` unset to use **Agent default**
-4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local parent), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `suggestions_page` / `messaging_group`
+4. Set properties (structured facts live here, not only in markdown): `role`, `lifecycle`, `harness_profile` (Local parent), optional `subagents`, `team` / `reports_to`, `autonomy`, `short_description`, `hermes_profile`, `board_member`, `map_path`, `delegation_enabled`, `analytics_enabled` (default false; Primary may be true for Langfuse), `browser` / `computer` / `tool_profile` (catalog links; org defaults: Computer + Browser = owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair; Tool profile **Standard interactive**; Primary / Board leave browser+computer empty), `terminal_backend` / `computer_surface` (keep aligned with linked Computer / Tool profile; org defaults `cua` / `cua-spaces`; Primary uses `computer_surface: none`), voice fields (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`, optional `stt_*` / `tts_*` overrides; prefer Harness profile STT/TTS stack), optional `memory_pages` / `skills_page` / `logs_page` / `agenda_page` / `suggestions_page` / `messaging_group`
 5. Create a **Prompt** (`prompt_kind=system`) with the full system / SOUL text; set Agent.`system_prompt` to it (`prompts.md`). Agent body keeps a short System prompt pointer + Agenda pointer only (no Suggested runtime section, no Full System Prompt fence, no Short description / Autonomy / Home / Chief / Team / HQ prose that duplicates properties)
 6. Create **Memory** objects (Memory & Decisions, Lessons Learned, Resources, Operating Notes), a Skills **Query**, a Logs **Query**, an Agenda **Query**, and a Suggestions **Query**; link via `memory_pages` + `skills_page` + `logs_page` + `agenda_page` + `suggestions_page` (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`)
 7. Link from the HQ map / Subteam; keep Agent.`team` pointing at the Subteam or HQ
 8. Inside the Prompt body, point at Shared Rules (short pointer, not a full paste, when token economy matters) and include `# HQ standing instructions (mandatory)` + `# Agenda (mandatory)` short sections (`hq-standing-instructions.md`, `agenda-and-schedules.md`)
 9. Fill runtime facts as **properties** + catalog links (`harness_profile`, `browser`, `computer`, `tool_profile`, `subagents`, voice fields, `short_description`, `autonomy`, `team`, `reports_to`, `map_path`, Agenda). Use `suggested-runtime.md` only as an apply checklist when configuring Hermes, not as agent-page markdown
 10. Tell the user Anytype is updated; **copy the linked Prompt into the runtime bot** and verify groups/routines separately
-11. If the runtime is Hermes, continue with skill `hermes-profiles` → **`anytype-apply.md`** (Primary → Hermes id `default`; SOUL from Prompt; Local parent; Subagents → `model_map` **including route `fallback_providers` from harness `fallback_*`**; tools; Agenda→cron + `hermes_job_*` writeback; active procedure Skills → `skills/org/<key>` additive; voice modes even when off). Topic refs: `models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `memory-and-skills.md` (Hermes skills sync), `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`, `messaging-groups.md`. Recurring Schedules decline only when the user asks. Do **not** paste HQ standing libraries into SOUL; keep the short pointer. After apply, set Agent.`hermes_profile` when empty and report Anytype gaps (`platform_chat_id` empty blocks allowlists)
+11. If the runtime is Hermes, continue with skill `hermes-profiles` → **`anytype-apply.md`** (Primary → Hermes id `default`; SOUL from Prompt; Local parent; Subagents → `model_map` **including route `fallback_providers` from harness `fallback_*`**; tools; Agenda→cron + `hermes_job_*` writeback; active procedure Skills → `skills/org/<key>` additive; voice modes even when off; **`analytics_enabled` → langfuse plugin**). Topic refs: `models.md`, `delegation.md`, `soul-templates.md`, `memory.md`, `memory-and-skills.md` (Hermes skills sync), `browser-and-computer.md`, `runtime-limits-and-tools.md`, `security.md`, `workspace.md`, `display.md`, `voice.md`, `cron.md`, `messaging-groups.md`. Recurring Schedules decline only when the user asks. Do **not** paste HQ standing libraries into SOUL; keep the short pointer. After apply, set Agent.`hermes_profile` when empty and report Anytype gaps (`platform_chat_id` empty blocks allowlists)
 
 ### Create or update a Team / HQ
 

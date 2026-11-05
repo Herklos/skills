@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.26.0
+version: 1.27.0
 license: MIT
 metadata:
   category: agents
@@ -360,7 +360,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
 - **Multi-bot group:** `messaging-groups.md` (tokens + allowlist + mention gates + welcome paste)
 - **Share package:** `export` / `import` or `profile install <git-url>`
-- **Anytype → Hermes apply:** `anytype-apply.md` (SOUL + Local parent + model_map route fallbacks + tools + cron + org skills + voice modes + describe)
+- **Anytype → Hermes apply:** `anytype-apply.md` (SOUL + Local parent + model_map route fallbacks + tools + cron + org skills + voice modes + analytics/langfuse + describe)
 
 ## Workflow checklist
 

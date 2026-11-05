@@ -4,8 +4,8 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.26.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.36.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.27.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.37.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -31,8 +31,9 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group
 - **Gateway**: start/stop/install one messaging gateway per profile (one bot token each)
 - **Suggestions gate**: apply Anytype harness / Subagent / model changes only after an accepted `suggestion` (or explicit ask)
+- **Analytics**: Agent.`analytics_enabled` → enable **langfuse** on apply (`anytype-apply.md`); copy `HERMES_LANGFUSE_*` from default when needed
 
-**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `recipes`, `troubleshooting`.
+**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `anytype-apply`, `recipes`, `troubleshooting`.
 
 **Typical flows**
 
@@ -53,7 +54,7 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 
 | Type | Purpose |
 |------|---------|
-| `agent` | Role, memory links, `harness_profile`, Subagents, `system_prompt` → Prompt, browser/computer/tool links, voice modes |
+| `agent` | Role, memory links, `harness_profile`, Subagents, `system_prompt` → Prompt, browser/computer/tool links, voice modes, `analytics_enabled` |
 | `team` | Board / HQ / Group (`kind`) |
 | `subteam` | Domain / pod under an HQ (preferred over legacy Sub-team teams) |
 | `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools) |
@@ -81,6 +82,7 @@ Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Pro
 - Most agents link **Local parent** (Ollama `lfm3` chat + llamacpp `d1` approval; spawn Subagents for specialized routes). Exceptions: Foyer, CLASQUIN
 - Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive
 - Voice stack on Local parent / Foyer: local Whisper + Edge TTS; Agent holds enablement / modes
+- Analytics: Agent.`analytics_enabled` (opt-in Langfuse); Primary may be true; specialists false until asked
 - Canonical system / welcome text on typed **Prompt** objects; Agent.`system_prompt` and Group `welcome_prompt` link them; agent bodies keep short pointers
 - Improvement feedback as typed **`suggestion`**; no Hermes auto-apply
 
@@ -107,6 +109,7 @@ agent + harness_profile  →   profile config / models / voice
 agent.system_prompt      →   SOUL / system prompt copy
 subagent routes          →   delegation model_map
 browser / computer / tools → browser-and-computer, runtime-limits
+analytics_enabled        →   langfuse plugin + HERMES_LANGFUSE_* env
 suggestion (accepted)    →   gate for apply via hermes-profiles refs
 schedule / agenda        →   cron jobs (when asked)
 group                    →   messaging-groups (when asked)

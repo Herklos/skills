@@ -12,9 +12,9 @@ Agenda→cron, write discipline, verify + gaps report). Use this file as the
 property worksheet; use `anytype-apply.md` as the execution order.
 
 **Properties are the source of truth:** Agent.`harness_profile`,
-`hermes_profile`, `delegation_enabled`, `browser`, `computer`, `tool_profile`,
-`terminal_backend`, `computer_surface`, `subagents`, `short_description`,
-`autonomy`, `team`, `reports_to`, `map_path`, voice fields
+`hermes_profile`, `delegation_enabled`, `analytics_enabled`, `browser`,
+`computer`, `tool_profile`, `terminal_backend`, `computer_surface`, `subagents`,
+`short_description`, `autonomy`, `team`, `reports_to`, `map_path`, voice fields
 (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`,
 optional `stt_*` / `tts_*`), plus Harness profile `model_*` / `fallback_*` /
 `aux_*` / voice stack. Do not paste this checklist onto the Agent page.
@@ -92,6 +92,11 @@ block to the Agent object body.
 - TTS: {edge|elevenlabs|openai|…} · voice {en-US-AriaNeural|…} · speed {1}
 - Org default stack: local / base + edge / en-US-AriaNeural
 - Apply: hermes-profiles `voice.md`
+**Analytics (Langfuse):** (Agent.`analytics_enabled`)
+- Enabled: no | yes — when yes, Hermes apply installs/enables **langfuse**
+- Keys: `HERMES_LANGFUSE_PUBLIC_KEY` + `HERMES_LANGFUSE_SECRET_KEY` (+ optional `BASE_URL`) on the profile `.env`; copy from default when missing
+- If keys absent: tell the user to run `hermes -p <slug> plugins install langfuse` (CLI prompts) or paste into that profile `.env`; do not invent placeholders
+- Opt-in only (false does not auto-disable). Apply: hermes-profiles `anytype-apply.md`
 **Browser access:** (prefer Agent.`browser` → type `browser` catalog)
 - Catalog: {{HQ name} – Hermes Chromium | empty on Board/Primary | exception surface …}
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)
