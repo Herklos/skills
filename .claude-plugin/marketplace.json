@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "herklos-skills",
-  "description": "Product-agnostic agent-ops skills for Hermes profiles and Anytype multi-agent orgs.",
+  "description": "Product-agnostic agent-ops skills for Hermes, Osaurus, and Anytype multi-agent orgs.",
   "owner": {
     "name": "Herklos",
     "url": "https://github.com/Herklos"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "agent-ops-skills",
-      "description": "Bundle: Hermes profiles + Anytype Agents management.",
+      "description": "Bundle: Hermes profiles + Osaurus agents + Anytype Agents management.",
       "source": "./",
       "category": "productivity"
     },
@@ -17,6 +17,12 @@
       "name": "hermes-profiles",
       "description": "Manage Hermes Agent profiles: create, clone, configure, describe, gateway lifecycle.",
       "source": "./skills/hermes-profiles",
+      "category": "productivity"
+    },
+    {
+      "name": "osaurus-agents",
+      "description": "Define Osaurus agents via osaurus config plan/apply or Osaurus Bundles.",
+      "source": "./skills/osaurus-agents",
       "category": "productivity"
     },
     {

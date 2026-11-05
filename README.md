@@ -1,11 +1,12 @@
 # Agent-ops skills
 
-Two companion skills for running a multi-agent org: **Anytype** as the org source of truth, **Hermes** as the runtime home for each bot. Compatible with Claude Code, Cursor, Codex, and other skills installers.
+Companion skills for running a multi-agent org: **Anytype** as the org source of truth, plus runtime apply skills (**Hermes**, **Osaurus**, …). Compatible with Claude Code, Cursor, Codex, and other skills installers.
 
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.31.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.41.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.0.0 | Define Osaurus agents via `osaurus config` / bundles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.42.0 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -61,7 +62,8 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 | `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools) |
 | `harness` | Product catalog (Claude, Codex, Grok, Copilot, Muse, NIM, Local model) |
 | `harness_profile` | Reusable primary + backup model stack, optional decision model, shared STT/TTS |
-| `browser` / `computer` / `tool_profile` | Runtime catalogs; Browser/Computer are per-HQ (Cua pair; Browser org default = Chrome real profile); Tool profiles are shared; agents/teams/subteams link them |
+| `browser` / `computer` / `tool_profile` | Surface catalogs; Browser/Computer are per-HQ (Cua pair; Browser org default = Chrome real profile); Tool profiles are shared; agents/teams/subteams link them |
+| `runtime` | Where the agent runs: `grok-bot` / `hermes` / `osaurus` / `noodle`; Agent.`runtime` links one |
 | `vault_grant` | **Capability only:** which Agents may use which site / login identity (no passwords; Shared Rule 27) |
 | `prompt` | System / welcome / shared_rules / library / draft text; Agents and Groups link them |
 | `memory` / `skill` / `log` / `suggestion` / `schedule` | Memory pages, skill catalog, activity logs, improvement feedback, Agenda jobs |
@@ -102,22 +104,30 @@ Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)
 
 ---
 
+## osaurus-agents
+
+Define **Osaurus** agents with declarative config (`osaurus config plan|apply`) or Osaurus Bundles (`osaurus import`). Mirrors hermes-profiles for the Osaurus platform: discover with `config export` / `import list`, plan before apply, secrets via `env:` / Keychain refs only.
+
+**References:** `cli-map`, `config-document`, `bundles`, `anytype-apply`, `recipes`, `troubleshooting`.
+
+Docs: [CLI](https://docs.osaurus.ai/cli) · [Configuration](https://docs.osaurus.ai/configuration) · [Bundles](https://docs.osaurus.ai/bundles) · Skill: [`skills/osaurus-agents/SKILL.md`](./skills/osaurus-agents/SKILL.md)
+
+---
+
 ## How they fit
 
 ```
-Anytype (org truth)          Hermes (runtime)
-─────────────────            ────────────────
-agent + harness_profile  →   profile config / models / voice
-agent.system_prompt      →   SOUL / system prompt copy
-subagent routes          →   delegation model_map
-browser / computer / tools → browser-and-computer, runtime-limits
-analytics_enabled        →   langfuse plugin + HERMES_LANGFUSE_* env
-suggestion (accepted)    →   gate for apply via hermes-profiles refs
-schedule / agenda        →   cron jobs (when asked)
-group                    →   messaging-groups (when asked)
+Anytype (org truth)          Runtime (Agent.runtime)
+─────────────────            ───────────────────────
+agent + runtime:hermes   →   hermes-profiles (profile home)
+agent + runtime:osaurus  →   osaurus-agents (config / bundle)
+agent + runtime:grok-bot →   (manual / Grok Build for now)
+agent + runtime:noodle   →   (manual for now)
+agent.system_prompt      →   SOUL / system_prompt / agent prompt
+suggestion (accepted)    →   gate before live apply
 ```
 
-`anytype-agents` designs and stores the roster. `hermes-profiles` creates and configures the live homes. Keep them in sync deliberately; the skills never auto-push one into the other.
+`anytype-agents` designs and stores the roster. Runtime skills create and configure live homes. Keep them in sync deliberately; the skills never auto-push one into the other.
 
 ---
 
@@ -128,7 +138,7 @@ group                    →   messaging-groups (when asked)
 ```bash
 claude plugin marketplace add Herklos/skills
 claude plugin install agent-ops-skills@herklos-skills
-# or: hermes-profiles@herklos-skills / anytype-agents@herklos-skills
+# or: hermes-profiles@herklos-skills / osaurus-agents@herklos-skills / anytype-agents@herklos-skills
 ```
 
 ### Other installers
@@ -139,6 +149,7 @@ npx ai-agent-skills install Herklos/skills
 
 # Manual copy into a harness skills folder
 cp -r skills/hermes-profiles ~/.claude/skills/
+cp -r skills/osaurus-agents ~/.claude/skills/
 cp -r skills/anytype-agents ~/.claude/skills/
 ```
 

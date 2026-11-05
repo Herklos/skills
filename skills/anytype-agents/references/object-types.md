@@ -1,4 +1,4 @@
-# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Vault grant, Prompt, Group, Project)
+# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Runtime, Vault grant, Prompt, Group, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
@@ -28,6 +28,7 @@ via `agenda_page` (see `agenda-and-schedules.md`).
 | `browser` | Browsers | Reusable browser access catalog (`is_real` / engine / pin + source + identity). Agents / Teams / Subteams link here |
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
+| `runtime` | Runtimes | Where the agent runs: `grok-bot` \| `hermes` \| `osaurus` \| `noodle`. Agents link via Agent.`runtime` |
 | `vault_grant` | Vault grants | **Capability only:** which Agents may use which site / login identity. No passwords (`hermes-profiles` → `browser-and-computer.md`) |
 | `prompt` | Prompts | System prompts, group welcomes, Shared Rules, libraries, drafts (`prompts.md`) |
 | `memory` | Memories | Durable agent notes (`memory-and-skills.md`) |
@@ -42,7 +43,7 @@ via `agenda_page` (see `agenda-and-schedules.md`).
 
 Hub roots named **Agents** / **Projects** may remain `page`; their inventory
 children use the keys above. Keep Harness + Harness profile + Browser + Computer
-+ Tool profile objects under Agents → Shared (or a Runtime / Harnesses index).
++ Tool profile + Runtime objects under Agents → Shared (or a Runtime / Harnesses index).
 Keep Subagent objects linked from their parent Agent (`parent_agent` +
 Agent.`subagents`).
 
@@ -76,6 +77,7 @@ Featured properties (API keys):
 | `browser` | objects | Link to one **Browser** catalog object |
 | `computer` | objects | Link to one **Computer** catalog object |
 | `tool_profile` | objects | Link to one **Tool profile** catalog object |
+| `runtime` | objects | Link to one **Runtime** catalog object (`grok-bot` / `hermes` / `osaurus` / `noodle`) |
 | `voice_enabled` | checkbox | Intended to use Hermes voice mode (featured) |
 | `analytics_enabled` | checkbox | When true, Hermes apply enables the **langfuse** observability plugin (featured). Opt-in; default false. Org: Primary (P) true; others leave false until asked |
 | `board_member` | checkbox | Board seat |
@@ -495,7 +497,42 @@ when those toolsets are enabled.
 - Tool profile → **Standard interactive**; Engineering → **Coding**; fetch /
   veille roles → **Data fetching**
 
+## Runtime (`api_key`: `runtime`)
+
+Catalog of **where** an Agent runs. Distinct from **Harness** (model product) and
+from Osaurus's own `agents[].runtime` (Claude Code / Pi inside Osaurus).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `slug` | text | Stable id: `grok-bot` \| `hermes` \| `osaurus` \| `noodle` (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `runtime_kind` | select | Same vocabulary as slug (featured). Display **Runtime kind** |
+| `product` | text | Product label (featured) |
+| `cli_command` | text | e.g. `hermes`, `osaurus` |
+| `home_path` | text | e.g. `~/.hermes`, `~/.osaurus` |
+| `skill_name` | text | Apply skill: `hermes-profiles`, `osaurus-agents`, … |
+| `docs_url` | url | Optional docs |
+| `notes` | text | Short apply notes |
+
+Also `tag`, `links`, `backlinks`.
+
+**Canonical catalog (create these once):** Grok Bot, Hermes, Osaurus, Noodle
+(matching slugs / `runtime_kind` above).
+
+| Name | slug / kind | Skill |
+|------|-------------|-------|
+| Hermes | `hermes` | `hermes-profiles` |
+| Osaurus | `osaurus` | `osaurus-agents` |
+| Grok Bot | `grok-bot` | (none yet) |
+| Noodle | `noodle` | (none yet) |
+
+Agents link one via featured Agent.`runtime`. Keep under Agents → Shared (or a
+Runtime index). Editing Anytype does not push into the live runtime.
+
+**Default template name:** `Runtime default`.
+
 ## Vault grant (`api_key`: `vault_grant`)
+
 
 **Capability catalog only.** Records which Agents (or Team) may use which site
 login / browser identity. **Never** store passwords, TOTP seeds, API tokens, or
@@ -650,7 +687,7 @@ Create a Subagent the same way (`"type": "subagent"`) with `parent_agent`,
 `task_key`, `harness_profile`, then add its id to the parent's `subagents`.
 
 Team / Subteam / Group / Subagent / Harness / Harness profile / Browser /
-Computer / Tool profile / project the same way with the matching `"type"` and
+Computer / Tool profile / Runtime / project the same way with the matching `"type"` and
 property keys above.
 
 ## Search by type
@@ -666,7 +703,7 @@ property keys above.
 
 Use `"type": "team"`, `"type": "group"`, `"type": "subteam"`, `"type": "subagent"`,
 `"type": "harness"`, `"type": "harness_profile"`, `"type": "browser"`,
-`"type": "computer"`, `"type": "tool_profile"`, or `"type": "project"` the same way.
+`"type": "computer"`, `"type": "tool_profile"`, `"type": "runtime"`, or `"type": "project"` the same way.
 
 ## Migrate an existing page (`set_type`)
 
@@ -757,7 +794,7 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
 
 1. `API-create-type` for `agent`, `team`, `group`, `subteam`, `subagent`,
    `harness`, `harness_profile`, `browser`, `computer`, `tool_profile`,
-   `vault_grant`, `prompt`, `memory`, `skill`, `log`, `suggestion`, and
+   `vault_grant`, `runtime`, `prompt`, `memory`, `skill`, `log`, `suggestion`, and
    `schedule` with the property definitions above (`create_missing_options: true`
    for selects).
    On `team`, define `kind` options `Board` / `HQ` only (no `Sub-team`, no new
@@ -768,7 +805,7 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    when a shorter name already exists with a different format.
 2. On existing Agent / Team / Subteam / Subagent types: `add_property` for
    org/runtime fields above including featured `browser`, `computer`,
-   `tool_profile`, shared `system_prompt` (Agent required; Team/Subteam/Subagent
+   `tool_profile`, `runtime`, shared `system_prompt` (Agent required; Team/Subteam/Subagent
    optional), and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
    `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
    `board_member`, `memory_pages`, `skills_page`,
