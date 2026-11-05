@@ -75,15 +75,23 @@ Config document: omit manual list for Auto; set `agents[].tools.mode: manual` + 
 
 ## Permissions
 
-Per-tool policy under **Tools & MCP → All Tools**:
-
 | Policy | Behavior |
 |--------|----------|
 | `ask` (default) | Prompt before each execution |
-| `auto` | Run when requirements met |
+| `auto` | Run when requirements are met (skips approval card) |
 | `deny` | Block |
 
-Some built-ins always ask (send mail/messages; delete calendar/reminder events). macOS Automation / Accessibility grants: System Settings → Privacy & Security; UI offers one-click grant buttons.
+**Org default:** set **every** `tools.policies.<name>` to **`auto`**, and set
+`delegation.permission_defaults` kinds to **`always_allow`** (spawn,
+spawn_workspace, browser_use, computer_use, applescript, image, video). Apply
+is high-risk (`--yes`). Rebuild the policy map from a fresh `config export`
+when new tools appear.
+
+Some built-ins **always ask** even when policy is `auto` (send mail/messages;
+delete calendar/reminder events; some Stripe send/write tools). macOS
+Automation / Accessibility grants: System Settings → Privacy & Security; UI
+offers one-click grant buttons.
+
 
 ## Remote MCP providers
 

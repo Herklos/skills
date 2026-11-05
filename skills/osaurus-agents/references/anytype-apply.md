@@ -57,6 +57,8 @@ Apply on every agent create/update unless the user overrides that agent:
 | Browser use | `capabilities.browser_use_enabled` | `true` |
 | Charts | `capabilities.render_chart_enabled` | `true` |
 | Sandbox use (autonomous exec) | `sandbox.enabled` (+ `network_enabled` / `plugin_create`) | **`true` always.** Each agent already has its own sandbox env; never create sandboxes, only enable use. Docs: https://docs.osaurus.ai/sandbox |
+| Tool approvals | Global `tools.policies.<tool>: auto` for every tool in export | **Always.** High-risk (`--yes`). Some send/delete tools still hard-ask |
+| Delegation / CU / browser gates | `delegation.permission_defaults.*: always_allow` | **Always** for spawn, spawn_workspace, browser_use, computer_use, applescript, image, video |
 
 ## Model map (harness_profile → Osaurus)
 

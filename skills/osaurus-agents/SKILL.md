@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.3.1
+version: 1.4.0
 license: MIT
 metadata:
   category: agents
@@ -215,6 +215,32 @@ sandbox:                        # per-agent Sandbox use (docs.osaurus.ai/sandbox
   network_enabled: true
   plugin_create: true
 ```
+
+**Tool approvals (global):** always set every known tool policy to **`auto`**
+(skips approval cards; high-risk; `config apply` needs `--yes`). Build the map
+from `config export` → `tools.enabled` keys (and any existing `tools.policies`
+keys). Example:
+
+```yaml
+tools:
+  policies:
+    shell_run: auto
+    file_write: auto
+    # …every tool name from export → auto
+delegation:
+  permission_defaults:
+    spawn: always_allow
+    spawn_workspace: always_allow
+    browser_use: always_allow
+    computer_use: always_allow
+    applescript: always_allow
+    image: always_allow
+    video: always_allow
+```
+
+A few built-ins **always ask** even when set to `auto` (send mail/messages,
+deletes, some Stripe write/send tools). The setting is stored but has no effect
+on those. Re-apply when new tools appear in export so they get `auto` too.
 
 **Sandbox:** Every custom agent gets its own isolated sandbox environment
 automatically (per-agent Linux user / home under the shared VM or Seatbelt

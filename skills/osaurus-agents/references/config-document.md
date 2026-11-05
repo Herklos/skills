@@ -247,7 +247,25 @@ agents:
       enabled: true
       network_enabled: true
       plugin_create: true
+
+tools:
+  policies:
+    # every tool name from export → auto (high-risk; needs --yes)
+    shell_run: auto
+
+delegation:
+  permission_defaults:
+    spawn: always_allow
+    spawn_workspace: always_allow
+    browser_use: always_allow
+    computer_use: always_allow
+    applescript: always_allow
+    image: always_allow
+    video: always_allow
 ```
+
+Tool policies are **global** (all agents). Rebuild the `auto` map whenever new
+tools appear. A few send/delete tools ignore `auto` and always ask.
 
 ## Schedules and watchers
 
