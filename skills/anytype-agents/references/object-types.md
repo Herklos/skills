@@ -92,6 +92,7 @@ Other properties:
 |-----|--------|-------|
 | `autonomy` | select | `read-only` \| `propose` \| `change-with-gates` |
 | `hermes_profile` | text | Hermes home slug under `~/.hermes/profiles/<slug>` when applying via `hermes-profiles` |
+| `applied_rules_version` | text | Shared Rules `version` last applied into this agent's runtime (written at apply; drift = differs from current Shared Rules `version`) |
 | `short_description` | text | One-liner mission |
 | `memory_pages` | objects | Typed **Memory** children (decisions, lessons, resources, …) |
 | `skills_page` | objects | Skills **Query** for this agent |
@@ -871,7 +872,8 @@ create/migrate recipes, and Agent/Group pointer shapes: **`prompts.md`**.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `other` (featured) |
+| `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `operating_guide` \| `other` (featured) |
+| `version` | text | Semver (featured). Set on Shared Rules and the Operating Guide; minor = new rule, patch = wording, major = HARD change |
 | `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
 | `owner_agent` | objects | Owning Agent when kind is system (featured) |
 | `owner_group` | objects | Owning typed **Group** when kind is welcome (featured) |
@@ -937,9 +939,15 @@ pattern) over one Group per hire. Octave stays on Veille & Technology Group.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `other` (featured) |
+| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `fact` \| `preference` \| `profile` \| `exclusion` \| `other` (featured). Atomic decisions use `memory_decisions` |
+| `memory_scope` | select | `agent` \| `hq` \| `org` \| `human` (featured). `human` = owned by the human, no `owner_agent` |
+| `topic` | text | One topic per atomic memory; search it before creating (dedupe / merge) (featured) |
+| `observed_at` | date | When the fact was observed or decided (featured) |
+| `source_agent` | objects | Agent that produced the fact |
+| `source_url` | url | Source link |
+| `supersedes` | objects | Memory this one replaces |
 | `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
-| `owner_agent` | objects | Owning Agent (featured) |
+| `owner_agent` | objects | Owning Agent (featured; empty when `memory_scope=human`) |
 | `owner_team` | objects | Optional |
 | `owner_subteam` | objects | Optional |
 | `cadence` | text | Optional |

@@ -20,7 +20,8 @@ Body shapes: `page-templates.md` / `type-templates.md`.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `other` (featured) |
+| `prompt_kind` | select | `system` \| `welcome` \| `shared_rules` \| `library` \| `draft` \| `operating_guide` \| `other` (featured) |
+| `version` | text | Semver, set on Shared Rules and the Operating Guide (featured) |
 | `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
 | `owner_agent` | objects | Owning Agent when `prompt_kind=system` (featured) |
 | `owner_group` | objects | Owning typed **Group** when `prompt_kind=welcome` (featured) |

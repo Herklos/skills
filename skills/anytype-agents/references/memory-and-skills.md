@@ -28,9 +28,15 @@ Subteam / Global). Point at them via `skills_page`. Logs **indexes** are type
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `other` (featured) |
+| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `fact` \| `preference` \| `profile` \| `exclusion` \| `other` (featured) |
+| `memory_scope` | select | `agent` \| `hq` \| `org` \| `human` (featured). Existing bucket memories are `agent` |
+| `topic` | text | Atomic memory topic (one fact per object). Search `type=memory` + topic before creating; merge into the hit and update `observed_at` |
+| `observed_at` | date | When observed / decided |
+| `source_agent` | objects | Producing Agent |
+| `source_url` | url | Source link |
+| `supersedes` | objects | Replaced Memory |
 | `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
-| `owner_agent` | objects | Owning Agent (featured; required for agent memory) |
+| `owner_agent` | objects | Owning Agent (featured; required for agent memory, empty for `memory_scope=human`) |
 | `owner_team` | objects | Optional HQ-shared notes |
 | `owner_subteam` | objects | Optional |
 | `cadence` | text | Optional (weekly scorecard, Monday retro) |
