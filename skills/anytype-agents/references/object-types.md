@@ -25,7 +25,7 @@ via `agenda_page` (see `agenda-and-schedules.md`).
 | `subagent` | Subagents | Spawn configs an Agent may start (task, harness profile, scope, tools). Not the same as `subteam` |
 | `harness` | Harnesses | Product catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
 | `harness_profile` | Harness profiles | Reusable Hermes-shaped model / fallback / aux stacks. Agents and Subagents link here |
-| `browser` | Browsers | Reusable browser access catalog (source + identity). Agents / Teams / Subteams link here |
+| `browser` | Browsers | Reusable browser access catalog (`is_real` / engine / pin + source + identity). Agents / Teams / Subteams link here |
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
 | `vault_grant` | Vault grants | **Capability only:** which Agents may use which site / login identity. No passwords (`hermes-profiles` → `browser-and-computer.md`) |
@@ -367,17 +367,26 @@ Reusable browser-access catalog. Agents / Teams / Subteams link one via
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `slug` | text | Stable id (e.g. `none`, `cua-spaces-chromium`, `local-chromium-throwaway`) (featured) |
+| `slug` | text | Stable id (e.g. `engineering-hermes-chromium`) (featured) |
 | `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
 | `access_needed` | checkbox | Whether interactive browser is needed (featured). Display name **Access needed** |
-| `browser_source` | select | `none` \| `local-chromium` \| `lightpanda` \| `cloud-browserbase` \| `cloud-browser-use` \| `cloud-firecrawl` \| `cloud-nous` \| `cdp-attach` \| `operator-real-profile` (featured). Display name **Browser source** (avoid bare `Source`; that clashes with a url property elsewhere) |
-| `browser_identity` | select | `none` \| `dedicated-throwaway` \| `dedicated-persistent` \| `team-shared-persistent` \| `operator-real-profile`. Display name **Browser identity** |
+| `browser_source` | select | `none` \| `local-chromium` \| `lightpanda` \| `cloud-browserbase` \| `cloud-browser-use` \| `cloud-firecrawl` \| `cloud-nous` \| `cdp-attach` \| `operator-real-profile` (featured). Display name **Browser source** |
+| `is_real` | checkbox | When true, Hermes apply sets `browser.use_real_profile: true` (featured). Display **Is real**. Org default: **true** |
+| `browser_engine` | select | `chrome` \| `brave` \| `edge` \| `chromium` \| `brave-origin` (featured). Display **Browser engine**. Org default: **chrome**. Intended Chromium-family binary for real-profile / CDP |
+| `real_profile_pin` | text | Chrome/Brave profile directory name when `is_real` (e.g. `Default`, `Profile 2`) (featured). Display **Real profile pin**. Required when `is_real`; maps to Hermes `browser.real_profile_pin` |
+| `browser_identity` | select | `none` \| `dedicated-throwaway` \| `dedicated-persistent` \| `team-shared-persistent` \| `operator-real-profile`. Prefer align with `is_real` (`operator-real-profile` when true) |
 | `headed` | checkbox | Headed Chromium when true |
 | `cloud_provider` | text | Optional cloud provider label when source is cloud-* |
 | `docs_url` | url | Optional docs |
 | `notes` | text | Short apply notes |
 
 Also `tag`, `links`, `backlinks`. Long apply notes stay in the body.
+
+**`is_real` vs identity:** `is_real` is the apply source of truth for
+`use_real_profile`. Keep `browser_source` / `browser_identity` as
+`operator-real-profile` when `is_real` is true. When `is_real` is false, use
+throwaway / persistent / cloud / CDP as before and leave `real_profile_pin`
+empty.
 
 **Per-HQ catalog (org convention):** one Browser per HQ, not a shared org-wide
 row. Create when the HQ is created; Subteams and Agents under that HQ link the
@@ -386,13 +395,13 @@ playbook: `hq-runtime-pair.md`.
 
 | Name pattern | slug pattern | Typical props |
 |--------------|--------------|---------------|
-| `{HQ name} – Hermes Chromium` | `{hq-slug}-hermes-chromium` | `browser_source: local-chromium`, `browser_identity: dedicated-throwaway`, `access_needed: true`, `headed: false` |
+| `{HQ name} – Hermes Chromium` | `{hq-slug}-hermes-chromium` | `is_real: true`, `browser_engine: chrome`, `real_profile_pin: Default`, `browser_source` + `browser_identity: operator-real-profile`, `access_needed: true`, `headed: false` |
 
-Example: `Engineering HQ – Hermes Chromium` / `engineering-hermes-chromium`. Pair with
-the same HQ's Computer. The Browser object describes **Hermes** browser settings
-(`tools enable browser`, local throwaway Chromium); Space placement follows the
-paired Computer's `desktop_enabled`. Do not mint shared None / Local throwaway /
-Operator rows unless the user asks for an exception surface.
+Example: `Engineering HQ – Hermes Chromium` / `engineering-hermes-chromium`. Pair
+with the same HQ's Computer. Org default is **operator Chrome real profile**
+(`is_real` + `browser_engine: chrome` + pin `Default`). Space placement for
+in-Space browsing still follows the paired Computer's `desktop_enabled`. Do not
+mint shared None / throwaway catalog rows unless the user asks for an exception.
 
 **Default template name:** `Browser default`. Body: `type-templates.md`.
 

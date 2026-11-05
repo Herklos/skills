@@ -213,13 +213,16 @@ Primary leave both empty.
       "slug": "engineering-hermes-chromium",
       "lifecycle": "live",
       "access_needed": true,
-      "browser_source": "local-chromium",
-      "browser_identity": "dedicated-throwaway",
+      "is_real": true,
+      "browser_engine": "chrome",
+      "real_profile_pin": "Default",
+      "browser_source": "operator-real-profile",
+      "browser_identity": "operator-real-profile",
       "headed": false,
       "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser",
-      "notes": "Hermes-managed local Chromium (throwaway) for Engineering HQ. Pair with the HQ Cua Space Computer."
+      "notes": "Hermes-managed operator Chrome real profile (pin Default) for Engineering HQ. Pair with the HQ Cua Space Computer."
     },
-    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; Space placement follows Computer desktop.\n"
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; org default is operator Chrome real profile.\n"
   }
 }
 ```

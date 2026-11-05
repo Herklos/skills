@@ -4,8 +4,8 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.29.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.39.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.30.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.40.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -22,7 +22,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Models**: main / decision / routing model (including local `llamacpp`), auxiliary tasks, fallback providers, MoA
 - **Delegation**: `advanced-delegation` + `model_map` / profile routes so a parent routes specialized work to Subagents
 - **Memory**: per-profile `MEMORY.md` / `USER.md`, write approval, optional external provider
-- **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + Chromium in that Space; host desktop and Linux Bot Screen as exceptions; **sign-in** via Hermes vault / password manager / persistent or real profile / CDP (never paste passwords in chat; respect Anytype `vault_grant`)
+- **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + **operator Chrome real profile** (`is_real` / `browser_engine` / `real_profile_pin`); host desktop and Linux Bot Screen as exceptions; **sign-in** via real profile / Hermes vault / password manager / persistent / CDP (never paste passwords in chat; respect Anytype `vault_grant`)
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs; Bot Mode Edit Profile Description vs roster card chat preview (`profile-map.md`)
@@ -61,7 +61,7 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 | `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools) |
 | `harness` | Product catalog (Claude, Codex, Grok, Copilot, Muse, NIM, Local model) |
 | `harness_profile` | Reusable primary + backup model stack, optional decision model, shared STT/TTS |
-| `browser` / `computer` / `tool_profile` | Runtime catalogs; Browser/Computer are per-HQ (Cua pair); Tool profiles are shared; agents/teams/subteams link them |
+| `browser` / `computer` / `tool_profile` | Runtime catalogs; Browser/Computer are per-HQ (Cua pair; Browser org default = Chrome real profile); Tool profiles are shared; agents/teams/subteams link them |
 | `vault_grant` | **Capability only:** which Agents may use which site / login identity (no passwords; Shared Rule 27) |
 | `prompt` | System / welcome / shared_rules / library / draft text; Agents and Groups link them |
 | `memory` / `skill` / `log` / `suggestion` / `schedule` | Memory pages, skill catalog, activity logs, improvement feedback, Agenda jobs |
@@ -82,7 +82,7 @@ Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Pro
 **Org defaults (documented in the skill)**
 
 - Most agents link **Local parent** (Ollama `lfm3` chat + llamacpp `d1` approval; spawn Subagents for specialized routes). Exceptions: Foyer, CLASQUIN
-- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (Board/Primary leave both empty); Tool profile → Standard interactive
+- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (`is_real` + chrome + pin `Default`; Board/Primary leave both empty); Tool profile → Standard interactive
 - Voice stack on Local parent / Foyer: local Whisper + Edge TTS; Agent holds enablement / modes
 - Analytics: Agent.`analytics_enabled` (opt-in Langfuse); Primary may be true; specialists false until asked
 - Canonical system / welcome text on typed **Prompt** objects; Agent.`system_prompt` and Group `welcome_prompt` link them; agent bodies keep short pointers

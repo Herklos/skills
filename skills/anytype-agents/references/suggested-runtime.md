@@ -100,8 +100,11 @@ block to the Agent object body.
 **Browser access:** (prefer Agent.`browser` → type `browser` catalog)
 - Catalog: {{HQ name} – Hermes Chromium | empty on Board/Primary | exception surface …}
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)
-- Source: local Chromium (HQ Hermes Chromium) | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach | operator real profile
-- Identity: dedicated throwaway | dedicated persistent | team/shared persistent | operator real profile
+- Is real: yes (org default → `use_real_profile`) | no
+- Engine: chrome (org default) | brave | edge | chromium | brave-origin
+- Real profile pin: Default (org default when is_real) | Profile 2 | …
+- Source: operator real profile (org default) | local Chromium | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach
+- Identity: operator real profile (align with is_real) | dedicated throwaway | dedicated persistent | team/shared persistent
 - Headed: no | yes · Notes: {vault logins? cron needs cookies?}
 **Computer access:** (prefer Agent.`computer` → type `computer` catalog)
 - Catalog: {{HQ name} – Cua Spaces | empty on Board/Primary | host / Bot Screen exception …}

@@ -54,19 +54,24 @@ Data fetching / Read-only). This playbook is Browser + Computer only.
 | `docs_url` | `https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces` |
 | `notes` | Dedicated Cua Space for this HQ; `terminal.backend: cua`; desktop true. Linked from HQ, Subteams, Agents. |
 
-**Browser** (`type: browser`): Hermes-managed local Chromium (throwaway).
-Not a separate Cua browser product. With Computer `desktop_enabled: true`,
-Hermes places browser work inside that HQ Space.
+**Browser** (`type: browser`): Hermes-managed Chromium-family browser using the
+**operator real Chrome profile** (org default). Not a separate Cua browser
+product. With Computer `desktop_enabled: true`, Hermes can still place browser
+work inside that HQ Space when not using real-profile; real-profile snapshots
+the host Chrome profile.
 
 | Key | Value |
 |-----|-------|
 | `lifecycle` | `live` |
 | `access_needed` | `true` |
-| `browser_source` | `local-chromium` |
-| `browser_identity` | `dedicated-throwaway` |
+| `is_real` | `true` |
+| `browser_engine` | `chrome` |
+| `real_profile_pin` | `Default` |
+| `browser_source` | `operator-real-profile` |
+| `browser_identity` | `operator-real-profile` |
 | `headed` | `false` |
 | `docs_url` | `https://hermes-agent.nousresearch.com/docs/user-guide/features/browser` |
-| `notes` | Hermes browser toolset; local throwaway Chromium. Pair with the HQ Computer. |
+| `notes` | Hermes browser toolset; operator Chrome real profile (pin Default). Pair with the HQ Computer. |
 
 ## Create the pair (MCP)
 
@@ -108,13 +113,16 @@ AnyBlock document form and rejects that shortcut).
       "slug": "engineering-hermes-chromium",
       "lifecycle": "live",
       "access_needed": true,
-      "browser_source": "local-chromium",
-      "browser_identity": "dedicated-throwaway",
+      "is_real": true,
+      "browser_engine": "chrome",
+      "real_profile_pin": "Default",
+      "browser_source": "operator-real-profile",
+      "browser_identity": "operator-real-profile",
       "headed": false,
       "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser",
-      "notes": "Hermes-managed local Chromium (throwaway) for Engineering HQ. Pair with the HQ Cua Space Computer."
+      "notes": "Hermes-managed operator Chrome real profile (pin Default) for Engineering HQ. Pair with the HQ Cua Space Computer."
     },
-    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; Space placement follows Computer desktop.\n"
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; org default is operator Chrome real profile.\n"
   }
 }
 ```

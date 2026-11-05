@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.29.0
+version: 1.30.0
 license: MIT
 metadata:
   category: agents
@@ -274,9 +274,9 @@ Full guide: `references/memory.md`. Keys: `memory.*`, `hermes -p <slug> memory s
 
 ### Browser and computer use
 
-Full guide: `references/browser-and-computer.md` (includes **Signing in**). **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). When Anytype links a per-HQ pair (`{HQ} – Cua Spaces` + `{HQ} – Hermes Chromium`; `hq-runtime-pair.md` + `cua-hq-spaces.md`), pin Hermes `settings.space` from Computer.`cua_space` and enable Hermes-managed local Chromium throwaway (see **Anytype per-HQ pair → Hermes**). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
+Full guide: `references/browser-and-computer.md` (includes **Signing in**). **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). When Anytype links a per-HQ pair (`{HQ} – Cua Spaces` + `{HQ} – Hermes Chromium`; `hq-runtime-pair.md` + `cua-hq-spaces.md`), pin Hermes `settings.space` from Computer.`cua_space` and apply Browser.`is_real` / `browser_engine` / `real_profile_pin` (org default: Chrome real profile, pin `Default`; see **Anytype per-HQ pair → Hermes**). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
 
-**Authenticated browsing:** default Chromium is logged out. Agents must use Hermes **vault** (masked prompts; never paste passwords in chat), 1Password/Bitwarden CLI, **dedicated persistent** `user_data_dir`, **operator real profile** (`use_real_profile`), or CDP attach. Check Anytype **`vault_grant`** for which Agent may use which site/identity. Secrets never live in Anytype. Vault docs: https://hermes-agent.nousresearch.com/docs/user-guide/features/credential-vault
+**Authenticated browsing:** org Anytype default is **operator real profile** (`use_real_profile` + pin). When `is_real` is false, Chromium is logged out; use Hermes **vault** (masked prompts; never paste passwords in chat), 1Password/Bitwarden CLI, **dedicated persistent** `user_data_dir`, or CDP attach. Check Anytype **`vault_grant`** for which Agent may use which site/identity. Secrets never live in Anytype. Vault docs: https://hermes-agent.nousresearch.com/docs/user-guide/features/credential-vault
 
 ### Tools, terminal, limits
 

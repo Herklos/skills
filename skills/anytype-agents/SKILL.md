@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.39.0
+version: 1.40.0
 license: MIT
 metadata:
   category: agents
@@ -95,7 +95,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Subagent | Typed `subagent` object: spawn/route config (task_key, harness_profile, scope, tools) under an Agent |
 | Harness | Typed `harness` catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
 | Harness profile | Typed `harness_profile`: Hermes-shaped model / fallback / aux stack; agents and subagents link here |
-| Browser | Typed `browser` catalog: source + identity + headed; agents / teams / subteams link here |
+| Browser | Typed `browser` catalog: `is_real` / `browser_engine` / `real_profile_pin` + source + identity + headed; agents / teams / subteams link here |
 | Computer | Typed `computer` catalog: surface + scope + desktop; agents / teams / subteams link here |
 | Tool profile | Typed `tool_profile` catalog: toolsets + approvals + terminal; agents / teams / subteams link here |
 | Vault grant | Typed `vault_grant`: which Agents may use which site / login identity (**no secrets**; Shared Rule 27) |
@@ -237,9 +237,10 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    playbook in `hq-runtime-pair.md`. When adding an HQ, create one Computer
    (`{hq-slug}-cua-spaces`, `computer_surface: cua-spaces`,
    `computer_scope: dedicated`, `desktop_enabled: true`) and one Browser
-   (`{hq-slug}-hermes-chromium`, `browser_source: local-chromium`,
-   `browser_identity: dedicated-throwaway`). Name them `{HQ name} – Cua Spaces`
-   and `{HQ name} – Hermes Chromium`. **Then create the live Cua Space**
+   (`{hq-slug}-hermes-chromium`, `is_real: true`, `browser_engine: chrome`,
+   `real_profile_pin: Default`, `browser_source` + `browser_identity:
+   operator-real-profile`). Name them `{HQ name} – Cua Spaces` and
+   `{HQ name} – Hermes Chromium`. **Then create the live Cua Space**
    (`cua spaces create linux --on local --kind container --runtime runc
    --name {hq-slug}-hq`) and set Computer.`cua_space` to the full id
    (e.g. `local:engineering-hq`); playbook `cua-hq-spaces.md`. Link that pair
@@ -247,7 +248,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    every Agent under it. Board and Primary leave `browser` / `computer` empty
    (Primary also `computer_surface: none`). Do not create shared org-wide None /
    Host / Bot Screen catalog rows unless the user asks for an exception.
-3. **Browser** (`browser`): `slug`, `access_needed`, `browser_source`, `browser_identity`,
+3. **Browser** (`browser`): `slug`, `access_needed`, `is_real` (default true),
+   `browser_engine` (default chrome), `real_profile_pin` (required when
+   `is_real`; org default `Default`), `browser_source`, `browser_identity`,
    optional `headed` / `cloud_provider` / `docs_url` / `notes`
 4. **Computer** (`computer`): `slug`, `access_needed`, `computer_surface`, `computer_scope`,
    optional `cua_space` (full live Space id, e.g. `local:engineering-hq`) /

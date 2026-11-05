@@ -67,11 +67,13 @@ Watch live with the Cua Spaces app, `cua spaces ls`, or `cua viewer`. Env overri
 
 Org source of truth (skill `anytype-agents` → `hq-runtime-pair.md`): each HQ owns
 one **Computer** (`{HQ} – Cua Spaces`, Docker container/runc by default) and one
-**Browser** (`{HQ} – Hermes Chromium`). The Browser catalog is **Hermes-managed**
-local Chromium (throwaway); it is not a separate Cua browser product. With
-Computer `desktop_enabled: true`, Hermes places browser work inside that HQ
-Space. Subteams and Agents under that HQ link the same pair. Board and Primary
-leave both empty (Primary `computer_surface: none`).
+**Browser** (`{HQ} – Hermes Chromium`). Org default Browser is **operator Chrome
+real profile** (`is_real: true`, `browser_engine: chrome`, `real_profile_pin:
+Default`, `browser_source` / `browser_identity: operator-real-profile`). It is
+not a separate Cua browser product. Throwaway / persistent / cloud / CDP remain
+exception surfaces when `is_real` is false. Subteams and Agents under that HQ
+link the same pair. Board and Primary leave both empty (Primary
+`computer_surface: none`).
 
 When applying a linked Agent into a Hermes profile, decline as follows (Anytype
 does not push configs):
@@ -80,7 +82,8 @@ does not push configs):
 |---------|--------------|
 | Computer `computer_surface: cua-spaces`, `desktop_enabled: true`, `computer_scope: dedicated` | `plugins install` cua-spaces; `terminal.backend: cua`; `plugins.entries.cua-spaces.settings.desktop: true`; pin `settings.space` to Computer.`cua_space` (full id e.g. `local:engineering-hq`, or short name `engineering-hq`) with `delete_on_exit: false` so the HQ shares one Space instead of minting a throwaway each run |
 | Computer.`cua_space` empty | Create the live Space first (`anytype-agents` → `cua-hq-spaces.md`: `--kind container --runtime runc`), then pin; do not invent a Space name that is not on the Computer |
-| Browser `browser_source: local-chromium`, `browser_identity: dedicated-throwaway`, `headed: false` | `tools enable browser`; `browser.cloud_provider: local`; `browser.use_real_profile: false`; `browser.user_data_dir: ""`; `browser.headed: false`. Hermes owns the browser toolset; with Cua desktop on Linux it runs **inside** that HQ Space |
+| Browser `is_real: true` (+ `browser_engine: chrome`, `real_profile_pin`, `browser_source` / `browser_identity: operator-real-profile`) | `tools enable browser`; `browser.cloud_provider: local`; `browser.use_real_profile: true`; `browser.real_profile_pin` from Anytype (org default `Default`); `browser.headed: false`. Engine intent is Chrome: use OS default Chromium-family / CDP / `executable_path` when needed; there is no separate `real_profile_browser` key |
+| Browser `is_real: false` with throwaway / persistent / cloud / CDP | Follow the matching identity row below (`use_real_profile: false`; `user_data_dir` / cloud / `cdp_url` as documented) |
 | Agent `computer_surface: none` / empty Computer+Browser (Primary) | Do not enable `computer_use` / Space desktop for that profile unless the user asks; terminal may still use another backend |
 | Exception Computer (`host` / `bot-screen`) | Follow Host desktop or Linux Bot Screen sections below; document on the agent page |
 
@@ -110,7 +113,13 @@ Use these labels on Anytype agent pages and map them to Hermes as follows.
 | **Cloud dedicated** | Managed cloud browser (Browserbase, Browser Use, Firecrawl, Nous, …) | `browser.cloud_provider: …` + provider keys in `.env` |
 | **Attach existing** | Drive a running Chrome via CDP | `browser.cdp_url: …` or `/browser connect` |
 
-Default local browsing is **dedicated throwaway** (one browser process per Hermes session name; omit `session` for the shared default session within that chat). Named `session` args give parallel browsers so subagents do not clobber each other. With **Cua Spaces** + desktop stack on Linux, the browser runs in the Space (still a dedicated throwaway profile unless you configure persistence inside that Space).
+Org Anytype default for HQ Browsers is **operator real profile** (`is_real`).
+When `is_real` is false, local browsing is **dedicated throwaway** (one browser
+process per Hermes session name; omit `session` for the shared default session
+within that chat). Named `session` args give parallel browsers so subagents do
+not clobber each other. With **Cua Spaces** + desktop stack on Linux (and not
+real-profile), the browser runs in the Space (still a dedicated throwaway
+profile unless you configure persistence inside that Space).
 
 ### Computer / screen
 
@@ -168,9 +177,11 @@ browsing is consent-gated: the agent acts with the operator's logins.
 
 ## Signing in (passwords, cookies, “browse as me”)
 
-Default local browsing is **logged out** (throwaway Chromium). Agents that need
-an authenticated site must use one of the paths below. **Do not ask the human to
-paste a password into chat.** Prefer Hermes vault fills or a configured identity.
+When the linked Browser has `is_real: false`, local browsing is **logged out**
+(throwaway Chromium). When `is_real: true` (org default), Hermes snapshots the
+operator Chrome profile (consent-gated). Agents that need an authenticated site
+must use one of the paths below. **Do not ask the human to paste a password into
+chat.** Prefer Hermes vault fills or a configured identity.
 
 Official vault docs:
 https://hermes-agent.nousresearch.com/docs/user-guide/features/credential-vault

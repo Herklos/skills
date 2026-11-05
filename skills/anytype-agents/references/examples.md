@@ -121,8 +121,9 @@ Skills: Agent → Subteam → Team → Project → Global
 - External provider: none
 **Browser access:**
 - Needed: yes (PR checks on CI web UI)
-- Source: local Chromium
-- Identity: dedicated throwaway
+- Is real: yes · Engine: chrome · Pin: Default
+- Source: operator real profile
+- Identity: operator real profile
 - Headed: no
 **Computer access:**
 - Needed: yes (sandboxed work surface)
@@ -180,6 +181,7 @@ Ops agent on Cua Spaces (preferred) with headed takeover in the Space viewer:
 ```markdown
 **Browser access:**
 - Needed: yes
+- Is real: no (exception: Space-local throwaway / persistent)
 - Source: local Chromium (inside Linux Space with desktop stack)
 - Identity: dedicated throwaway (or dedicated persistent inside a kept Space)
 - Headed: yes · human takeover via Cua Spaces viewer / Desktop Screen pane
