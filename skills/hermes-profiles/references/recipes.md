@@ -67,32 +67,11 @@ hermes profile describe forge --text "…"
 
 ## 5b. Install custom Bot Mode avatars
 
-When the user supplies a folder of PNGs named by profile slug (e.g.
-`~/Documents/images/agents/avatars/`):
+When the user supplies slug-named PNGs (e.g. `~/Documents/images/agents/avatars/`):
 
-**Writing `assets/avatar.png` alone is not enough.** On launch, Bot Mode
-(`pullServerAvatars` / `pushLocalAvatars`) prefers cached `bot-meta` images and
-can overwrite disk files with a 160×160 SVG raster. Install through the asset
-API and clear the Desktop cache.
-
-1. Diff filenames vs `hermes profile list` + live Hermes-runtime Anytype Agents.
-   Fix typos; map `p.png` → profile `default`. Skip Osaurus-only slugs.
-2. **Quit Hermes Desktop** (otherwise it may race and restore old faces).
-3. Center-crop square → resize to **256×256** PNG data URL.
-4. For each slug, call gateway `profiles.set_asset`
-   `{ name, asset: "avatar", data: "data:image/png;base64,…" }`
-   (Hermes Python: `tui_gateway.server.handle_request` after importing
-   `tui_gateway.methods_profiles`). This writes `assets/avatar.png` atomically.
-5. Stamp `ui_meta.hermes-bots.imageKind: photo` + `custom: true` (via
-   `profiles.configure` or `profile.yaml`).
-6. Clear cached images in Desktop plugin storage so the roster re-fetches:
-   Chromium LevelDB key `hermes.plugin.hermes-bots.bot-meta-v2` under
-   `~/Library/Application Support/Hermes/Local Storage/leveldb` — delete each
-   entry’s `image` field and set `imageKind: photo`. Backup the Local Storage
-   folder first. (Backfill rasters are exactly **160×160**; real photos are 256.)
-7. Reopen Hermes Desktop. Leave Osaurus art in `osaurus-ready/` for manual use.
-
-Paths and style notes: `profile-map.md` → **Custom photo avatars**.
+Full playbook: **`avatars.md`** (quit Desktop → `profiles.set_asset` →
+`ui_meta` photo/custom → clear `bot-meta-v2` images → reopen). Bare
+`assets/avatar.png` copies get overwritten by Desktop cache / SVG backfill.
 
 ## 6. Export / import between machines
 
@@ -182,6 +161,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Scheduled tasks / Bot routines | `cron.md` |
 | Multi-bot Telegram / Discord groups | `messaging-groups.md` |
 | Anytype Agent → live Hermes apply / create-if-missing | `anytype-apply.md` |
+| Bot Mode custom photo avatars | `avatars.md` |
 
 ## Decision guide: what to edit where
 
@@ -204,4 +184,4 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Task-specific subagent routes | `delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |
 | Kanban one-liner | `hermes profile describe` |
-| Bot roster avatar/section | `assets/avatar.png` + `ui_meta` (`profile-map.md`; fleet: recipe **5b**) |
+| Bot roster avatar/section | `avatars.md` (fleet: recipe **5b**); layout in `profile-map.md` |

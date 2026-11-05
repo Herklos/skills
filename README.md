@@ -4,7 +4,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.35.0 | Lifecycle and config for Hermes Agent profiles |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.36.0 | Lifecycle and config for Hermes Agent profiles |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.43.1 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
 
@@ -27,6 +27,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs; Bot Mode Edit Profile Description vs roster card chat preview (`profile-map.md`)
+- **Bot Mode avatars**: fleet photo install via `profiles.set_asset` + Desktop `bot-meta-v2` clear (`avatars.md`); bare file copies get overwritten
 - **Voice**: mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord voice channel. Defaults: local Whisper + Edge TTS
 - **Cron**: scheduled jobs and Bot routines per profile; Anytype Agenda → Hermes bind when asked
 - **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group
@@ -35,7 +36,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Analytics**: Agent.`analytics_enabled` → enable **langfuse** on apply (`anytype-apply.md`); copy `HERMES_LANGFUSE_*` from default when needed
 - **Delegation safety (Local parent):** always set `model_map.default`; SOUL/Shared Rules require `option` on every `delegate_task`; rebuild schema with `/delegation model_map --now` or `/new`
 
-**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `anytype-apply`, `recipes`, `troubleshooting`.
+**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `avatars`, `anytype-apply`, `recipes`, `troubleshooting`.
 
 **Typical flows**
 

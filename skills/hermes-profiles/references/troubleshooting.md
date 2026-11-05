@@ -188,6 +188,12 @@ hermes profile describe default
 - Card has role-like text but `describe` says none → that text is chat preview,
   not `profile.yaml` description.
 
+## Bot Mode avatars stuck on old faces / tiny 160×160 icons
+
+Bare `assets/avatar.png` copies lose to Desktop `bot-meta` cache and SVG
+backfill. Quit Desktop, re-install via `profiles.set_asset`, clear
+`bot-meta-v2` images, reopen. Full playbook: `avatars.md`.
+
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.
