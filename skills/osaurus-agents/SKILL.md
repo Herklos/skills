@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.2.0
+version: 1.3.0
 license: MIT
 metadata:
   category: agents
@@ -178,18 +178,64 @@ Full layout: `references/bundles.md`.
 
 1. Confirm Agent.`runtime` → Runtime with `runtime_kind: osaurus` (and usually
    `slug: osaurus`).
-2. Read Agent.`system_prompt` Prompt, `short_description`, Subagents, Team
-   standing instructions, Groups, catalog links as intent only.
-3. Build a config fragment or bundle (`anytype-apply.md`). Match agents by short
-   **name** (patches UI stubs). Map Team → chief `subagents` + standing text;
-   Group → `channels` only when chat ids/tokens exist.
-4. `config plan` or `import validate`, then apply/install only when the user asks.
+2. Read Agent.`system_prompt`, `short_description`, `harness_profile` (model),
+   Subagents/chief reports, Team standing, Groups, Agenda schedules, catalog
+   links as intent only.
+3. Build a config fragment with **org defaults** (capabilities, sandbox,
+   `runtime`+`model` from harness profile), chief `subagents`, and `schedules:`
+   for live Agenda items (`anytype-apply.md`). Match agents by short **name**.
+4. `config plan` or `import validate`, then apply/install only when the user asks
+   (`--yes` when browser/channel high-risk).
 5. Report gaps: voice (Settings UI), empty Group chat ids, Signal if unsupported,
-   Cua Spaces ≠ Computer Use, skills allow-lists, working folder / secrets.
+   Cua Spaces ≠ Computer Use, model id missing on host, skills allow-lists.
 
 Do not auto-apply from draft/proposed suggestions. Hermes-shaped fields
 (`hermes_profile`, Cua pair, langfuse, Chrome `real_profile_pin`) do not map 1:1;
 translate deliberately.
+
+## Org defaults (always on apply)
+
+When creating or updating any Osaurus agent (config fragment or Anytype apply),
+always set these unless the user overrides for that agent:
+
+```yaml
+runtime: builtin          # Osaurus host; use a harness_runtimes name only if Anytype says so
+model: <from harness_profile>   # required — never leave unset/foundation by accident
+capabilities:
+  tools_enabled: true
+  memory_enabled: true
+  search_memory_enabled: true   # memory recall
+  web_search_enabled: false     # prefer browser_use over web_search
+  db_enabled: true
+  self_scheduling_enabled: true
+  browser_use_enabled: true     # high-risk; apply needs --yes when newly granting
+  render_chart_enabled: true
+sandbox:                        # autonomous execution
+  enabled: true
+  network_enabled: true
+  plugin_create: true
+```
+
+**Model source:** Agent.`harness_profile` → `model_default` + `model_provider`
+(+ linked `model_harness`). Translate into an Osaurus model id that exists on
+this host (`osaurus list` / export `models:`). Example: Foyer / Local parent
+`lfm3` via `ollama-launch` → `OsaurusAI/LFM3-1.7B-JANG_6M` when that local model
+is installed. Do not invent cloud fallbacks the profile forbids.
+
+**Chief / subchief delegation:** If the agent is a Team/Subteam chief (or has
+direct reports / Subagents in Anytype), set `subagents.enabled: true` and
+`subagents.agents: [<specialist names…>]`, and keep those names on
+`delegation.spawnable_agents`. Specialists without reports stay
+`subagents.enabled: false`.
+
+**Schedules:** If Agent.`agenda_page` (or search by `owner_agent`) has live
+`schedule` objects, create matching `schedules:` entries (`name`, `agent`,
+`frequency`/`frequency_value` from `schedule_expr` or kind, `instructions` from
+intent/body Prompt, `enabled` from lifecycle/paused). Osaurus has no timezone
+field; note Europe/Paris (etc.) in instructions and assume host local clock.
+Skip draft/paused unless the user asks to enable them.
+
+Details: `anytype-apply.md`, `recipes.md`, `config-document.md`.
 
 ## Safety
 

@@ -3,11 +3,13 @@
 ## New Osaurus agent (config)
 
 1. Export current state: `osaurus config export -o /tmp/osaurus-before.yaml`
-2. Write a fragment with the new `agents:` entry (+ optional `delegation.spawnable_agents`)
-3. `osaurus config plan` → review → `osaurus config apply`
+2. Write a fragment with the new `agents:` entry including **org defaults**
+   (capabilities, sandbox, `runtime`+`model`), optional chief `subagents`, and
+   any `schedules:` (+ `delegation.spawnable_agents`)
+3. `osaurus config plan` → review → `osaurus config apply` (`--yes` if browser newly granted)
 4. Verify in app Agents list or re-export
 
-Full field map: `config-document.md`.
+Org defaults + field map: `SKILL.md` (Org defaults), `anytype-apply.md`, `config-document.md`.
 
 ## Twin / update an agent
 
@@ -65,19 +67,22 @@ Example pattern (Foyer-style): Sidonie chief, Philippe / Blanche / Bob specialis
 
 1. Confirm each Agent.`runtime` → Runtime(`osaurus`); export Osaurus config (with
    `OSAURUS_API_KEY` if required).
-2. Fetch Prompt bodies + Team.`standing_instructions` + Group platform/chat ids.
+2. Fetch Prompt bodies + `harness_profile` + Team.`standing_instructions` +
+   Group platform/chat ids + Agenda schedules (`owner_agent`).
 3. Fragment document:
    - `agents[]` matched by short **name** (merge stubs’ generic prompts)
+   - **always** org capability defaults + `sandbox.enabled`
+   - **always** `runtime: builtin` + `model` translated from `harness_profile`
    - chief: `subagents.enabled: true`, `subagents.agents: [specialists…]`
    - `delegation.spawnable_agents` lists the whole HQ set
    - append standing instructions to the chief prompt
-   - `browser_use_enabled: true` only when Anytype `browser` is linked (needs `--yes`)
+   - `schedules:` for each live Agenda item (cron from `schedule_expr`)
    - leave `computer_use_enabled: false` when Anytype computer is Cua Spaces
 4. `config plan` → `apply --yes` if browser/channel high-risk lines appear.
 5. Report gaps: empty Group chat ids, Signal (if unsupported), voice Settings,
-   skills allow-lists, WhatsApp/Telegram `inbound_agent` mapping.
+   missing local model id, skills allow-lists, channel `inbound_agent` mapping.
 
-Full Team/Group translation rules: `anytype-apply.md`.
+Full Team/Group / schedule / model rules: `anytype-apply.md`.
 
 ## Serve + supervise (keep-alive)
 

@@ -215,6 +215,40 @@ delegation:
   budget_max_seconds: 900
 ```
 
+Per-agent delegation (chief → specialists) uses `agents[].subagents`:
+
+```yaml
+agents:
+  - name: Sidonie
+    subagents:
+      enabled: true
+      agents: [Philippe, Blanche, Bob]
+```
+
+## Org defaults sketch (this workspace)
+
+Always include on agent apply (see `SKILL.md` / `anytype-apply.md`):
+
+```yaml
+agents:
+  - name: Example
+    runtime: builtin
+    model: OsaurusAI/LFM3-1.7B-JANG_6M   # from harness_profile translation
+    capabilities:
+      tools_enabled: true
+      memory_enabled: true
+      search_memory_enabled: true
+      web_search_enabled: false
+      db_enabled: true
+      self_scheduling_enabled: true
+      browser_use_enabled: true
+      render_chart_enabled: true
+    sandbox:
+      enabled: true
+      network_enabled: true
+      plugin_create: true
+```
+
 ## Schedules and watchers
 
 Listed under `schedules` / `watchers`; match by name; create or patch on apply.
@@ -222,6 +256,19 @@ On disk: `~/.osaurus/schedules/{uuid}.json`, `~/.osaurus/watchers/{uuid}.json`.
 Prefer exporting first and editing known fields; prune only with `--prune` and
 user confirmation. Product docs: https://docs.osaurus.ai/schedules ·
 https://docs.osaurus.ai/watchers
+
+When applying from Anytype Agenda, emit cron schedules like:
+
+```yaml
+schedules:
+  - name: mardi-proposition-semaine – Philippe
+    agent: Philippe
+    frequency: cron
+    frequency_value: "59 8 * * 2"
+    enabled: true
+    instructions: |
+      …self-contained task…
+```
 
 ## Sandbox resources (not declarative config)
 
