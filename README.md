@@ -4,7 +4,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.31.0 | Lifecycle and config for Hermes Agent profiles |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.32.0 | Lifecycle and config for Hermes Agent profiles |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.42.0 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
 
@@ -83,7 +83,7 @@ Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Pro
 
 **Org defaults (documented in the skill)**
 
-- Most agents link **Local parent** (Ollama `lfm3` chat + llamacpp `d1` approval; spawn Subagents for specialized routes). Exceptions: Foyer, CLASQUIN
+- Most agents link **Local parent** (llamacpp `LFM3-1.7B-Q8_0` chat + llamacpp `d1` approval; spawn Subagents for specialized routes). Exceptions: Foyer, CLASQUIN
 - Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (`is_real` + chrome + dedicated `Profile N` pin minted on the host; Board/Primary leave both empty); Tool profile → Standard interactive
 - Voice stack on Local parent / Foyer: local Whisper + Edge TTS; Agent holds enablement / modes
 - Analytics: Agent.`analytics_enabled` (opt-in Langfuse); Primary may be true; specialists false until asked

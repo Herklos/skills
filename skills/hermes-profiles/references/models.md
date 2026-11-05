@@ -63,24 +63,23 @@ model:
 
 Mid-session: `/model` in chat. New sessions pick up `config.yaml` changes; open chats keep their start model until switched.
 
-## Local parent (Ollama chat + llamacpp approval)
+## Local parent (llamacpp chat + llamacpp approval)
 
-**Org default for Local parent / Foyer agents:**
+**Org default for Local parent / Foyer agents** (both on Hermes builtin llama.cpp):
 
 | Role | Provider | Model | Notes |
 |------|----------|-------|-------|
-| **Chat / route picking** (`model.*`) | `ollama-launch` (or `ollama`) | `lfm3` | Effort **none**. Ollama must serve lfm3. **llamacpp cannot run lfm3.** |
-| **Approvals** (`auxiliary.approval.*`) | `llamacpp` | `d1-2b-q4_k_m` | Hermes builtin llama.cpp managed runtime (`local_runtime`) |
+| **Chat / route picking** (`model.*`) | `llamacpp` | `LFM3-1.7B-Q8_0` | Effort **none**. GGUF under `~/.hermes/models/LFM3-1.7B-Q8_0.gguf`. Needs llama.cpp build that supports LFM3 (e.g. metal **b12110+**). |
+| **Approvals** (`auxiliary.approval.*`) | `llamacpp` | `d1-2b-q4_k_m` | Same managed runtime (`local_runtime`); GGUF `d1-2B-Q4_K_M.gguf` |
 
-Parent answers peers / light asks on lfm3 and picks Subagent routes when needed
+Parent answers peers / light asks on LFM3 and picks Subagent routes when needed
 (`delegation.md`). Hermes has no separate routing-model slot: route picking uses
-`model.*` (lfm3). Smart command approvals use d1 via `auxiliary.approval`.
+`model.*`. Smart command approvals use d1 via `auxiliary.approval`.
 
-Anytype **Local parent** / **Foyer** store chat as `model_provider: ollama-launch`,
-`model_default: lfm3`, `model_effort: none`, plus `aux_approval_provider: llamacpp`,
-`aux_approval_model: d1-2b-q4_k_m`. Prefer those fields when applying; if Hermes
-assigns a slightly different local name after **Add model file**, use the exact
-id Hermes shows.
+Anytype **Local parent** / **Foyer** store chat as `model_provider: llamacpp`,
+`model_default: LFM3-1.7B-Q8_0`, `model_effort: none`, plus
+`aux_approval_provider: llamacpp`, `aux_approval_model: d1-2b-q4_k_m`. Prefer
+those fields when applying; use the exact id Hermes shows after **Add model file**.
 
 ### Config shape
 
@@ -90,8 +89,10 @@ local_runtime:
   backend: auto          # or cuda / metal / vulkan / cpu
 
 model:
-  provider: ollama-launch   # or ollama — match live Hermes provider key
-  default: lfm3
+  provider: llamacpp
+  default: LFM3-1.7B-Q8_0
+  api_mode: chat_completions
+  # base_url usually points at managed llama-server (e.g. http://127.0.0.1:18434/v1)
 
 auxiliary:
   approval:
@@ -100,23 +101,39 @@ auxiliary:
 ```
 
 ```bash
-hermes -p <slug> config set model.provider ollama-launch
-hermes -p <slug> config set model.default lfm3
+hermes -p <slug> config set model.provider llamacpp
+hermes -p <slug> config set model.default LFM3-1.7B-Q8_0
+hermes -p <slug> config set model.api_mode chat_completions
+hermes -p <slug> config set model.base_url http://127.0.0.1:18434/v1   # match live server.json
 hermes -p <slug> config set local_runtime.enabled true
+hermes -p <slug> config set local_runtime.backend auto
+hermes -p <slug> config unset model.api_key   # clear stale ollama key if migrating
 hermes -p <slug> config set auxiliary.approval.provider llamacpp
 hermes -p <slug> config set auxiliary.approval.model d1-2b-q4_k_m
 ```
 
-Add the d1 GGUF via Desktop **Add model file** (links without copying). Hermes
-manages the llama-server for approvals. Keep Ollama running for lfm3 chat.
+Add LFM3 and d1 GGUFs via Desktop **Add model file** (or place under
+`~/.hermes/models/`). Hermes manages llama-server via `local_runtime`.
+
+### Migrate off Ollama `lfm3`
+
+Old org shape was `ollama-launch` / `lfm3`. To migrate a profile:
+
+1. Confirm `~/.hermes/models/LFM3-1.7B-Q8_0.gguf` exists and `hermes pm doctor`
+   shows a new-enough `llamacpp-metal` (LFM3 needs ~b11938+).
+2. Apply the config sets above; clear `model.api_key` / Ollama `11434` base_url.
+3. Update disabled MoA stubs that still reference `ollama-launch`/`lfm3`.
+4. Restart / reload sessions so open chats pick up the new model.
 
 Notes:
 
-- `local_runtime.backend: auto` picks CUDA / Metal / Vulkan / CPU for d1.
-- Do not put lfm3 on `provider: llamacpp`.
+- `local_runtime.backend: auto` picks CUDA / Metal / Vulkan / CPU.
+- Chat and approval share the managed llama.cpp runtime; only one GGUF is loaded
+  at a time (Hermes swaps as needed).
 - No cloud `fallback_providers` on Local parent / Foyer by org default.
 - Cloning a profile with default clone flags excludes local model trees; re-link
-  or re-download the GGUF on the new profile if needed.
+  or re-download GGUFs on the new profile if needed.
+- Do **not** point chat back at Ollama for LFM3 unless the user explicitly asks.
 
 ## Auxiliary models
 
@@ -237,7 +254,7 @@ Configure also via Dashboard / Desktop → Model → Mixture of Agents.
 | Need | Configure |
 |------|-----------|
 | Default chat brain / decision / routing model | `model.*` |
-| **Local parent (org default)** | Chat `ollama-launch`/`lfm3`; approval `llamacpp`/`d1-2b-q4_k_m` + `local_runtime` (section above) |
+| **Local parent (org default)** | Chat `llamacpp`/`LFM3-1.7B-Q8_0`; approval `llamacpp`/`d1-2b-q4_k_m` + `local_runtime` (section above) |
 | Cheaper summaries / vision / approvals | `auxiliary.<task>.*` |
 | Survive primary outages | `fallback_providers` |
 | Multi-model advice, one acting loop | `moa` preset as main via provider `moa` |

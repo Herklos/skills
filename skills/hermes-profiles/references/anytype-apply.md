@@ -36,7 +36,7 @@ After apply, write back `hermes_profile` on the Agent if it was empty.
    - **Clear leftover MoA** on Local parent / Foyer: a stub `moa.active_preset: ''`
      alone still makes `hermes moa list` / Desktop synthesize stock cloud advisors
      (gpt-5.5 / deepseek / opus). Write an explicit preset with `enabled: false`,
-     local `reference_models` + `aggregator` (`ollama-launch`/`lfm3`), and
+     local `reference_models` + `aggregator` (`llamacpp`/`LFM3-1.7B-Q8_0`), and
      `active_preset: ''`. Empty `reference_models` is filled with stock defaults
      by normalize, so always put at least one local ref. Prefer Hermes
      `load_config`/`save_config` (via `hermes_bootstrap`) over a whole-file dump.
@@ -123,7 +123,8 @@ Harness profile fields often store **display** names. Resolve against
 | Grok 4.5 | `xai-oauth` | `grok-4.5` |
 | Claude Code Sonnet 5.5 / Claude Sonnet 5.5 | `anthropic` | `claude-sonnet-5-5` |
 | Codex Sol 6.1 | `openai-codex` | `gpt-6.1-sol` |
-| ollama-launch / lfm3 | `ollama-launch` | `lfm3` |
+| llamacpp / LFM3-1.7B-Q8_0 | `llamacpp` | `LFM3-1.7B-Q8_0` (+ `local_runtime`) |
+| ollama-launch / lfm3 (legacy) | migrate → `llamacpp` | `LFM3-1.7B-Q8_0` (see `models.md`) |
 | llamacpp / d1-2b-q4_k_m | `llamacpp` | `d1-2b-q4_k_m` (+ `local_runtime`) |
 
 Re-check the cache when labels drift. Prefer provider ids that exist in

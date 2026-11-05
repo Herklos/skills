@@ -18,7 +18,7 @@ Related: `models.md` for main / auxiliary / fallback / MoA. The parent **routing
 **task-specific models** via the official **`advanced-delegation`** plugin
 (`delegation.backend: model_map`).
 
-**Org default (Anytype Local parent):** most parents use **Ollama `lfm3`** as
+**Org default (Anytype Local parent):** most parents use **llamacpp `LFM3-1.7B-Q8_0`** as
 `model.*` (chat + route picking) and **llamacpp `d1-2b-q4_k_m`** for
 `auxiliary.approval`. That parent answers other agents / light asks itself when
 no Subagent is needed, and picks named `model_map` routes (from Anytype Subagent
@@ -230,8 +230,8 @@ local_runtime:
   backend: auto                           # cuda / metal / vulkan / cpu
 
 model:
-  provider: ollama-launch                 # Local parent chat (lfm3; not llamacpp)
-  default: lfm3
+  provider: llamacpp                      # Local parent chat (LFM3-1.7B-Q8_0)
+  default: LFM3-1.7B-Q8_0
 
 auxiliary:
   approval:
@@ -296,7 +296,7 @@ routes from Anytype **Subagent** objects (see below).
 When the org uses skill `anytype-agents`, most parents link **Local parent** as
 `harness_profile` and zero or more typed **`subagent`** objects
 (`parent_agent` + Agent.`subagents`). Decline Local parent → parent `model.*`
-(ollama/lfm3) + `auxiliary.approval` (llamacpp/d1). Treat Subagents as the
+(llamacpp/LFM3-1.7B-Q8_0) + `auxiliary.approval` (llamacpp/d1). Treat Subagents as the
 source of truth for `model_map` routes. Do not invent a Subagent for “quick
 peer answers”; that stays on the local parent.
 
@@ -321,7 +321,7 @@ Steps:
    (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
 2. Decline parent Agent.`harness_profile` (usually **Local parent**) into
    `model.*` + `auxiliary.approval` + `local_runtime` for d1: prefer profile
-   `model_provider` / `model_default` (org: `ollama-launch` / `lfm3`) and
+   `model_provider` / `model_default` (org: `llamacpp` / `LFM3-1.7B-Q8_0`) and
    `aux_approval_*` (`llamacpp` / `d1-2b-q4_k_m`); see `models.md`
    **Local parent**. Also map `fallback_*` and other `aux_*` when filled.
 3. For each live Subagent, open its `harness_profile` and take `model_*` /
@@ -378,7 +378,7 @@ to the ids your runtime actually accepts (`models.md`).
 | Need | Configure |
 |------|-----------|
 | Parallel research / isolated workers | `tools enable delegation` + `delegate_task` |
-| **Local parent router (org default)** | Anytype Local parent → `model.*` lfm3 + `auxiliary.approval` d1; answer peers without spawning |
+| **Local parent router (org default)** | Anytype Local parent → `model.*` LFM3-1.7B-Q8_0 (llamacpp) + `auxiliary.approval` d1; answer peers without spawning |
 | **Routing model** (who picks routes) | Parent `model.*` — see `models.md` |
 | **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options` |
 | Routes from Anytype Subagent objects | Decline table above; keep Agent.`subagents` in sync |
