@@ -59,6 +59,26 @@ in via Claude Code separately. Full options: `harness-runtimes.md`.
 2. Follow `anytype-apply.md`
 3. Prefer config fragment for a single specialist; bundle when shipping skills too
 
+## Anytype HQ team (chief + specialists + groups)
+
+Example pattern (Foyer-style): Sidonie chief, Philippe / Blanche / Bob specialists.
+
+1. Confirm each Agent.`runtime` → Runtime(`osaurus`); export Osaurus config (with
+   `OSAURUS_API_KEY` if required).
+2. Fetch Prompt bodies + Team.`standing_instructions` + Group platform/chat ids.
+3. Fragment document:
+   - `agents[]` matched by short **name** (merge stubs’ generic prompts)
+   - chief: `subagents.enabled: true`, `subagents.agents: [specialists…]`
+   - `delegation.spawnable_agents` lists the whole HQ set
+   - append standing instructions to the chief prompt
+   - `browser_use_enabled: true` only when Anytype `browser` is linked (needs `--yes`)
+   - leave `computer_use_enabled: false` when Anytype computer is Cua Spaces
+4. `config plan` → `apply --yes` if browser/channel high-risk lines appear.
+5. Report gaps: empty Group chat ids, Signal (if unsupported), voice Settings,
+   skills allow-lists, WhatsApp/Telegram `inbound_agent` mapping.
+
+Full Team/Group translation rules: `anytype-apply.md`.
+
 ## Serve + supervise (keep-alive)
 
 ```bash

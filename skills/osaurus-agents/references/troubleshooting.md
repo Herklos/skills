@@ -40,9 +40,21 @@ High-risk includes prune, browser/Computer Use, new MCP, runtime moves, Claude C
 
 ## Access key rejected / Invalid access key
 
-Pass `--access-key` or set `OSAURUS_API_KEY` when Require Access Key for Local
-Admin Routes (or network exposure) is on. Without a key, imports may queue.
-Do not paste live keys into chat; confirm the user has a valid `osk-v1-…` style key in env.
+Pass `--access-key` or set `OSAURUS_API_KEY` when **Require Access Key for Local
+Admin Routes** (or network exposure) is on. Without a key, `config export|plan|apply`
+and some admin routes fail; imports may queue.
+
+Token format must be `osk-v1.…` (JWT-shaped). Errors like `Invalid access key:
+Unrecognized token format` mean the value is missing, truncated, or not an
+Osaurus local-admin access key.
+
+**Keychain pitfall:** `com.osaurus.account` often holds master/recovery material,
+not the local admin access key. Do not treat Keychain blobs as `OSAURUS_API_KEY`.
+Ask the user for a key labeled for local admin / terminal (Settings → Server),
+store session-only (`export OSAURUS_API_KEY=…` or `chmod 600` temp file), never
+commit or write into skills.
+
+Loopback `/admin/*` without the key returns 401 when the require-key flag is on.
 
 ## Agent missing a tool
 

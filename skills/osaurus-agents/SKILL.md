@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.1.0
+version: 1.2.0
 license: MIT
 metadata:
   category: agents
@@ -43,9 +43,13 @@ or install the CLI from **Settings → Server → Overview → Command Line Tool
 Access key (when **Require Access Key for Local Admin Routes** is on):
 
 ```bash
-export OSAURUS_API_KEY=osk-v1-…
+export OSAURUS_API_KEY=osk-v1.…
 # or pass --access-key on config / import / mcp
 ```
+
+Must be a live `osk-v1.…` local-admin key (Settings → Server). Keychain
+`com.osaurus.account` master/recovery material is **not** this key. Session-only;
+never commit. See `troubleshooting.md`.
 
 ## References (load when needed)
 
@@ -174,15 +178,18 @@ Full layout: `references/bundles.md`.
 
 1. Confirm Agent.`runtime` → Runtime with `runtime_kind: osaurus` (and usually
    `slug: osaurus`).
-2. Read Agent.`system_prompt` Prompt, `short_description`, Subagents, catalog
-   links as intent only.
-3. Build either a config document fragment or a bundle agent JSON from those
-   fields (`anytype-apply.md`).
+2. Read Agent.`system_prompt` Prompt, `short_description`, Subagents, Team
+   standing instructions, Groups, catalog links as intent only.
+3. Build a config fragment or bundle (`anytype-apply.md`). Match agents by short
+   **name** (patches UI stubs). Map Team → chief `subagents` + standing text;
+   Group → `channels` only when chat ids/tokens exist.
 4. `config plan` or `import validate`, then apply/install only when the user asks.
-5. Report gaps (working folder picker, pending secrets, models not pulled).
+5. Report gaps: voice (Settings UI), empty Group chat ids, Signal if unsupported,
+   Cua Spaces ≠ Computer Use, skills allow-lists, working folder / secrets.
 
 Do not auto-apply from draft/proposed suggestions. Hermes-shaped fields
-(`hermes_profile`, Cua pair, langfuse) do not map 1:1; translate deliberately.
+(`hermes_profile`, Cua pair, langfuse, Chrome `real_profile_pin`) do not map 1:1;
+translate deliberately.
 
 ## Safety
 
