@@ -121,7 +121,7 @@ Skills: Agent → Subteam → Team → Project → Global
 - External provider: none
 **Browser access:**
 - Needed: yes (PR checks on CI web UI)
-- Is real: yes · Engine: chrome · Pin: Default
+- Is real: yes · Engine: chrome · Pin: Profile 2 (Hermes Engineering)
 - Source: operator real profile
 - Identity: operator real profile
 - Headed: no

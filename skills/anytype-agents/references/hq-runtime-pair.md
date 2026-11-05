@@ -54,11 +54,11 @@ Data fetching / Read-only). This playbook is Browser + Computer only.
 | `docs_url` | `https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces` |
 | `notes` | Dedicated Cua Space for this HQ; `terminal.backend: cua`; desktop true. Linked from HQ, Subteams, Agents. |
 
-**Browser** (`type: browser`): Hermes-managed Chromium-family browser using the
-**operator real Chrome profile** (org default). Not a separate Cua browser
-product. With Computer `desktop_enabled: true`, Hermes can still place browser
-work inside that HQ Space when not using real-profile; real-profile snapshots
-the host Chrome profile.
+**Browser** (`type: browser`): Hermes-managed Chromium-family browser using a
+**dedicated operator Chrome profile per Browser** (org default). Not a separate
+Cua browser product. **Always create the Chrome profile on the host first**,
+then store its directory name in `real_profile_pin`. Never reuse the human's
+personal profile or another HQ's pin.
 
 | Key | Value |
 |-----|-------|
@@ -66,12 +66,49 @@ the host Chrome profile.
 | `access_needed` | `true` |
 | `is_real` | `true` |
 | `browser_engine` | `chrome` |
-| `real_profile_pin` | `Default` |
+| `real_profile_pin` | `Profile N` (dedicated; from Create Chrome profile below) |
 | `browser_source` | `operator-real-profile` |
 | `browser_identity` | `operator-real-profile` |
 | `headed` | `false` |
 | `docs_url` | `https://hermes-agent.nousresearch.com/docs/user-guide/features/browser` |
-| `notes` | Hermes browser toolset; operator Chrome real profile (pin Default). Pair with the HQ Computer. |
+| `notes` | Hermes browser toolset; Chrome display name Hermes {HQ short}; pin Profile N. Pair with the HQ Computer. |
+
+## Create Chrome profile (required when `is_real`)
+
+Do this **before** (or immediately with) the Anytype Browser create. One host
+Chrome profile per Browser object.
+
+**macOS path:** `~/Library/Application Support/Google/Chrome/`
+**Pin value** = profile **directory** name (`Profile 2`, `Profile 3`, …). Hermes
+`browser.real_profile_pin` uses that directory string.
+**Chrome display name** = `Hermes {HQ short}` (e.g. `Hermes Engineering`,
+`Hermes Legal-HR`, `Hermes Arnold`). Shown in the profile picker; stored in
+Local State `profile.info_cache[<dir>].name`.
+
+Steps:
+
+1. List existing pins: read Local State `profile.info_cache` keys and dirs
+   matching `Default` / `Profile N`. Pick the next free `Profile N`.
+2. Quit Google Chrome first (editing Local State while Chrome runs is unsafe).
+3. Create `…/Google/Chrome/Profile N/` with a minimal `Preferences` that sets
+   `profile.name` to `Hermes {HQ short}` and `profile.is_using_default_name` to
+   false.
+4. Register the directory in Local State `profile.info_cache` and append to
+   `profile.profiles_order`. Set `name` + `shortcut_name` to the Hermes display
+   name; `is_using_default_name: false`.
+5. Optional: launch Chrome once with
+   `--profile-directory="Profile N" --no-first-run about:blank`, then quit, so
+   Chrome finishes scaffolding.
+6. Put **`Profile N`** into Browser.`real_profile_pin` (and mention the display
+   name in `notes`).
+7. Reopen Chrome for the user if you quit it.
+
+**Do not** point several Browsers at the same pin. **Do not** use the human's
+signed-in personal profile as an HQ pin unless the user explicitly asks.
+
+Live org map (example): Engineering → `Profile 2` / Hermes Engineering;
+Product → `Profile 3`; Growth → `Profile 4`; Finance → `Profile 5`; Legal-HR →
+`Profile 6`; Foyer → `Profile 7`; Arnold → `Profile 8`.
 
 ## Create the pair (MCP)
 
@@ -115,14 +152,14 @@ AnyBlock document form and rejects that shortcut).
       "access_needed": true,
       "is_real": true,
       "browser_engine": "chrome",
-      "real_profile_pin": "Default",
+      "real_profile_pin": "Profile 2",
       "browser_source": "operator-real-profile",
       "browser_identity": "operator-real-profile",
       "headed": false,
       "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser",
-      "notes": "Hermes-managed operator Chrome real profile (pin Default) for Engineering HQ. Pair with the HQ Cua Space Computer."
+      "notes": "Chrome profile Hermes Engineering (pin Profile 2). Hermes use_real_profile=true. Pair with Engineering HQ Cua Spaces Computer."
     },
-    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; org default is operator Chrome real profile.\n"
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Create the Chrome profile on the host first; store its directory pin here.\n"
   }
 }
 ```
@@ -179,13 +216,17 @@ When retiring shared org-wide Browser/Computer objects:
 ## New HQ checklist
 
 1. Create `team` (`kind: HQ`) with chief / mission / …
-2. Create Computer + Browser pair (this file)
-3. Create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`)
-4. Link pair on the HQ
-5. Create Subteams → link same pair
-6. Create / move Agents → link same pair + `computer_surface: cua-spaces`
-7. Remind: Hermes apply is separate (`hermes-profiles` `browser-and-computer.md`;
-   pin `settings.space` from Computer.`cua_space`)
+2. **Create dedicated Chrome profile** on the host (Create Chrome profile above);
+   note the directory pin
+3. Create Computer + Browser pair (this file); set Browser.`real_profile_pin` to
+   that directory
+4. Create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`)
+5. Link pair on the HQ
+6. Create Subteams → link same pair
+7. Create / move Agents → link same pair + `computer_surface: cua-spaces`
+8. Remind: Hermes apply is separate (`hermes-profiles` `browser-and-computer.md`;
+   pin `settings.space` from Computer.`cua_space`; `use_real_profile` +
+   `real_profile_pin` from Browser)
 
 ## Verify
 

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.40.0
+version: 1.41.0
 license: MIT
 metadata:
   category: agents
@@ -238,10 +238,14 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    (`{hq-slug}-cua-spaces`, `computer_surface: cua-spaces`,
    `computer_scope: dedicated`, `desktop_enabled: true`) and one Browser
    (`{hq-slug}-hermes-chromium`, `is_real: true`, `browser_engine: chrome`,
-   `real_profile_pin: Default`, `browser_source` + `browser_identity:
+   dedicated `real_profile_pin`, `browser_source` + `browser_identity:
    operator-real-profile`). Name them `{HQ name} – Cua Spaces` and
-   `{HQ name} – Hermes Chromium`. **Then create the live Cua Space**
-   (`cua spaces create linux --on local --kind container --runtime runc
+   `{HQ name} – Hermes Chromium`. **Before the Browser row:** create a
+   dedicated Chrome profile on the host (display `Hermes {HQ short}`, directory
+   `Profile N`) and set `real_profile_pin` to that directory; never reuse
+   another Browser's pin or the human's personal profile
+   (`hq-runtime-pair.md` → Create Chrome profile). **Then create the live Cua
+   Space** (`cua spaces create linux --on local --kind container --runtime runc
    --name {hq-slug}-hq`) and set Computer.`cua_space` to the full id
    (e.g. `local:engineering-hq`); playbook `cua-hq-spaces.md`. Link that pair
    on the HQ, every Subteam under it, and
@@ -250,8 +254,9 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    Host / Bot Screen catalog rows unless the user asks for an exception.
 3. **Browser** (`browser`): `slug`, `access_needed`, `is_real` (default true),
    `browser_engine` (default chrome), `real_profile_pin` (required when
-   `is_real`; org default `Default`), `browser_source`, `browser_identity`,
-   optional `headed` / `cloud_provider` / `docs_url` / `notes`
+   `is_real`; **always a newly created dedicated Chrome directory**),
+   `browser_source`, `browser_identity`, optional `headed` / `cloud_provider` /
+   `docs_url` / `notes`
 4. **Computer** (`computer`): `slug`, `access_needed`, `computer_surface`, `computer_scope`,
    optional `cua_space` (full live Space id, e.g. `local:engineering-hq`) /
    `permission_mode` / `desktop_enabled` / `docs_url` / `notes`
@@ -403,7 +408,7 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
-- **New Browser / Computer:** for a new HQ, follow `hq-runtime-pair.md` then `cua-hq-spaces.md` (live Space + Computer.`cua_space`); for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
+- **New Browser / Computer:** for a new HQ, mint a dedicated Chrome profile on the host first, then `hq-runtime-pair.md` (store directory in `real_profile_pin`), then `cua-hq-spaces.md` (live Space + Computer.`cua_space`); for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
 - **New Vault grant:** create `vault_grant` with `site_origins`, `identity_kind`, `agents` (and optional `vault_handle` / `team`); **never** put passwords in Anytype; Hermes paths in `hermes-profiles` → `browser-and-computer.md` (Shared Rule 27)
 - **New Prompt:** create `prompt` with kind + owners → link Agent.`system_prompt` or Group.`welcome_prompt` (`prompts.md`)
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub → PM Queries (`project-pm.md`)

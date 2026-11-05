@@ -176,8 +176,11 @@ Point agents at the profile with `harness_profile: ["<profileObjectId>"]`.
 ## Create a per-HQ Browser + Computer pair
 
 Full playbook: `hq-runtime-pair.md`. Org convention: one Computer and one
-Browser per HQ. Link both on the HQ, its Subteams, and its Agents. Board /
-Primary leave both empty.
+Browser per HQ. **When `is_real` (org default):** create a dedicated Chrome
+profile on the host first (`hq-runtime-pair.md` → Create Chrome profile), then
+set Browser.`real_profile_pin` to that directory (`Profile N`). Never reuse
+another Browser's pin. Link both on the HQ, its Subteams, and its Agents. Board
+/ Primary leave both empty.
 
 ```json
 {
@@ -215,14 +218,14 @@ Primary leave both empty.
       "access_needed": true,
       "is_real": true,
       "browser_engine": "chrome",
-      "real_profile_pin": "Default",
+      "real_profile_pin": "Profile 2",
       "browser_source": "operator-real-profile",
       "browser_identity": "operator-real-profile",
       "headed": false,
       "docs_url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/browser",
-      "notes": "Hermes-managed operator Chrome real profile (pin Default) for Engineering HQ. Pair with the HQ Cua Space Computer."
+      "notes": "Chrome profile Hermes Engineering (pin Profile 2). Hermes use_real_profile=true. Pair with Engineering HQ Cua Spaces Computer."
     },
-    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Hermes owns the browser; org default is operator Chrome real profile.\n"
+    "markdown": "## When to use\nPair with Engineering HQ – Cua Spaces. Create the Chrome profile on the host first; store its directory pin here.\n"
   }
 }
 ```

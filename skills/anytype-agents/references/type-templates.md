@@ -213,11 +213,13 @@ object to Agent.`subagents`.
 ## When to use
 (Set properties: slug, access_needed, is_real, browser_engine, real_profile_pin,
 browser_source, browser_identity, headed. Org default: is_real true, engine
-chrome, pin Default, source/identity operator-real-profile. Body for apply notes.)
+chrome, dedicated Profile N pin minted on the host first, source/identity
+operator-real-profile. Body for apply notes.)
 
 ## Apply
 Map to hermes-profiles browser-and-computer.md (`use_real_profile` /
-`real_profile_pin` from is_real / pin). Anytype does not push configs.
+`real_profile_pin` from is_real / pin). Create the Chrome profile before
+saving the pin (`hq-runtime-pair.md`). Anytype does not push configs.
 ```
 
 ---

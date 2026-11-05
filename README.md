@@ -4,8 +4,8 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.30.0 | Lifecycle and config for Hermes Agent profiles |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.40.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.31.0 | Lifecycle and config for Hermes Agent profiles |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.41.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -22,7 +22,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Models**: main / decision / routing model (including local `llamacpp`), auxiliary tasks, fallback providers, MoA
 - **Delegation**: `advanced-delegation` + `model_map` / profile routes so a parent routes specialized work to Subagents
 - **Memory**: per-profile `MEMORY.md` / `USER.md`, write approval, optional external provider
-- **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + **operator Chrome real profile** (`is_real` / `browser_engine` / `real_profile_pin`); host desktop and Linux Bot Screen as exceptions; **sign-in** via real profile / Hermes vault / password manager / persistent / CDP (never paste passwords in chat; respect Anytype `vault_grant`)
+- **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + **one dedicated Chrome real profile per Browser** (`is_real` / `browser_engine` / unique `real_profile_pin`); host desktop and Linux Bot Screen as exceptions; **sign-in** via real profile / Hermes vault / password manager / persistent / CDP (never paste passwords in chat; respect Anytype `vault_grant`)
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs; Bot Mode Edit Profile Description vs roster card chat preview (`profile-map.md`)
@@ -82,7 +82,7 @@ Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Pro
 **Org defaults (documented in the skill)**
 
 - Most agents link **Local parent** (Ollama `lfm3` chat + llamacpp `d1` approval; spawn Subagents for specialized routes). Exceptions: Foyer, CLASQUIN
-- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (`is_real` + chrome + pin `Default`; Board/Primary leave both empty); Tool profile → Standard interactive
+- Computer + Browser → owning HQ's `{HQ} – Cua Spaces` / `{HQ} – Hermes Chromium` pair (`is_real` + chrome + dedicated `Profile N` pin minted on the host; Board/Primary leave both empty); Tool profile → Standard interactive
 - Voice stack on Local parent / Foyer: local Whisper + Edge TTS; Agent holds enablement / modes
 - Analytics: Agent.`analytics_enabled` (opt-in Langfuse); Primary may be true; specialists false until asked
 - Canonical system / welcome text on typed **Prompt** objects; Agent.`system_prompt` and Group `welcome_prompt` link them; agent bodies keep short pointers

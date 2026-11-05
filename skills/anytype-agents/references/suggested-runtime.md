@@ -102,7 +102,7 @@ block to the Agent object body.
 - Needed: no | yes (interactive pages; else prefer web_search / web_extract)
 - Is real: yes (org default → `use_real_profile`) | no
 - Engine: chrome (org default) | brave | edge | chromium | brave-origin
-- Real profile pin: Default (org default when is_real) | Profile 2 | …
+- Real profile pin: Profile N (dedicated Chrome directory minted for this Browser; never share across HQs) | …
 - Source: operator real profile (org default) | local Chromium | lightpanda | cloud ({browserbase|browser-use|firecrawl|nous|…}) | CDP attach
 - Identity: operator real profile (align with is_real) | dedicated throwaway | dedicated persistent | team/shared persistent
 - Headed: no | yes · Notes: {vault logins? cron needs cookies?}

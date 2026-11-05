@@ -373,7 +373,7 @@ Reusable browser-access catalog. Agents / Teams / Subteams link one via
 | `browser_source` | select | `none` \| `local-chromium` \| `lightpanda` \| `cloud-browserbase` \| `cloud-browser-use` \| `cloud-firecrawl` \| `cloud-nous` \| `cdp-attach` \| `operator-real-profile` (featured). Display name **Browser source** |
 | `is_real` | checkbox | When true, Hermes apply sets `browser.use_real_profile: true` (featured). Display **Is real**. Org default: **true** |
 | `browser_engine` | select | `chrome` \| `brave` \| `edge` \| `chromium` \| `brave-origin` (featured). Display **Browser engine**. Org default: **chrome**. Intended Chromium-family binary for real-profile / CDP |
-| `real_profile_pin` | text | Chrome/Brave profile directory name when `is_real` (e.g. `Default`, `Profile 2`) (featured). Display **Real profile pin**. Required when `is_real`; maps to Hermes `browser.real_profile_pin` |
+| `real_profile_pin` | text | Chrome/Brave **profile directory** name when `is_real` (e.g. `Profile 2`, never a shared human Default across HQs) (featured). Display **Real profile pin**. Required when `is_real`; maps to Hermes `browser.real_profile_pin`. **Always mint a dedicated host profile** for this Browser and store that directory here (see `hq-runtime-pair.md` → Create Chrome profile) |
 | `browser_identity` | select | `none` \| `dedicated-throwaway` \| `dedicated-persistent` \| `team-shared-persistent` \| `operator-real-profile`. Prefer align with `is_real` (`operator-real-profile` when true) |
 | `headed` | checkbox | Headed Chromium when true |
 | `cloud_provider` | text | Optional cloud provider label when source is cloud-* |
@@ -395,13 +395,17 @@ playbook: `hq-runtime-pair.md`.
 
 | Name pattern | slug pattern | Typical props |
 |--------------|--------------|---------------|
-| `{HQ name} – Hermes Chromium` | `{hq-slug}-hermes-chromium` | `is_real: true`, `browser_engine: chrome`, `real_profile_pin: Default`, `browser_source` + `browser_identity: operator-real-profile`, `access_needed: true`, `headed: false` |
+| `{HQ name} – Hermes Chromium` | `{hq-slug}-hermes-chromium` | `is_real: true`, `browser_engine: chrome`, `real_profile_pin: Profile N` (dedicated), `browser_source` + `browser_identity: operator-real-profile`, `access_needed: true`, `headed: false` |
 
-Example: `Engineering HQ – Hermes Chromium` / `engineering-hermes-chromium`. Pair
-with the same HQ's Computer. Org default is **operator Chrome real profile**
-(`is_real` + `browser_engine: chrome` + pin `Default`). Space placement for
-in-Space browsing still follows the paired Computer's `desktop_enabled`. Do not
-mint shared None / throwaway catalog rows unless the user asks for an exception.
+Example: `Engineering HQ – Hermes Chromium` / `engineering-hermes-chromium` with
+pin `Profile 2` (Chrome display name **Hermes Engineering**). Pair with the
+same HQ's Computer. Org default is **one dedicated operator Chrome profile per
+Browser** (`is_real` + `browser_engine: chrome` + unique `real_profile_pin`).
+**Never** reuse the human's personal profile or another HQ's pin. Create the
+Chrome profile on the host before or with the Anytype row
+(`hq-runtime-pair.md`). Space placement for in-Space browsing still follows the
+paired Computer's `desktop_enabled`. Do not mint shared None / throwaway
+catalog rows unless the user asks for an exception.
 
 **Default template name:** `Browser default`. Body: `type-templates.md`.
 
