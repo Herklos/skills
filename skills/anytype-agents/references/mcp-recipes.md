@@ -590,6 +590,41 @@ markdown-link destinations; prefer delete + insert for wholesale welcome rewrite
 `hermes_profiles` on Group is a checklist string until Hermes apply
 (`hermes-profiles` → `messaging-groups.md`).
 
+## Set an Agent avatar (files property)
+
+Shared featured property `avatar` (`files`) on Agent / Team / Subteam /
+Subagent / Project. Upload once, then link the returned file id. Source library:
+`~/Documents/images/agents/avatars/<hermes_profile>.png` (`p.png` → Hermes id
+`default`). Team / Subteam / Subagent / Project may stay empty until images exist.
+
+1. Ensure the type has featured `avatar` (`API-get-type`; else create property
+   format `files` and `add_property` with `section: featured`).
+2. Upload:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "file": "/absolute/path/to/avatar.png"
+}
+```
+
+(`API-upload-file`; returns a file object id.)
+
+3. Patch the agent:
+
+```json
+{
+  "space_id": "<spaceId>",
+  "object_id": "<agentObjectId>",
+  "ops": [
+    { "op": "set_properties", "set": { "avatar": ["<fileObjectId>"] } }
+  ]
+}
+```
+
+Object `icon` stays emoji when already set; there is no patch op to change an
+existing object's icon to a file. Prefer `avatar` for portraits.
+
 ## Patch with etag
 
 1. `API-get-object` → note `etag`

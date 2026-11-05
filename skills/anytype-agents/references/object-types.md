@@ -78,6 +78,7 @@ Featured properties (API keys):
 | `computer` | objects | Link to one **Computer** catalog object |
 | `tool_profile` | objects | Link to one **Tool profile** catalog object |
 | `runtime` | objects | Link to one **Runtime** catalog object (`grok-bot` / `hermes` / `osaurus` / `noodle`) |
+| `avatar` | files | Portrait image (featured). Shared property key across Agent / Team / Subteam / Subagent / Project. Source PNGs: `~/Documents/images/agents/avatars/<hermes_profile>.png` (`p.png` → Hermes id `default`). Upload via `API-upload-file`, then `set_properties` `avatar: ["<fileId>"]`. Distinct from object `icon` (emoji); API has no patch to set existing object icons to file |
 | `voice_enabled` | checkbox | Intended to use Hermes voice mode (featured) |
 | `analytics_enabled` | checkbox | When true, Hermes apply enables the **langfuse** observability plugin (featured). Opt-in; default false. Org: Primary (P) true; others leave false until asked |
 | `board_member` | checkbox | Board seat |
@@ -177,6 +178,7 @@ use type **`group`** (do not create new `team` with `kind: Group`).
 | `browser` | objects | Optional team-default **Browser** catalog link |
 | `computer` | objects | Optional team-default **Computer** catalog link |
 | `tool_profile` | objects | Optional team-default **Tool profile** catalog link |
+| `avatar` | files | Optional HQ / Board portrait (featured; shared key with Agent). Leave empty until images are ready |
 
 Also `tag`, `links`, `backlinks`. Put long gates / principles / routing prose on
 the linked Standing instructions Prompt; keep the filterable one-liner in
@@ -214,6 +216,7 @@ sub-teams on the `team` type.
 | `browser` | objects | Optional domain-default **Browser** catalog link |
 | `computer` | objects | Optional domain-default **Computer** catalog link |
 | `tool_profile` | objects | Optional domain-default **Tool profile** catalog link |
+| `avatar` | files | Optional domain portrait (featured; shared key with Agent). Leave empty until images are ready |
 
 Also `tag`, `links`, `backlinks`. No `kind` property: the type itself is the kind.
 Agent-level runtime links override subteam defaults when both are set.
@@ -242,6 +245,7 @@ Subagents. Distinct from **`subteam`** (org domain).
 | `model_override` | text | Optional pin over the linked Harness profile primary |
 | `deliver_back` | text | What the child must return to the parent (summary shape) |
 | `system_prompt` | objects | Optional child **Prompt** when the spawn needs its own system text (else inherit parent) |
+| `avatar` | files | Optional spawn portrait (featured; shared key with Agent). Leave empty until images are ready |
 | `notes` | text | Extra apply notes |
 
 Also `tag`, `links`, `backlinks`.
@@ -583,6 +587,7 @@ live in properties; long narrative stays in the body.
 | `design_page` | objects | Child Design hub |
 | `business_page` | objects | Child Business hub |
 | `marketing_page` | objects | Child Marketing hub |
+| `avatar` | files | Optional project portrait (featured; shared key with Agent). Leave empty until images are ready |
 
 **Default template name:** `Project default`. Full dumped body:
 `type-templates.md`.
@@ -805,9 +810,9 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
 2. On existing Agent / Team / Subteam / Subagent types: `add_property` for
    org/runtime fields above including featured `browser`, `computer`,
    `tool_profile`, `runtime`, shared `system_prompt` (Agent required; Team/Subteam/Subagent
-   optional), and Agent voice fields (`voice_enabled`, `voice_auto_tts`,
-   `voice_chat_mode`, `messaging_voice_mode`, shared `stt_*` / `tts_*`); also
-   `board_member`, `memory_pages`, `skills_page`,
+   optional), featured shared `avatar` (`files`), and Agent voice fields
+   (`voice_enabled`, `voice_auto_tts`, `voice_chat_mode`, `messaging_voice_mode`,
+   shared `stt_*` / `tts_*`); also `board_member`, `memory_pages`, `skills_page`,
    `logs_page`, `agenda_page`, `suggestions_page`, `messaging_group`, `map_path`,
    `delegation_enabled`, `analytics_enabled`, `terminal_backend`, `computer_surface`; keep
    `harness_profile` / `subagents`; `remove_property` legacy `harness` select,
@@ -820,11 +825,11 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
    `agenda-and-schedules.md` + Group section below.
 3. On Team: `add_property` `members`, `subteams`, `messaging_group`,
    `skills_page`, `subteams_page`, `routing_summary`, `standing_instructions`
-   (+ runtime catalog links). Create `{HQ} – Subteams` Query
+   (+ runtime catalog links + featured `avatar`). Create `{HQ} – Subteams` Query
    (`type: subteam`, `filter: parent_team IN ("<hqId>")`) and link
    `subteams_page`. On Project:
-   `execution_policy`, `lead_agent`, `related_projects`, `overview`, and child
-   hub page links.
+   `execution_policy`, `lead_agent`, `related_projects`, `overview`, child
+   hub page links, and featured `avatar`.
 4. `API-create-template` with `template_for`: `agent` | `team` | `group` |
    `subteam` | `subagent` | `harness` | `harness_profile` | `browser` |
    `computer` | `tool_profile` | `prompt` | `memory` | `skill` | `log` |

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.43.1
+version: 1.44.0
 license: MIT
 metadata:
   category: agents
@@ -411,6 +411,7 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
 - **New Browser / Computer:** for a new HQ, mint a dedicated Chrome profile on the host first, then `hq-runtime-pair.md` (store directory in `real_profile_pin`), then `cua-hq-spaces.md` (live Space + Computer.`cua_space`); for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
 - **New Runtime:** create `runtime` with `slug` + `runtime_kind` (`grok-bot`/`hermes`/`osaurus`/`noodle`) → link Agent.`runtime` → apply via matching skill (`hermes-profiles` / `osaurus-agents`)
+- **Agent avatar:** `API-upload-file` PNG → `set_properties` `avatar: ["<fileId>"]` (featured `files` on Agent; same key also on Team / Subteam / Subagent / Project). Source: `~/Documents/images/agents/avatars/`. Recipe: `mcp-recipes.md`
 - **New Vault grant:** create `vault_grant` with `site_origins`, `identity_kind`, `agents` (and optional `vault_handle` / `team`); **never** put passwords in Anytype; Hermes paths in `hermes-profiles` → `browser-and-computer.md` (Shared Rule 27)
 - **New Prompt:** create `prompt` with kind + owners → link Agent.`system_prompt` or Group.`welcome_prompt` (`prompts.md`)
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub → PM Queries (`project-pm.md`)

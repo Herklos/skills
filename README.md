@@ -6,7 +6,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.36.0 | Lifecycle and config for Hermes Agent profiles |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.43.1 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.44.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -57,10 +57,10 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 
 | Type | Purpose |
 |------|---------|
-| `agent` | Role, memory links, `harness_profile`, Subagents, `system_prompt` → Prompt, browser/computer/tool links, voice modes, `analytics_enabled` |
-| `team` | Board / HQ / Group (`kind`) |
-| `subteam` | Domain / pod under an HQ (preferred over legacy Sub-team teams) |
-| `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools) |
+| `agent` | Role, memory links, `harness_profile`, Subagents, `system_prompt` → Prompt, browser/computer/tool links, voice modes, `analytics_enabled`, featured `avatar` |
+| `team` | Board / HQ (`kind`); featured `avatar` (optional) |
+| `subteam` | Domain / pod under an HQ (preferred over legacy Sub-team teams); featured `avatar` (optional) |
+| `subagent` | Spawn/route config under an Agent (`task_key`, harness, scope, tools); featured `avatar` (optional) |
 | `harness` | Product catalog (Claude, Codex, Grok, Copilot, Muse, NIM, Local model) |
 | `harness_profile` | Reusable primary + backup model stack, optional decision model, shared STT/TTS |
 | `browser` / `computer` / `tool_profile` | Surface catalogs; Browser/Computer are per-HQ (Cua pair; Browser org default = Chrome real profile); Tool profiles are shared; agents/teams/subteams link them |
@@ -69,7 +69,7 @@ Manage a multi-agent **organization in Anytype** through the Anytype MCP. The Ag
 | `prompt` | System / welcome / shared_rules / library / draft text; Agents and Groups link them |
 | `memory` / `skill` / `log` / `suggestion` / `schedule` | Memory pages, skill catalog, activity logs, improvement feedback, Agenda jobs |
 | `group` | Messaging room roster + welcome Prompt + platform gates |
-| `project` | Portfolio root with status, owning team, execution policy, child hub links |
+| `project` | Portfolio root with status, owning team, execution policy, child hub links; featured `avatar` (optional) |
 
 Shared Rules is type `prompt`. Skills resolve Agent → Subteam → Team → Project → Global. Suggestions index via Agent.`suggestions_page` (Shared Rule 25; Agathe weekly + ad-hoc).
 
