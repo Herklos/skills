@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.39.0
+version: 1.40.0
 license: MIT
 metadata:
   category: agents
@@ -38,7 +38,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/display.md` | Fonts, `display.*`, skins, ui-preferences |
 | `references/voice.md` | Voice mode, STT, TTS (`voice.*` / `stt.*` / `tts.*`), messaging `/voice` |
 | `references/cron.md` | Scheduled tasks: `cronjob` toolset, `hermes cron`, model pins, delivery, no-agent; **Anytype Agenda → Hermes** bind |
-| `references/messaging-groups.md` | Multi-bot Telegram/Discord rooms; Anytype typed **Group** → Hermes decline (tokens, allowlists, mention gates) |
+| `references/messaging-groups.md` | **Hermes Bot Mode hosted Group Chats** (preferred) + optional Telegram/Discord; Anytype typed **Group** → room_id writeback |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
 | `references/avatars.md` | **Bot Mode custom photo avatars** (fleet: quit Desktop → `set_asset` → seed `bot-meta-v2` with 256 data URLs) |
 | `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (create-if-missing inventory, ordered fast path, model label map, write discipline, gaps) |
@@ -96,7 +96,7 @@ Do not print `.env` secret values into chat.
 | Agent | Running Hermes process using that home |
 | Bot | Profile in Desktop Bot Mode roster (`ui_meta` in `profile.yaml`) |
 | Messaging bot | Platform account token in that profile's `.env` |
-| Messaging group | Shared Telegram/Discord room with several profiles; Anytype typed Group holds roster + welcome + intended gates (`messaging-groups.md`) |
+| Messaging group | Shared multi-bot room; org default = Hermes Bot Mode hosted Group Chat (2–6 bots); optional Telegram/Discord when asked. Anytype typed Group holds roster + welcome + `platform_chat_id` (`messaging-groups.md`) |
 | Subagent | Child from `delegate_task` (fresh chat, not a separate profile) |
 | Personality | Named voice overlay (`display.personality` / `/personality`) on top of SOUL |
 | Memory | Per-profile curated `MEMORY.md` / `USER.md`, optional one external provider |
@@ -307,16 +307,16 @@ recurring/oneshot rows into Hermes only when the user asks to apply.
 
 ### Messaging groups (multi-bot rooms)
 
-Full guide: `references/messaging-groups.md`. One bot token + gateway per
-member profile. Allowlist the platform chat id on each profile; prefer
-`require_mention` + `exclusive_bot_mentions` + `bots_require_mention`. Intended
-rooms live as Anytype typed **Group** objects (`anytype-agents`
-`object-types.md`); decline into Hermes only when the user asks to apply. On
-Anytype, **join the HQ/domain Group first** for new specialists (every live
-Agent needs `messaging_group`); mint a new Group only for a new HQ or a
-distinct domain room. Groups are not `delegation.backend` modes
-(`delegation.md`). **Fleet apply** (gates when `platform_chat_id` empty):
-`messaging-groups.md` → Fleet apply.
+Full guide: `references/messaging-groups.md`. **Org default: Hermes Bot Mode
+hosted Group Chats** (Desktop Bots → Manage groups / New Group Chat, or
+`groups.create` RPC; 2–6 bots; stored in `hosted_rooms`). Do not create
+Telegram/Discord rooms unless the user asks. Write the Hermes `room_id` back to
+Anytype Group.`platform_chat_id` (and `platform=hermes`). When a Group has more
+than 6 `hermes_profiles`, seat six in the primary room and create a satellite
+B room for overflow. External Telegram/Discord still need one token + allowlist
++ mention gates per profile. Intended rooms live as Anytype typed **Group**
+objects; decline only when the user asks. **Join HQ/domain Group first** for
+new specialists. Groups are not `delegation.backend` modes (`delegation.md`).
 
 ### Anytype suggestions → Hermes apply
 
@@ -369,8 +369,8 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
 - **Fleet Bot Mode avatars:** quit Desktop → `profiles.set_asset` → `ui_meta` photo/custom → seed `bot-meta-v2` with 256 data URLs (`avatars.md`; recipe **5b**)
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
-- **Multi-bot group:** `messaging-groups.md` (Anytype join-HQ-first + tokens + allowlist + mention gates + welcome paste)
-- **Fleet messaging + deferred delegation:** `anytype-apply.md` → Fleet apply; gates-only when chat id empty; `model_map` via JSON `config set` for Subagent parents still unconfigured (`delegation.md` Fleet apply); skip `profile_routes` parents
+- **Multi-bot group:** `messaging-groups.md` (prefer Hermes Bot Mode hosted rooms; Anytype join-HQ-first; optional Telegram tokens/allowlists only when asked)
+- **Fleet messaging + deferred delegation:** `anytype-apply.md` → Fleet apply; Bot Mode `groups.create` when chat id empty; `model_map` via JSON `config set` for Subagent parents still unconfigured (`delegation.md` Fleet apply); skip `profile_routes` parents
 - **Delegation mode:** one of `model_map` / `profile_routes` / `default` via Agent.`delegation_backend` (`delegation.md`); distinct from messaging Groups
 - **Share package:** `export` / `import` or `profile install <git-url>`
 - **Anytype → Hermes apply:** `anytype-apply.md` (SOUL + Local parent + model_map routes + **default** + option enforcement + tools + cron + org skills + voice modes + analytics/langfuse + describe)

@@ -794,9 +794,9 @@ Prefer `set_type` → `group` (keeps id, `welcome_prompt`, and Agent
         "parent_team": ["<hqTeamObjectId>"],
         "members": ["<agentId>", "…"],
         "slug": "engineering",
-        "platform": ["telegram"],
-        "require_mention": true,
-        "exclusive_bot_mentions": true
+        "platform": ["hermes"],
+        "platform_chat_id": "anytype-engineering-group"
+
       }
     }
   ]
@@ -887,9 +887,10 @@ place).
 
 ## Group (`api_key`: `group`)
 
-Messaging roster for a shared Telegram / Discord / … room. Distinct from Team
-(`kind` Board/HQ) and Subteam. Hermes has no first-class Group object; decline
-platform settings via `hermes-profiles` → `messaging-groups.md`.
+Messaging roster for a shared multi-bot room. Distinct from Team (`kind`
+Board/HQ) and Subteam. **Org default:** Hermes Bot Mode hosted Group Chat
+(Desktop Bots tab). External Telegram / Discord only when the user asks.
+Decline via `hermes-profiles` → `messaging-groups.md`.
 
 **Not the same as delegation.** Groups are human-visible rooms. Hermes spawn
 backends (`model_map` / `profile_routes` / `default`) live on Agent
@@ -903,15 +904,15 @@ Subagent routes, while the Group stays the shared human chat.
 | `parent_team` | objects | Owning HQ / Board Team (featured) |
 | `members` | objects | Agent members of the chat (featured) |
 | `welcome_prompt` | objects | One Prompt (`prompt_kind=welcome`) (featured) |
-| `platform` | select | `telegram` \| `discord` \| `slack` \| `whatsapp` \| `other` \| `none` (featured) |
-| `platform_chat_id` | text | Platform room/channel id when known (featured); leave empty until real |
+| `platform` | select | Prefer `hermes` (Bot Mode). Also `telegram` \| `discord` \| `slack` \| `whatsapp` \| `other` \| `none` (featured). Mint `hermes` once (sequential); parallel `create_missing_options` duplicates the option |
+| `platform_chat_id` | text | Hermes hosted `room_id` (e.g. `anytype-engineering-group`) or external chat id (featured); leave empty until real |
 | `slug` | text | Stable lowercase id (e.g. `engineering`) (featured) |
 | `mission` | text | Short purpose of the room |
 | `routing_summary` | text | One-line who answers what |
-| `hermes_profiles` | text | Comma list of member Hermes slugs (checklist) |
-| `require_mention` | checkbox | Intended `telegram.require_mention` (and peers) |
-| `exclusive_bot_mentions` | checkbox | Intended `telegram.exclusive_bot_mentions` |
-| `notes` | text | Apply / sync notes |
+| `hermes_profiles` | text | Comma list of member Hermes slugs (checklist; Bot Mode max 6 per room → satellite B for overflow) |
+| `require_mention` | checkbox | Intended external-platform mention gate (Telegram/Discord) |
+| `exclusive_bot_mentions` | checkbox | Intended external-platform exclusive mentions |
+| `notes` | text | Apply / sync notes (satellite room ids when split) |
 
 Also `tag`, `links`, `backlinks`. Canonical roster is `members`; keep each
 Agent.`messaging_group` pointing here. Body keeps Members + Welcome pointer
@@ -931,9 +932,12 @@ only (`page-templates.md` / **Group default**).
 Prefer one Engineering Group for Eng specialists (Clovis / Denise / Joachim
 pattern) over one Group per hire. Octave stays on Veille & Technology Group.
 
-**Hermes decline:** one bot token + gateway per member profile; allowlist
-`platform_chat_id`; apply mention gates from the checkboxes; paste welcome from
-`welcome_prompt`. Do not apply until the user asks.
+**Hermes decline (preferred):** create Bot Mode hosted room(s) via
+`groups.create` (2–6 members; satellite B if more than 6 `hermes_profiles`);
+set `platform=hermes` + `platform_chat_id=<room_id>`; paste welcome from
+`welcome_prompt`. Do **not** create Telegram groups unless asked. External
+path (tokens + allowlists + mention gates) only when the user names Telegram /
+Discord. Do not apply until the user asks.
 
 ## Memory (`api_key`: `memory`)
 

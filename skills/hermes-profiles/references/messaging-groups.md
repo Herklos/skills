@@ -1,27 +1,31 @@
-# Messaging groups (multi-bot Telegram / Discord)
+# Messaging groups (Hermes Bot Mode + optional Telegram / Discord)
 
-How to put several Hermes **profiles** (bots) into one shared chat group, and
+How to put several Hermes **profiles** (bots) into one shared chat room, and
 how that maps from Anytype typed **Group** objects.
+
+**Org default (this fleet):** Hermes **Bot Mode Group Chats** (hosted rooms in
+Desktop Bots tab / `hosted_rooms` in `state.db`). Do **not** create Telegram or
+Discord rooms unless the user explicitly asks for an external platform.
 
 Load when creating or updating a multi-agent messaging room, applying
 Agent.`messaging_group` / Group platform fields, or debugging mention routing.
-Platform setup details: official Telegram / Discord messaging docs. Lifecycle:
-`recipes.md`. Tokens: profile `.env` only (never echo).
+Bot Mode docs: https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode
+Lifecycle: `recipes.md`. External tokens: profile `.env` only (never echo).
 
 ## Mental model
 
 | Layer | What it is |
 |-------|------------|
 | Anytype **Group** (`type: group`) | Org roster + welcome Prompt + platform ids |
-| Hermes **profile** | One bot home (`~/.hermes/profiles/<slug>/`) |
-| Platform group/channel | Telegram supergroup / Discord channel the bots join |
-| Gateway | One process per profile (`hermes -p <slug> gateway …`) |
-| Delegation backend | Separate: `model_map` / `profile_routes` / `default` on the Agent (`delegation.md`). Groups are rooms, not spawn modes |
+| Hermes **profile** / Bot | One bot home (`~/.hermes/profiles/<slug>/`; Primary = `default`) |
+| **Hermes hosted room** | Bot Mode Group Chat (2–6 bots); stored in `hosted_rooms` |
+| External platform room | Optional Telegram / Discord / … (only when asked) |
+| Gateway | Multiplex host serving profiles (`hermes gateway`); one process can serve many |
+| Delegation backend | Separate: `model_map` / `profile_routes` / `default` (`delegation.md`). Groups are rooms, not spawn modes |
 
-Anytype does **not** create the Telegram/Discord room or start gateways. It
-stores who belongs, the welcome text, and intended platform settings. Apply
-into Hermes when the user asks (standing redesign rule: wait until they say
-apply).
+Anytype stores who belongs, the welcome text, and intended platform settings.
+It does not create the Hermes room by itself. Apply into Hermes when the user
+asks.
 
 ## Anytype: join HQ Group vs create a new room
 
@@ -35,7 +39,7 @@ the owning HQ (or existing domain) Group over minting one room per specialist.
 3. Append slug to Group.`hermes_profiles` (comma list)
 4. Set Agent.`messaging_group` → Group id
 5. Rewrite welcome Prompt (delete stale blocks → `insert_blocks`)
-6. Defer Hermes token/allowlist/gateway apply until the user asks
+6. Defer Hermes room membership apply until the user asks
 
 **Create a new typed Group only when** there is a new HQ, or a domain that
 already owns a distinct chat (Veille & Technology, Wedding, Ana, Kitchen, …).
@@ -45,35 +49,93 @@ getting three new rooms; Octave stays on Veille & Technology Group.
 Gap inventory: `type: agent`, `lifecycle = "live"`, fields include
 `messaging_group`. Empty → join HQ or domain Group.
 
-## Create a multi-bot group (Hermes)
+## Create a Hermes Bot Mode Group Chat (preferred)
 
-1. **One bot token per profile.** In BotFather (Telegram) or the Discord portal,
-   create a distinct bot for each agent. Put `TELEGRAM_BOT_TOKEN` (or platform
-   equivalent) only in that profile's `.env`. Never share a token across two
-   running gateways (Telegram returns HTTP 409).
-2. **Create the platform room.** Private Telegram **supergroup** (basic groups
-   only allow one admin bot). Add every bot as admin (or with permission to
-   read messages). Disable BotFather privacy mode when bots must see all human
-   messages.
-3. **Allowlist the chat** on each member profile (ids are numeric; get them from
-   a forwarded message or bot updates):
+Bot Mode rooms are **hosted rooms**: 2–6 member bots on the active gateway
+connection. UI path: Desktop **Bots** tab → right-click a Bot → **Manage
+groups** / **New Group Chat**, or room header **Manage members**.
+
+There is no `hermes group` CLI. Create via JSON-RPC `groups.create` on the
+gateway session WebSocket (host-scoped ticket), or the Desktop UI.
+
+### Constraints
+
+- **2–6 members** per room (`MIN_DISCUSSION_MEMBERS` / `MAX_DISCUSSION_MEMBERS`).
+- Members must be profiles the multiplex gateway **serves**.
+- Room id should be stable (org convention: `anytype-<group-slug>`).
+- When Anytype `hermes_profiles` has more than 6 slugs: seat the first 6 in the
+  primary room, then create a **satellite B** room for overflow (include one
+  bridge chief from the primary roster so the satellite stays tied to the HQ).
+  Record satellite room ids in Group.`notes`.
+
+### Member shape (`groups.create`)
+
+```json
+{
+  "room_id": "anytype-engineering-group",
+  "name": "Engineering Group",
+  "members": [
+    {
+      "member_id": "etienne",
+      "profile": "etienne",
+      "handle": "etienne",
+      "target": { "kind": "local", "profile": "etienne" }
+    }
+  ]
+}
+```
+
+Call with `profile: "default"` (or any served bot) on a **host-scoped**
+interactive session ticket so sibling served profiles can be seated.
+
+### Verify
+
+```bash
+sqlite3 ~/.hermes/state.db "SELECT room_id, name FROM hosted_rooms WHERE disbanded_at IS NULL;"
+```
+
+Rooms also appear in Desktop Bots → group rows. Docs: Bot Mode → Groups and
+group chats.
+
+### Anytype writeback after create
+
+| Field | Value |
+|-------|-------|
+| `platform` | `hermes` (mint once; do not parallel `create_missing_options` or you get duplicate select options) |
+| `platform_chat_id` | Hermes `room_id` (e.g. `anytype-engineering-group`) |
+| `notes` | Satellite room ids + overflow seats when split |
+
+### Fleet example (2026-11-05)
+
+Created 13 primary hosted rooms (one per live Anytype Group) plus 5 satellite
+B rooms for overflow (Engineering, Board, Finance, Legal & HR, Product). Wrote
+`platform_chat_id` on all 13 Groups; `platform=hermes` on the first batch
+(remaining Groups need `platform=hermes` after deduping duplicate select
+options in Anytype UI).
+
+## Optional: Telegram / Discord (only when asked)
+
+External platforms need one bot **token** per profile, a platform room, and
+allowlists. Skip this path for the org Bot Mode default.
+
+1. **One bot token per profile** in that profile's `.env` (`TELEGRAM_BOT_TOKEN`
+   or Discord equivalent). Never share a token across two running gateways.
+2. **Create the platform room** (Telegram private **supergroup**; Discord
+   channel). Add every bot with read permission.
+3. **Allowlist** on each member profile:
 
 ```bash
 hermes -p <slug> config set telegram.group_allowed_chats -- "<GROUP_ID>"
-# optional: also on allowed_chats / free_response_channels when the org uses them
 ```
 
-Or edit that profile `config.yaml` under `telegram:` (prefer `hermes config set`
-so restarts do not fight hand-edits of `.env`).
-
-4. **Recommended multi-bot gates** (each member profile):
+4. **Mention gates** (each member profile):
 
 ```yaml
 telegram:
   require_mention: true
   exclusive_bot_mentions: true
   mention_patterns: []
-  bots_require_mention: true   # bot-authored msgs only when @this_bot
+  bots_require_mention: true
 gateway:
   bot_loop_guard:
     enabled: true
@@ -82,82 +144,62 @@ gateway:
     cooldown_seconds: 600
 ```
 
-With this, `@research_bot @ops_bot summarize this` wakes only those two
-profiles. Other Hermes bots in the room stay silent.
-
-5. **Start one gateway per profile:**
-
-```bash
-hermes -p etienne gateway start
-hermes -p arnold gateway start
-# or install launchd/systemd per profile
-hermes -p etienne gateway install
-```
-
-6. **Paste the welcome** from the Anytype Group's linked Prompt
-   (`welcome_prompt`, `prompt_kind=welcome`) into the room once.
+5. Start / install gateways as needed; paste the Anytype welcome Prompt once.
 
 ## Anytype Group → Hermes decline
 
 | Anytype Group field | Hermes apply |
 |---------------------|--------------|
-| `members` + each Agent.`hermes_profile` | Profiles that must join; start their gateways |
-| `hermes_profiles` (text, comma slugs) | Quick checklist of slugs |
-| `platform` | `telegram` / `discord` / … |
-| `platform_chat_id` | Value for `telegram.group_allowed_chats` (or Discord channel allowlist) |
-| `require_mention` | `telegram.require_mention` |
-| `exclusive_bot_mentions` | `telegram.exclusive_bot_mentions` |
-| `welcome_prompt` | Human/ops paste into the room; not auto-pushed |
+| `members` + each Agent.`hermes_profile` | Profiles that must sit in the room |
+| `hermes_profiles` (text, comma slugs) | Checklist; split at 6 for Bot Mode |
+| `platform` | Prefer `hermes` for Bot Mode rooms; `telegram` / `discord` / … only when external |
+| `platform_chat_id` | Hermes `room_id` **or** Telegram/Discord chat id |
+| `require_mention` / `exclusive_bot_mentions` | External platform gates (Telegram/Discord) |
+| `welcome_prompt` | Paste into the room once (Bot Mode or external) |
 
 Keep Agent.`messaging_group` pointing at the typed Group. Do not invent chat
-ids; leave `platform_chat_id` empty until a real id is known.
+ids; leave `platform_chat_id` empty until a real Hermes room_id or platform id
+is known.
 
-## Fleet apply (groups that use messaging, Hermes still incomplete)
+## Fleet apply (incomplete Hermes config)
 
-When the user asks to apply messaging groups for agents that already have
-Anytype Groups but Hermes is still unconfigured:
+When the user asks to apply messaging for agents that already have Anytype
+Groups:
 
-1. **Inventory** live Groups (`type: group`, `lifecycle=live`) and member
-   Agent.`hermes_profile` slugs (also Group.`hermes_profiles` comma list).
-2. **Per member profile** that exists under `~/.hermes/profiles/<slug>/`:
-   - Always set mention gates (and bot loop guard when missing):
-     ```bash
-     hermes -p <slug> config set telegram.require_mention true
-     hermes -p <slug> config set telegram.exclusive_bot_mentions true
-     hermes -p <slug> config set telegram.bots_require_mention true
-     # bot_loop_guard: enabled + max_events/window/cooldown if absent
-     ```
-   - Set allowlists **only** when Group.`platform_chat_id` is a real id.
-   - If `platform_chat_id` is empty: gates only; leave
-     `group_allowed_chats` / `allowed_chats` empty. **Do not invent** chat ids.
-3. **Tokens / gateways:** never auto-clone `TELEGRAM_BOT_TOKEN` or start a
-   dedicated gateway unless asked. Treat commented `# TELEGRAM_BOT_TOKEN=`
-   lines as **missing** (not configured). Report token + chat-id gaps.
-4. Verify gates with `hermes -p <slug> config get telegram` (or a YAML scan).
-   A profile can have `require_mention` set while still missing
-   `bots_require_mention`; check all three gates.
+### Bot Mode path (preferred)
 
-Fleet example (2026-11-05): mention gates on ~50 Group member profiles; every
-live Group still lacked `platform_chat_id`; no live tokens written.
+1. Inventory live Groups + `hermes_profiles`.
+2. For each Group with empty `platform_chat_id`: create hosted room(s) via
+   `groups.create` (2–6; satellite B for overflow).
+3. Write back `platform_chat_id` (+ `platform=hermes`, `notes` for satellites).
+4. No Telegram tokens required.
 
-## Discord notes
+### External platform path (only when asked)
 
+1. Set mention gates on member profiles.
+2. Set allowlists **only** when `platform_chat_id` is a real external id.
+3. Never invent chat ids or clone tokens. Treat commented `# TELEGRAM_BOT_TOKEN=`
+   as missing.
 
-Same pattern: one bot application per profile, invite all bots to the server
-channel, allowlist channel ids per profile, prefer mention-gated behavior so
-bots do not answer every message. Voice channels use `voice.md` (`/voice join`).
+Earlier fleet pass (2026-11-05 morning): mention gates on ~50 profiles while
+chat ids were still empty. Evening pass: Hermes hosted rooms + Anytype
+writeback (this doc).
 
 ## Safety
 
-- Confirm before `--clone-channels` or copying tokens between profiles.
-- `TELEGRAM_ALLOW_BOTS=all` without `bots_require_mention` can loop forever.
-- Editing Anytype Group membership does not add/remove bots from Telegram;
-  do that in the platform + restart gateways as needed.
+- Confirm before creating many rooms, `--clone-channels`, or copying tokens.
+- Prefer Hermes Bot Mode over inventing Telegram groups.
+- Editing Anytype Group membership does not auto-update hosted room rosters;
+  re-run `groups.create` / Desktop Manage members / `groups` member RPCs as
+  needed.
+- Parallel Anytype `create_missing_options` for the same select name creates
+  duplicate options (ambiguous later). Mint `hermes` once, sequentially.
 - During org redesign, document intended groups in Anytype and **defer** Hermes
   apply until the user asks.
 
 ## Docs
 
+- https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode (Groups and group chats)
 - https://hermes-agent.nousresearch.com/docs/user-guide/messaging/
 - https://hermes-agent.nousresearch.com/docs/user-guide/messaging/telegram
 - Anytype side: skill `anytype-agents` → typed Group (`object-types.md`)

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.48.0
+version: 1.49.0
 license: MIT
 metadata:
   category: agents
@@ -109,7 +109,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Suggestion | Typed `suggestion` object: improvement feedback (model/subagent/skill/harness/…); indexes via `suggestions_page` (`suggestions.md`) |
 | Schedule | Typed `schedule` object: recurring / oneshot / event job; Agenda indexes are Queries via `agenda_page` |
 | Agenda | Query of Schedules filtered by `owner_agent` (Calendar on `next_run`; no Agenda type) |
-| Group | Typed `group` object: messaging roster + `welcome_prompt` → Prompt + platform fields; Agent/Team/Subteam link via `messaging_group`. Not auto-synced to chat |
+| Group | Typed `group` object: messaging roster + `welcome_prompt` → Prompt + platform fields; Agent/Team/Subteam link via `messaging_group`. Org default platform = Hermes Bot Mode hosted room (`platform_chat_id` = Hermes `room_id`). Not auto-synced |
 | Shared Rules | Mandatory rules every agent must follow (type `prompt`, `prompt_kind=shared_rules`) |
 | Skills | Typed procedures + owner Queries; resolve most-specific first: Agent → Subteam → Team → Project → Global |
 | Drafts | Agent designs not live until approved (often type `prompt` with `prompt_kind=draft`) |
@@ -210,10 +210,10 @@ Engineering HQ.
 
 1. Create type **`group`** (or `set_type` a legacy Group `page` in place) with `lifecycle`, `parent_team`, `members`, `slug`, optional `mission` / `routing_summary`
 2. Create a **Prompt** (`prompt_kind=welcome`, `owner_group`, `audience=group`); set Group.`welcome_prompt` (`prompts.md`)
-3. Set platform intent: `platform`, optional `platform_chat_id`, `hermes_profiles` (comma slugs), `require_mention`, `exclusive_bot_mentions`, `notes`
+3. Set platform intent: prefer `platform=hermes` for Bot Mode rooms; optional `platform_chat_id` (Hermes `room_id` once created), `hermes_profiles` (comma slugs), `require_mention`, `exclusive_bot_mentions`, `notes`. Use `telegram` / `discord` only when the user asks for an external platform
 4. Point Agent.`messaging_group` (and HQ/Subteam.`messaging_group` when the room is theirs) at this Group
 5. Body from **Group default** / `page-templates.md` (Members + Welcome pointer only; no second welcome fence)
-6. Hermes apply (tokens, allowlists, gateways) only via `hermes-profiles` `messaging-groups.md` when the user asks. If they ask to apply messaging for agents that still lack Hermes config and Group.`platform_chat_id` is empty: **gates only** (no invented chat ids/tokens). Fleet recipe: hermes-profiles `messaging-groups.md` → Fleet apply
+6. Hermes apply only via `hermes-profiles` `messaging-groups.md` when the user asks. Preferred apply: create Bot Mode hosted rooms (`groups.create`, 2–6 members; satellite B if more than 6) and write `platform_chat_id`. Do **not** invent Telegram groups or tokens. External-platform gates-only path remains for Telegram/Discord when those are requested
 
 **Inventory gap check:** search `type: agent` with `lifecycle = "live"` and
 `fields` including `messaging_group`. Any live Agent with empty `messaging_group`
@@ -433,8 +433,8 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
 - **New Suggestion:** create `suggestion` with `owner_agent` + kind/status → appears on Suggestions Query / Inbox → approve agent+chief (P org-wide); no Hermes auto-apply (`suggestions.md`)
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
-- **New Group:** prefer join HQ/domain Group first; mint `group` + welcome Prompt only for a new HQ or distinct domain room → set `members` / `hermes_profiles` / platform fields → link Agent/HQ `messaging_group` → welcome rewrite → Hermes apply via `messaging-groups.md` when asked
-- **Fleet messaging + deferred delegation:** when user asks to apply for agents that use Groups/Subagents but Hermes is still incomplete → hermes-profiles `anytype-apply.md` Fleet apply (gates without inventing `platform_chat_id`; `model_map` for Subagent parents; skip `profile_routes` strong-fit)
+- **New Group:** prefer join HQ/domain Group first; mint `group` + welcome Prompt only for a new HQ or distinct domain room → set `members` / `hermes_profiles` / `platform=hermes` → link Agent/HQ `messaging_group` → welcome rewrite → Hermes Bot Mode room via `messaging-groups.md` when asked
+- **Fleet messaging + deferred delegation:** when user asks to apply for agents that use Groups/Subagents but Hermes is still incomplete → hermes-profiles `anytype-apply.md` Fleet apply (Bot Mode `groups.create` + `platform_chat_id` writeback; `model_map` for Subagent parents; skip `profile_routes` strong-fit; no invented Telegram ids)
 - **Missing messaging_group:** live Agents without a Group → add to HQ Group members + hermes_profiles + Agent.`messaging_group` + welcome rewrite (Eng pattern: Clovis/Denise/Joachim → Engineering Group)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
