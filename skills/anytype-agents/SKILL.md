@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.42.0
+version: 1.42.1
 license: MIT
 metadata:
   category: agents
@@ -36,7 +36,7 @@ lives on **Harness profile**; Agent holds enablement / modes
 and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
 `voice.md`. **Analytics** is Agent checkbox `analytics_enabled`: when true,
 Hermes apply enables the **langfuse** plugin (`hermes-profiles`
-`anytype-apply.md`). **Most agents use Local parent** (chat = Ollama `lfm3` / effort
+`anytype-apply.md`). **Most agents use Local parent** (chat = llamacpp `LFM3-1.7B-Q8_0` / effort
 none; approvals = Hermes builtin llamacpp `d1-2b-q4_k_m`; voice stack local
 Whisper + Edge TTS). **lfm3 cannot run on llamacpp.** Spawn routes live on
 **Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
@@ -219,7 +219,7 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
    `fallback_1_*` / `fallback_2_*`, `aux_<task>_*` for vision / compression /
    web_extract / skills_hub / title_generation / **approval**, and optional voice
    stack (`stt_*` / `tts_*` / `voice_notes`). **Local parent** org default:
-   chat `ollama-launch` / `lfm3` / none; `aux_approval_*` = `llamacpp` /
+   chat `llamacpp` / `LFM3-1.7B-Q8_0` / none; `aux_approval_*` = `llamacpp` /
    `d1-2b-q4_k_m`; STT `local`/`base` + TTS `edge`/`en-US-AriaNeural`; no cloud
    fallbacks. **Foyer** mirrors Local parent (voice-friendly, no Subagents).
    **CLASQUIN** = Anthropic Claude subscription only. Specialist stacks

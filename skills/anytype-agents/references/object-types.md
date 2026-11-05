@@ -133,7 +133,7 @@ keys live on the default profile `.env` (`HERMES_LANGFUSE_*`).
 Keep Agent.`subagents` and each Subagent.`parent_agent` in sync (both ways).
 
 **Recommended parent pattern (most agents):**
-1. Agent.`harness_profile` → **Local parent** (chat = Ollama `lfm3` / none; approvals
+1. Agent.`harness_profile` → **Local parent** (chat = llamacpp `LFM3-1.7B-Q8_0` / none; approvals
    = llamacpp `d1-2b-q4_k_m`; route picking also uses parent `model.*`)
 2. Several Subagents with richer profiles (Chiefs, Coding, Reviewing, Browser,
    Web/MCP, Deep think) for specialized work
@@ -339,7 +339,7 @@ agents inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as
 
 | Profile | model.* | fallback_1 | fallback_2 | Aux | Voice | Typical use |
 |---------|---------|------------|------------|-----|-------|-------------|
-| **Local parent** | `ollama-launch` / `lfm3` · none · Local model | (none) | (none) | approval=`llamacpp`/`d1-2b-q4_k_m`; others `auto` | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent brain) |
+| **Local parent** | `llamacpp` / `LFM3-1.7B-Q8_0` · none · Local model | (none) | (none) | approval=`llamacpp`/`d1-2b-q4_k_m`; others `auto` | STT `local`/`base` · TTS `edge`/`en-US-AriaNeural` | **Most Agents** (parent brain) |
 | **Foyer** | same as Local parent | (none) | (none) | same dual local | local+edge (voice-friendly) | Foyer/home agents; no Subagents |
 | **CLASQUIN** | `anthropic` · Claude Code Sonnet 5.5 · high | (none) | (none) | `auto` | none | Arnold only; Claude subscription |
 | Chiefs | `xai` · Grok 4.5 · high | Sonnet 5.5 · high | Sol 6.1 · medium | `auto` | none | Subagent `chiefs` |
@@ -350,7 +350,7 @@ agents inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as
 | Deep think | same as Coding | same | same | `auto` | none | Subagent `deep` |
 
 Parent Agents usually link **Local parent**. Subagents link specialist stacks.
-**lfm3** is served by Ollama (`ollama-launch`); **d1** is Hermes builtin llamacpp
+**LFM3-1.7B-Q8_0** and **d1** both run on Hermes builtin llamacpp (`local_runtime`); legacy Ollama `lfm3` is retired
 (lfm3 cannot run on llamacpp).
 
 **Default template name:** `Harness profile default`. Body: `type-templates.md`.

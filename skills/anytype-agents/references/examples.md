@@ -49,7 +49,7 @@ Central home for teams and shared rules.
 - Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model
 
 ## Harness profiles (type `harness_profile`)
-- **Local parent** → chat `ollama-launch` / `lfm3` / none; aux approval `llamacpp` / `d1-2b-q4_k_m`; no cloud fallbacks (**most Agents**)
+- **Local parent** → chat `llamacpp` / `LFM3-1.7B-Q8_0` / none; aux approval `llamacpp` / `d1-2b-q4_k_m`; no cloud fallbacks (**most Agents**)
 - **Foyer** → same dual local; voice-friendly; no Subagents (home agents)
 - **CLASQUIN** → Anthropic Claude Sonnet 5.5 high; no fallbacks (Arnold)
 - Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think → Subagent specialist stacks
@@ -98,7 +98,7 @@ Skills: Agent → Subteam → Team → Project → Global
 - Enabled: yes (`delegation` toolset)
 - Pattern: parent Local parent answers peers / light asks on lfm3; spawn Subagent only when specialized
 - Anytype Subagents: role packs (`chiefs` / `coding` / `review` / `web` / `browser` / `deep`)
-- Chat / routing model: ollama-launch · lfm3; approvals: llamacpp · d1-2b-q4_k_m
+- Chat / routing model: llamacpp · LFM3-1.7B-Q8_0; approvals: llamacpp · d1-2b-q4_k_m
 - Mode: `model_map` · plugin advanced-delegation installed
 - Task-specific models (declined from Subagent objects; unrouted work stays on parent):
   - `fast` ← Quick edit · Coding · medium — small edits, simple tests
