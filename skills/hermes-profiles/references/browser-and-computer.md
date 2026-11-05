@@ -166,6 +166,60 @@ Cloud credentials live in the profile `.env` (never paste values into chat):
 Prefer `web_search` / `web_extract` when interaction is not required. Real-profile
 browsing is consent-gated: the agent acts with the operator's logins.
 
+## Signing in (passwords, cookies, “browse as me”)
+
+Default local browsing is **logged out** (throwaway Chromium). Agents that need
+an authenticated site must use one of the paths below. **Do not ask the human to
+paste a password into chat.** Prefer Hermes vault fills or a configured identity.
+
+Official vault docs:
+https://hermes-agent.nousresearch.com/docs/user-guide/features/credential-vault
+
+### Agent playbook (mandatory when a page needs login)
+
+1. Prefer **read-only** tools (`web_search`, `web_extract`, `x_search`, APIs) when
+   they can answer without a browser session.
+2. If interactive login is required, check Anytype **`vault_grant`** objects for
+   this Agent (site / identity label). If none grants the site, escalate to the
+   chief / P; do not invent credentials.
+3. Use the path that matches the grant / Browser catalog identity:
+
+| Need | Path | How |
+|------|------|-----|
+| One-off or recurring site login | **Hermes vault** | Say “log into \<site\>”; on first miss Hermes prompts a **masked** password. Later fills via vault tools. CLI: `hermes vault list\|add\|rm`. Passwords never enter model context. |
+| Already in 1Password / Bitwarden | **Password manager** | Install + unlock `op` / `bw`; Hermes auto-detects. Unlock once per session (masked). Opt out: `hermes vault sources --disable …`. |
+| Stay signed in across sessions (agent-only identity) | **Dedicated persistent** | `browser.user_data_dir: ~/.hermes/profiles/<slug>/browser-profile` + often `browser.headed: true` for the first login / 2FA. Cookies persist in that dir. |
+| Browse as the human (existing Chrome/Brave/Edge logins) | **Operator real profile** | `browser.use_real_profile: true` (+ optional `real_profile_pin`). Consent-gated; Hermes snapshots the active profile (does not open the live profile lock). |
+| Drive a browser that is already open and signed in | **Attach CDP** | `/browser connect` or `browser.cdp_url`, or chrome-profiles plugin. |
+| 2FA / CAPTCHA / passkey | **Human takeover or vault TOTP** | Authenticator seed on the vault item → Hermes enters codes. SMS/email codes → masked prompt. Passkeys / Duo → ask human to complete on device; headed Screen pane for computer_use. |
+
+4. After a successful vault save, continue the task; do not re-ask for the
+   password in prose.
+5. Headless cron / `-q` cannot answer vault prompts: save/unlock in an
+   interactive session first, or use persistent / real-profile cookies.
+
+```bash
+# Vault (per profile under ~/.hermes/vault/ or profiles/<slug>/…)
+hermes -p <slug> vault list
+hermes -p <slug> vault add
+# hermes -p <slug> vault sources
+
+# Persistent agent cookies
+hermes -p <slug> config set browser.headed true
+hermes -p <slug> config set browser.user_data_dir "$HOME/.hermes/profiles/<slug>/browser-profile"
+
+# Browse as the operator (explicit consent)
+hermes -p <slug> config set browser.use_real_profile true
+# hermes -p <slug> config set browser.real_profile_pin 'Profile 2'
+# Destructive unlock of real profile lock — only with explicit user OK:
+# hermes browser close-profile
+```
+
+**Anytype:** store **capability** only (`vault_grant`: which Agent may use which
+site / identity kind / vault handle). Never put passwords, TOTP seeds, or card
+numbers in Anytype. Secrets live in Hermes vault, 1Password/Bitwarden, or the
+Chromium profile dir.
+
 ## Computer use configuration
 
 ```bash
@@ -269,6 +323,8 @@ hermes -p forge computer-use screen start
 ## Safety
 
 1. Confirm before `use_real_profile`, shared `user_data_dir`, `close-profile`, or YOLO/`unrestricted` computer use.
-2. Do not put vault/API secrets in Anytype pages; only the capability labels.
-3. Shared host / shared Chromium profile is convenience, not multi-tenant isolation.
-4. `permission_mode: bounded` needs a reviewed capability manifest path.
+2. Do not put vault/API secrets in Anytype pages; only **`vault_grant`** capability labels (site, identity kind, which agents).
+3. Never ask the human to paste passwords into chat; use vault masked prompts or a configured identity path above.
+4. Shared host / shared Chromium profile is convenience, not multi-tenant isolation.
+5. `permission_mode: bounded` needs a reviewed capability manifest path.
+6. Respect `vault_grant` ACLs: no grant for that site → escalate; do not scrape credentials from Memory pages.

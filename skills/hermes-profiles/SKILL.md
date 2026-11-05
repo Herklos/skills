@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.28.0
+version: 1.29.0
 license: MIT
 metadata:
   category: agents
@@ -31,7 +31,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/delegation.md` | Subagents, advanced-delegation, `model_map` / `profile_routes` |
 | `references/soul-templates.md` | Personality stack: `SOUL.md`, `/personality`, custom presets |
 | `references/memory.md` | Built-in MEMORY/USER, limits, write approval, external providers |
-| `references/browser-and-computer.md` | Browser toolset, computer_use, **Cua Spaces default**, Anytype per-HQ pair decline, Bot Screen, shared vs dedicated |
+| `references/browser-and-computer.md` | Browser toolset, **sign-in / vault / real-profile**, computer_use, **Cua Spaces default**, Anytype per-HQ pair + `vault_grant`, Bot Screen |
 | `references/runtime-limits-and-tools.md` | Toolsets, terminal backend, output/turn/compression limits |
 | `references/security.md` | Approvals, privacy, write safety, pairing, checkpoints/rollback, backup |
 | `references/workspace.md` | `terminal.cwd`, projects, repo scan, worktrees |
@@ -54,6 +54,7 @@ Skins: https://hermes-agent.nousresearch.com/docs/user-guide/features/skins
 Personality: https://hermes-agent.nousresearch.com/docs/user-guide/features/personality  
 Memory: https://hermes-agent.nousresearch.com/docs/user-guide/features/memory  
 Browser: https://hermes-agent.nousresearch.com/docs/user-guide/features/browser  
+Passwords & logins (vault): https://hermes-agent.nousresearch.com/docs/user-guide/features/credential-vault  
 Computer use: https://hermes-agent.nousresearch.com/docs/user-guide/features/computer-use  
 Cua Spaces (default computer): https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces  
 Cron: https://hermes-agent.nousresearch.com/docs/user-guide/features/cron  
@@ -273,7 +274,9 @@ Full guide: `references/memory.md`. Keys: `memory.*`, `hermes -p <slug> memory s
 
 ### Browser and computer use
 
-Full guide: `references/browser-and-computer.md`. **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). When Anytype links a per-HQ pair (`{HQ} – Cua Spaces` + `{HQ} – Hermes Chromium`; `hq-runtime-pair.md` + `cua-hq-spaces.md`), pin Hermes `settings.space` from Computer.`cua_space` and enable Hermes-managed local Chromium throwaway (see **Anytype per-HQ pair → Hermes**). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
+Full guide: `references/browser-and-computer.md` (includes **Signing in**). **Default computer:** [cua-spaces](https://hermes-agent.nousresearch.com/docs/plugins/cua-spaces) (`plugins install` + `terminal.backend: cua`; set `desktop: true` for browser / `computer_use` in Linux Spaces). When Anytype links a per-HQ pair (`{HQ} – Cua Spaces` + `{HQ} – Hermes Chromium`; `hq-runtime-pair.md` + `cua-hq-spaces.md`), pin Hermes `settings.space` from Computer.`cua_space` and enable Hermes-managed local Chromium throwaway (see **Anytype per-HQ pair → Hermes**). Host desktop and Linux Bot Screen are exceptions. Also: `tools enable browser|computer_use`; `browser.*`, `computer_use.*`, `bot_desktop.*`.
+
+**Authenticated browsing:** default Chromium is logged out. Agents must use Hermes **vault** (masked prompts; never paste passwords in chat), 1Password/Bitwarden CLI, **dedicated persistent** `user_data_dir`, **operator real profile** (`use_real_profile`), or CDP attach. Check Anytype **`vault_grant`** for which Agent may use which site/identity. Secrets never live in Anytype. Vault docs: https://hermes-agent.nousresearch.com/docs/user-guide/features/credential-vault
 
 ### Tools, terminal, limits
 
@@ -362,6 +365,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Share package:** `export` / `import` or `profile install <git-url>`
 - **Anytype → Hermes apply:** `anytype-apply.md` (SOUL + Local parent + model_map routes + **default** + option enforcement + tools + cron + org skills + voice modes + analytics/langfuse + describe)
 - **Delegation safety:** Local parent `model_map.default` required; SOUL/Shared Rules require `option` on every `delegate_task`; rebuild schema with `/delegation model_map --now` or `/new` (`delegation.md`)
+- **Browser sign-in:** vault / manager / persistent / real-profile / CDP (`browser-and-computer.md`); respect Anytype `vault_grant`; never passwords in chat or Anytype
 
 ## Workflow checklist
 

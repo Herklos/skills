@@ -1,4 +1,4 @@
-# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Prompt, Group, Project)
+# Object types (Agent, Team, Subteam, Subagent, Harness, Harness profile, Browser, Computer, Tool profile, Vault grant, Prompt, Group, Project)
 
 Org inventory uses dedicated Anytype types (not plain `page`) so you can filter,
 feature properties, and start from body templates. Discover live keys with
@@ -28,6 +28,7 @@ via `agenda_page` (see `agenda-and-schedules.md`).
 | `browser` | Browsers | Reusable browser access catalog (source + identity). Agents / Teams / Subteams link here |
 | `computer` | Computers | Reusable computer / desktop catalog (surface + scope). Agents / Teams / Subteams link here |
 | `tool_profile` | Tool profiles | Reusable toolsets + approvals + terminal. Agents / Teams / Subteams link here |
+| `vault_grant` | Vault grants | **Capability only:** which Agents may use which site / login identity. No passwords (`hermes-profiles` → `browser-and-computer.md`) |
 | `prompt` | Prompts | System prompts, group welcomes, Shared Rules, libraries, drafts (`prompts.md`) |
 | `memory` | Memories | Durable agent notes (`memory-and-skills.md`) |
 | `skill` | Skills | Procedures / templates / guides (`memory-and-skills.md`) |
@@ -481,6 +482,35 @@ when those toolsets are enabled.
 - Tool profile → **Standard interactive**; Engineering → **Coding**; fetch /
   veille roles → **Data fetching**
 
+## Vault grant (`api_key`: `vault_grant`)
+
+**Capability catalog only.** Records which Agents (or Team) may use which site
+login / browser identity. **Never** store passwords, TOTP seeds, API tokens, or
+card numbers here. Secrets live in Hermes vault (`hermes vault`), 1Password /
+Bitwarden CLI, or a Chromium profile dir (`user_data_dir` / real-profile).
+
+| Key | Format | Notes |
+|-----|--------|-------|
+| `site_origins` | text | Origins or host list (e.g. `https://x.com, https://twitter.com`) (featured) |
+| `identity_kind` | select | `hermes-vault` \| `onepassword` \| `bitwarden` \| `persistent-profile` \| `real-profile` \| `cdp-attach` (featured) |
+| `vault_handle` | text | Optional label matching `hermes vault list` / manager item name (featured) |
+| `agents` | objects | Agents allowed to use this grant (featured) |
+| `team` | objects | Optional HQ / Team scope (featured) |
+| `lifecycle` | select | `draft` \| `live` \| `archived` (featured) |
+| `notes` | text | Apply notes (no secrets) |
+
+Also `tag`, `links`, `backlinks`. Keep under Agents → Shared (or a Runtime /
+Secrets index of **grants**, not credentials).
+
+**Agent playbook:** before signing into a site in Hermes browser, search
+`type: vault_grant` for this Agent + site. If none is live, escalate to chief /
+P. Prefer vault masked fill over asking the human to paste a password in chat.
+Full Hermes paths: `hermes-profiles` → `browser-and-computer.md` → **Signing in**.
+Shared Rule **27**.
+
+**Example:** `X.com – Octave` → `identity_kind: hermes-vault`, `agents: [Octave]`,
+`site_origins: https://x.com`, `lifecycle: live`.
+
 ## Project (`api_key`: `project`)
 
 Built-in Project type extended with org fields. Short overview and hub links
@@ -714,8 +744,9 @@ Keep existing `welcome_prompt` when present. Then patch HQ / Agent
 
 1. `API-create-type` for `agent`, `team`, `group`, `subteam`, `subagent`,
    `harness`, `harness_profile`, `browser`, `computer`, `tool_profile`,
-   `prompt`, `memory`, `skill`, `log`, `suggestion`, and `schedule` with the
-   property definitions above (`create_missing_options: true` for selects).
+   `vault_grant`, `prompt`, `memory`, `skill`, `log`, `suggestion`, and
+   `schedule` with the property definitions above (`create_missing_options: true`
+   for selects).
    On `team`, define `kind` options `Board` / `HQ` only (no `Sub-team`, no new
    `Group` option). Prefer **sequential** creates when several types share new
    property names (`members`, `skills_page`, `access_needed`,
@@ -932,5 +963,6 @@ Messaging rooms are type **`group`** (migrate legacy Group pages with
 `set_type`). Shared Rules and prompt libraries are type **`prompt`**. Memory
 children are type **`memory`**. Procedures / Skill Template / guides are type
 **`skill`**. Per-action summaries are type **`log`**. Improvement feedback is
-type **`suggestion`**. Scheduled jobs are type **`schedule`**. Skills, Logs,
+type **`suggestion`**. Scheduled jobs are type **`schedule`**. Login
+**capabilities** (not secrets) are type **`vault_grant`**. Skills, Logs,
 Suggestions, and Agenda indexes are type **`query`**.

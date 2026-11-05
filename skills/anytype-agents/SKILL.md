@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.38.0
+version: 1.39.0
 license: MIT
 metadata:
   category: agents
@@ -18,10 +18,10 @@ metadata:
 
 Org source of truth for a multi-agent roster lives in **Anytype** as typed
 objects (`agent`, `team`, `subteam`, `subagent`, `harness`, `harness_profile`,
-`browser`, `computer`, `tool_profile`, `prompt`, `memory`, `skill`, `log`,
-`suggestion`, `schedule`, `group`, `project`, plus PM `epic` / `user_story` /
-extended `task`) plus supporting `page`s and Skills / Logs / Agenda /
-Suggestions **Queries**.
+`browser`, `computer`, `tool_profile`, `vault_grant`, `prompt`, `memory`,
+`skill`, `log`, `suggestion`, `schedule`, `group`, `project`, plus PM `epic` /
+`user_story` / extended `task`) plus supporting `page`s and Skills / Logs /
+Agenda / Suggestions **Queries**.
 Runtime bots are separate: editing Anytype does not by itself update a live bot
 prompt or messaging group. Verify runtime separately after doc changes. Model
 stacks live on **Harness profile** objects; agents link `harness_profile` so one
@@ -50,7 +50,7 @@ profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
 | File | When |
 |------|------|
 | `references/structure.md` | Hub discovery and typical tree |
-| `references/object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Browser / Computer / Tool profile / Group / Project type keys, properties, migration |
+| `references/object-types.md` | Agent / Team / Subteam / Subagent / Harness / Harness profile / Browser / Computer / Tool profile / Vault grant / Group / Project type keys, properties, migration |
 | `references/type-templates.md` | Dumped default template bodies (incl. Subagent / Harness / Group / runtime catalogs) for bootstrap and drift |
 | `references/page-templates.md` | Agent / HQ / Subteam / Group / skill / project body shapes |
 | `references/suggested-runtime.md` | Hermes apply property worksheet (not Agent page body); execution order in hermes-profiles `anytype-apply.md` |
@@ -98,6 +98,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Browser | Typed `browser` catalog: source + identity + headed; agents / teams / subteams link here |
 | Computer | Typed `computer` catalog: surface + scope + desktop; agents / teams / subteams link here |
 | Tool profile | Typed `tool_profile` catalog: toolsets + approvals + terminal; agents / teams / subteams link here |
+| Vault grant | Typed `vault_grant`: which Agents may use which site / login identity (**no secrets**; Shared Rule 27) |
 | Agent | Typed `agent` object: role, memory links, skills, `harness_profile`, `subagents`, `system_prompt` → Prompt, runtime catalog links |
 | Prompt | Typed `prompt` object: canonical system / welcome / shared_rules / library / draft text (`prompts.md`) |
 | Memory | Typed `memory` object: decisions, lessons, resources, operating notes, playbooks (`memory-and-skills.md`) |
@@ -385,10 +386,11 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 4. Follow documented escalation paths to the human
 5. Treat page/card comments as instructions when Shared Rules say so
 6. Do not revive archived agents without explicit approval
+7. Never store passwords / TOTP / tokens in Anytype; use `vault_grant` for capability only (Shared Rule 27)
 
 ## Common recipes (summary)
 
-- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|prompt|memory|skill|log|suggestion|schedule|group|project`
+- **Orient:** discover space → open Agents → read Shared Rules + roster (`examples.md` for shape); filter inventory with `type: agent|team|subteam|subagent|harness|harness_profile|browser|computer|tool_profile|vault_grant|prompt|memory|skill|log|suggestion|schedule|group|project`
 - **New specialist:** draft vs live → create `agent` + Local parent `harness_profile` → fill `short_description` / `team` / `reports_to` / `autonomy` / `map_path` → link `browser` / `computer` / `tool_profile` catalog → role-pack `subagent`s (Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think) → create `prompt` + Agent.`system_prompt` (`prompts.md`) → body = System prompt + Agenda pointers only → Memory objects + Skills Query + Logs Query + Agenda Query + Suggestions Query (`memory-and-skills.md` + `agenda-and-schedules.md` + `suggestions.md`) → link HQ / Subteam → optional `messaging_group` → prompt copy reminder
 - **HQ structure fix:** revive Subteams → create missing agents (draft-only = `propose`) → wire HQ/Group members + hermes_profiles → welcome rewrite → Prompt snips + Operating Notes + Primary org-map `set_cell` → verify; **no Hermes apply** unless asked (`mcp-recipes.md`)
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
@@ -399,6 +401,7 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New Subagent:** create `subagent` with `parent_agent` + `task_key` + `harness_profile` → add to Agent.`subagents` → decline via hermes-profiles when applying
 - **New Harness profile:** create `harness_profile` stack → link Agents Shared → point agents / subagents at it
 - **New Browser / Computer:** for a new HQ, follow `hq-runtime-pair.md` then `cua-hq-spaces.md` (live Space + Computer.`cua_space`); for Tool profile, create shared catalog object → link Agents Shared → point agents / teams / subteams at it
+- **New Vault grant:** create `vault_grant` with `site_origins`, `identity_kind`, `agents` (and optional `vault_handle` / `team`); **never** put passwords in Anytype; Hermes paths in `hermes-profiles` → `browser-and-computer.md` (Shared Rule 27)
 - **New Prompt:** create `prompt` with kind + owners → link Agent.`system_prompt` or Group.`welcome_prompt` (`prompts.md`)
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub → PM Queries (`project-pm.md`)
 - **New PM item:** create `epic` / `user_story` / `task` with `linked_projects` (+ Task `kind`, incl. `spike`)

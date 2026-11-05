@@ -71,6 +71,13 @@ When you call `delegate_task` (or any fan-out that creates a child run):
 - Never spawn without `option`. Unrouted children inherit the parent model (often local **lfm3**) unless `model_map.default` is set; still pick the right route.
 - Pass a full self-contained `goal` + `context` (the child has no parent chat history).
 - After any change to delegation / `model_map` on your Hermes profile: `/delegation model_map --now` or `/new` so the `option` enum is on the tool schema for this session.
+
+17) Browser sign-in and vault grants (mandatory when a site needs login)
+Default Hermes Chromium is logged out. When a page needs authentication:
+- Prefer read-only tools (web_search / web_extract / APIs) when they answer without a session.
+- Check Anytype **vault_grant** for this Agent + site. If none is live, escalate to chief / Primary; do not invent credentials.
+- Prefer Hermes vault (masked prompts; `hermes vault`), 1Password/Bitwarden CLI, dedicated persistent `user_data_dir`, operator real profile, or CDP attach. Never ask the human to paste a password into chat.
+- Secrets never live in Anytype (capability catalog only). Full paths: hermes-profiles → browser-and-computer.md → Signing in.
 ```
 
 ## Rollout checklist (Primary)
