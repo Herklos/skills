@@ -70,7 +70,7 @@ hermes profile describe forge --text "…"
 When the user supplies slug-named PNGs (e.g. `~/Documents/images/agents/avatars/`):
 
 Full playbook: **`avatars.md`** (quit Desktop → `profiles.set_asset` →
-`ui_meta` photo/custom → clear `bot-meta-v2` images → reopen). Bare
+`ui_meta` photo/custom → seed `bot-meta-v2` with 256 data URLs → reopen). Bare
 `assets/avatar.png` copies get overwritten by Desktop cache / SVG backfill.
 
 ## 6. Export / import between machines

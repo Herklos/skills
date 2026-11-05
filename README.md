@@ -4,7 +4,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.36.0 | Lifecycle and config for Hermes Agent profiles |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.37.0 | Lifecycle and config for Hermes Agent profiles |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.44.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Prompts, suggestions, and Projects via Anytype MCP |
 
@@ -27,7 +27,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs; Bot Mode Edit Profile Description vs roster card chat preview (`profile-map.md`)
-- **Bot Mode avatars**: fleet photo install via `profiles.set_asset` + Desktop `bot-meta-v2` clear (`avatars.md`); bare file copies get overwritten
+- **Bot Mode avatars**: fleet photo install via `profiles.set_asset` + seed Desktop `bot-meta-v2` with 256 data URLs (`avatars.md`); bare file copies / clear-only get overwritten by SVG backfill
 - **Voice**: mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord voice channel. Defaults: local Whisper + Edge TTS
 - **Cron**: scheduled jobs and Bot routines per profile; Anytype Agenda → Hermes bind when asked
 - **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group

@@ -191,8 +191,10 @@ hermes profile describe default
 ## Bot Mode avatars stuck on old faces / tiny 160×160 icons
 
 Bare `assets/avatar.png` copies lose to Desktop `bot-meta` cache and SVG
-backfill. Quit Desktop, re-install via `profiles.set_asset`, clear
-`bot-meta-v2` images, reopen. Full playbook: `avatars.md`.
+backfill (`pushLocalAvatars` → 160×160). Quit Desktop, re-install via
+`profiles.set_asset`, **seed** `bot-meta-v2` with the same 256 data URLs on
+both `<slug>` and `local::<slug>` (clearing images alone re-opens the SVG
+race). Reopen and confirm disk widths stay 256. Full playbook: `avatars.md`.
 
 ## Secrets in chat
 

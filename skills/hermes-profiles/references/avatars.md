@@ -6,14 +6,22 @@ Interactive path: Desktop **Edit Profile** → upload photo. Fleet path below.
 
 ## Why a bare file copy fails
 
-Writing `assets/avatar.png` alone is not enough. On launch, Bot Mode
-(`pullServerAvatars` / `pushLocalAvatars`) prefers cached `bot-meta` images.
-If local meta already has an `image`, it skips the server asset. Local SVG
-backfill can also overwrite disk with a **160×160** raster
-(`isBackfilledFacePng`). Real photos are **256×256**.
+Writing `assets/avatar.png` alone is not enough. On launch, Bot Mode runs
+`pullServerAvatars` → `pushLocalAvatars`:
+
+- If `!bot.has_avatar` and local `bot-meta` has no `image`, Desktop rasterizes
+  the live SVG face to **160×160** and pushes it via `profiles.set_asset`
+  (overwriting a real photo on disk).
+- If local meta already has an `image`, pull skips the server asset.
+- Real photos are **256×256**. SVG backfills are **160×160** (~2–4 KB);
+  `isBackfilledFacePng` detects the 160 edge.
 
 Proper fleet install: **`profiles.set_asset`** + stamp `ui_meta` photo/custom +
-clear Desktop `bot-meta-v2` image cache (Desktop quit).
+**seed** Desktop `bot-meta-v2` with the same 256 data URLs (Desktop quit).
+
+Clearing `image` from bot-meta (older recipe) leaves the SVG push race open on
+first paint. Seeding the photo data URL means even a brief `!has_avatar` race
+pushes the real face.
 
 ## Paths
 
@@ -42,15 +50,18 @@ ui_meta:
 1. Diff source PNGs vs `hermes profile list` (+ live Hermes-runtime Anytype Agents
    when applying from org inventory). Fix typos; map `p` → `default`. Skip
    Osaurus-only slugs.
-2. **Quit Hermes Desktop** (otherwise it races and restores old faces).
+2. **Quit Hermes Desktop** (otherwise it races and restores old faces; LevelDB
+   is locked while open).
 3. Center-crop → 256×256 → call `profiles.set_asset` per slug (writes
-   `assets/avatar.png` atomically).
+   `assets/avatar.png` atomically). Keep the data URL for step 5.
 4. Stamp `ui_meta.hermes-bots` `imageKind: photo` + `custom: true` (via
    `profiles.configure` or `profile.yaml`).
-5. Backup, then clear cached `image` fields in Desktop Local Storage key
-   `hermes.plugin.hermes-bots.bot-meta-v2`; stamp `imageKind: photo` /
-   `custom: true` on each entry.
-6. Reopen Hermes Desktop. Roster re-fetches from assets.
+5. Backup, then **seed** Desktop Local Storage key
+   `hermes.plugin.hermes-bots.bot-meta-v2`: set `image` to the same 256 data URL
+   on both `<slug>` and `local::<slug>` (and `local::default` for Primary).
+   Stamp `imageKind: photo` / `custom: true` / `shape: blobatar`.
+6. Reopen Hermes Desktop. Roster uses seeded images; push skips SVG when meta
+   already has a data URL.
 
 ### 3–4. `profiles.set_asset` + `profiles.configure`
 
@@ -63,7 +74,7 @@ HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
 HERMES_PY=$(ls -d "$HERMES_HOME"/tools/python-*/bin/python3 2>/dev/null | sort -V | tail -1)
 # SRC= folder of slug-named PNGs; MAP stem→slug (include p→default)
 "$HERMES_PY" - <<'PY'
-import sys, os, base64, subprocess, tempfile
+import sys, os, base64, subprocess, tempfile, json
 from pathlib import Path
 
 os.environ["HERMES_HOME"] = str(Path.home() / ".hermes")
@@ -73,7 +84,16 @@ import tui_gateway.methods_profiles  # register handlers
 from tui_gateway.server import handle_request
 
 SRC = Path.home() / "Documents/images/agents/avatars"  # adjust
-MAP = {"p": "default", "forge": "forge"}  # stem → hermes slug; expand as needed
+SKIP = {"sidonie", "philippe", "blanche", "bob"}  # Osaurus-only
+MAP = {}
+for src in sorted(SRC.glob("*.png")):
+    stem = src.stem
+    if stem in SKIP:
+        continue
+    slug = "default" if stem == "p" else stem
+    home = Path.home() / ".hermes"
+    if slug == "default" or (home / "profiles" / slug).is_dir():
+        MAP[stem] = slug
 
 def make256(src: Path) -> bytes:
     tmpdir = Path(tempfile.mkdtemp())
@@ -100,6 +120,8 @@ def make256(src: Path) -> bytes:
     )
     return dest.read_bytes()
 
+sidecars = Path("/tmp/hermes-avatar-sidecars")
+sidecars.mkdir(exist_ok=True)
 for stem, slug in sorted(MAP.items(), key=lambda x: x[1]):
     src = SRC / f"{stem}.png"
     blob = make256(src)
@@ -119,6 +141,7 @@ for stem, slug in sorted(MAP.items(), key=lambda x: x[1]):
             },
         },
     })
+    (sidecars / f"{slug}.b64").write_text(data)
     home = Path.home() / ".hermes"
     path = (
         home / "assets" / "avatar.png"
@@ -126,13 +149,14 @@ for stem, slug in sorted(MAP.items(), key=lambda x: x[1]):
         else home / "profiles" / slug / "assets" / "avatar.png"
     )
     print(f"OK {slug} bytes={path.stat().st_size if path.exists() else 0}")
+print(json.dumps({"slugs": sorted(set(MAP.values()))}))
 PY
 ```
 
 Verify: each target `avatar.png` should be roughly 50–120 KB (256×256 photo),
 not a tiny SVG raster.
 
-### 5. Clear Desktop `bot-meta-v2` cache
+### 5. Seed Desktop `bot-meta-v2` (do not clear images)
 
 Desktop must stay quit. Key lives in Chromium Local Storage LevelDB:
 
@@ -159,6 +183,10 @@ const dbPath = path.join(
   os.homedir(), 'Library/Application Support/Hermes/Local Storage/leveldb'
 )
 const db = new ClassicLevel(dbPath, { valueEncoding: 'buffer', keyEncoding: 'buffer' })
+const sidecarDir = '/tmp/hermes-avatar-sidecars'
+const slugs = fs.readdirSync(sidecarDir)
+  .filter((f) => f.endsWith('.b64'))
+  .map((f) => f.replace(/\.b64$/, ''))
 
 ;(async () => {
   await db.open()
@@ -171,35 +199,49 @@ const db = new ClassicLevel(dbPath, { valueEncoding: 'buffer', keyEncoding: 'buf
   const raw = await db.get(key)
   if (raw[0] !== 1) throw new Error('unexpected value tag ' + raw[0])
   const parsed = JSON.parse(raw.slice(1).toString('utf8'))
-  let cleared = 0
-  for (const meta of Object.values(parsed)) {
-    if (!meta || typeof meta !== 'object') continue
-    if (typeof meta.image === 'string') {
-      delete meta.image
-      cleared++
+  let seeded = 0
+  for (const slug of slugs) {
+    const dataUrl = fs.readFileSync(path.join(sidecarDir, slug + '.b64'), 'utf8').trim()
+    const ids = slug === 'default'
+      ? ['local::default', 'default']
+      : [slug, 'local::' + slug]
+    for (const id of ids) {
+      if (!parsed[id] || typeof parsed[id] !== 'object') parsed[id] = {}
+      const meta = parsed[id]
+      meta.image = dataUrl
+      meta.imageKind = 'photo'
+      meta.custom = true
+      if (!meta.shape) meta.shape = 'blobatar'
+      seeded++
     }
-    meta.imageKind = 'photo'
-    meta.custom = true
-    if (!meta.shape) meta.shape = 'blobatar'
   }
   const body = Buffer.from(JSON.stringify(parsed), 'utf8')
   await db.put(key, Buffer.concat([Buffer.from([1]), body]))
   await db.close()
-  console.log('cleared images', cleared)
+  console.log('seeded entries', seeded)
 })().catch((e) => { console.error(e); process.exit(1) })
 NODE
 ```
 
 Do not edit LevelDB while Desktop is running.
 
+After reopen, confirm disk widths stay 256:
+
+```bash
+sips -g pixelWidth "$HERMES_HOME/assets/avatar.png"
+find "$HERMES_HOME/profiles" -path '*/assets/avatar.png' \
+  -exec sips -g pixelWidth {} \; | awk '/pixelWidth/{print $2}' | sort | uniq -c
+```
+
 ## Symptoms → fix
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| Roster shows old faces after disk install | `bot-meta` still has `image`; `pullServerAvatars` skips assets | Quit Desktop → clear `bot-meta-v2` images → reopen |
-| Disk `avatar.png` shrinks to ~2–4 KB / 160×160 | SVG backfill (`pushLocalAvatars`) | Quit Desktop → `set_asset` again → clear cache |
+| Roster shows old faces after disk install | `bot-meta` still has stale `image`; pull skips assets | Quit Desktop → seed `bot-meta-v2` with new 256 data URLs → reopen |
+| Disk `avatar.png` shrinks to ~2–4 KB / 160×160 after reopen | SVG backfill (`pushLocalAvatars`) when meta had no `image` | Quit → `set_asset` again → **seed** meta with 256 data URLs (do not only clear) |
 | New photo never appears | Desktop was open during install | Quit, re-run fleet steps 3–5 |
 | `set_asset` / type errors on system Python | Wrong interpreter (needs Hermes 3.14+ stack) | Use `$HERMES_HOME/tools/python-*/bin/python3` |
+| Only Primary (P) keeps the photo | Default path survived; named profiles lost to SVG push | Seed both `<slug>` and `local::<slug>` keys |
 
 ## Related
 

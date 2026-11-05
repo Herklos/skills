@@ -143,9 +143,9 @@ ui_meta:
 ### Custom photo avatars
 
 Desktop Edit Profile upload is the interactive path. Fleet install must use
-**`profiles.set_asset`** plus a Desktop `bot-meta` cache clear (bare
-`assets/avatar.png` copies get overwritten). Full playbook: **`avatars.md`**
-(also `recipes.md` **5b**).
+**`profiles.set_asset`** plus seeding Desktop `bot-meta-v2` with the same 256
+data URLs (bare `assets/avatar.png` copies get overwritten by SVG backfill).
+Full playbook: **`avatars.md`** (also `recipes.md` **5b**).
 
 | Profile | File written by `set_asset` |
 |---------|------|
