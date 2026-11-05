@@ -70,17 +70,27 @@ hermes profile describe forge --text "…"
 When the user supplies a folder of PNGs named by profile slug (e.g.
 `~/Documents/images/agents/avatars/`):
 
+**Writing `assets/avatar.png` alone is not enough.** On launch, Bot Mode
+(`pullServerAvatars` / `pushLocalAvatars`) prefers cached `bot-meta` images and
+can overwrite disk files with a 160×160 SVG raster. Install through the asset
+API and clear the Desktop cache.
+
 1. Diff filenames vs `hermes profile list` + live Hermes-runtime Anytype Agents.
    Fix typos; map `p.png` → profile `default`. Skip Osaurus-only slugs.
-2. Backup existing `assets/avatar.png` under `/tmp/hermes-avatars-backup-…/`.
-3. Center-crop square → resize to **256×256** → write:
-   - `default` → `~/.hermes/assets/avatar.png`
-   - others → `~/.hermes/profiles/<slug>/assets/avatar.png`
-4. In that profile’s `profile.yaml`, set
-   `ui_meta.hermes-bots.imageKind: photo` and `custom: true`
-   (keep `shape: blobatar`; bump `_ui_meta_revisions.hermes-bots`).
-5. Leave Osaurus art in a sibling folder (e.g. `osaurus-ready/`) for manual
-   Osaurus/Anytype icon set. Tell the user Desktop may need a roster refresh.
+2. **Quit Hermes Desktop** (otherwise it may race and restore old faces).
+3. Center-crop square → resize to **256×256** PNG data URL.
+4. For each slug, call gateway `profiles.set_asset`
+   `{ name, asset: "avatar", data: "data:image/png;base64,…" }`
+   (Hermes Python: `tui_gateway.server.handle_request` after importing
+   `tui_gateway.methods_profiles`). This writes `assets/avatar.png` atomically.
+5. Stamp `ui_meta.hermes-bots.imageKind: photo` + `custom: true` (via
+   `profiles.configure` or `profile.yaml`).
+6. Clear cached images in Desktop plugin storage so the roster re-fetches:
+   Chromium LevelDB key `hermes.plugin.hermes-bots.bot-meta-v2` under
+   `~/Library/Application Support/Hermes/Local Storage/leveldb` — delete each
+   entry’s `image` field and set `imageKind: photo`. Backup the Local Storage
+   folder first. (Backfill rasters are exactly **160×160**; real photos are 256.)
+7. Reopen Hermes Desktop. Leave Osaurus art in `osaurus-ready/` for manual use.
 
 Paths and style notes: `profile-map.md` → **Custom photo avatars**.
 

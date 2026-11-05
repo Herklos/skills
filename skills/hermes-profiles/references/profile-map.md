@@ -142,21 +142,22 @@ ui_meta:
 
 ### Custom photo avatars
 
-Desktop can upload; for a fleet install from files:
+Desktop Edit Profile upload is the interactive path. Fleet install from files
+must use **`profiles.set_asset`** (not a bare file copy). See `recipes.md` **5b**.
 
-| Profile | File |
+| Profile | File written by `set_asset` |
 |---------|------|
 | Primary (`default`, display **P**) | `$HERMES_HOME/assets/avatar.png` |
 | Named `<slug>` | `$HERMES_HOME/profiles/<slug>/assets/avatar.png` |
 
-- Target size **256×256 PNG** (Hermes Desktop normalizes uploads to edge 256). Generate larger (≈1024), center-crop square, then `sips -z 256 256`.
-- After writing the PNG, set `ui_meta.hermes-bots.imageKind: photo` and `custom: true` (bump `_ui_meta_revisions.hermes-bots`). Leave section/pin/title alone unless asked.
-- Filename the source as the **Hermes slug** (ASCII). `p.png` → `default`. Reject accents (`théophile` → `theophile`) and misspellings (`sidonnie` → `sidonie`).
-- Install only **Hermes-runtime** Agents. Osaurus (e.g. Foyer) agents are not Hermes homes; keep their art aside for Osaurus/Anytype.
-- Style org default (when regenerating): soft 3D clay / plush, head-and-shoulders, solid soft background; match existing refs on `default` / `etienne` / `micheline`.
-- Bot Mode may need a Desktop roster refresh to show new photos.
-
-Fleet recipe: `recipes.md` → **Install custom Bot Mode avatars**.
+- Target size **256×256 PNG**. Generate larger (≈1024), center-crop square, then resize.
+- Also set `ui_meta.hermes-bots.imageKind: photo` and `custom: true`.
+- Filename source as the **Hermes slug** (ASCII). `p.png` → `default`.
+- **Quit Desktop** before fleet install. Clear cached `image` fields in
+  `hermes.plugin.hermes-bots.bot-meta-v2` (Application Support Local Storage)
+  or Desktop keeps showing old faces / may overwrite disk with 160×160 SVG rasters.
+- Install only **Hermes-runtime** Agents. Osaurus art stays out of Hermes homes.
+- Style org default: soft 3D clay / plush; refs `default` / `etienne` / `micheline`.
 
 ### Description vs roster card subtitle
 
