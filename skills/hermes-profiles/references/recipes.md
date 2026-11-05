@@ -65,6 +65,25 @@ hermes profile describe forge --text "…"
 # display name via rename of default only, or Desktop title field
 ```
 
+## 5b. Install custom Bot Mode avatars
+
+When the user supplies a folder of PNGs named by profile slug (e.g.
+`~/Documents/images/agents/avatars/`):
+
+1. Diff filenames vs `hermes profile list` + live Hermes-runtime Anytype Agents.
+   Fix typos; map `p.png` → profile `default`. Skip Osaurus-only slugs.
+2. Backup existing `assets/avatar.png` under `/tmp/hermes-avatars-backup-…/`.
+3. Center-crop square → resize to **256×256** → write:
+   - `default` → `~/.hermes/assets/avatar.png`
+   - others → `~/.hermes/profiles/<slug>/assets/avatar.png`
+4. In that profile’s `profile.yaml`, set
+   `ui_meta.hermes-bots.imageKind: photo` and `custom: true`
+   (keep `shape: blobatar`; bump `_ui_meta_revisions.hermes-bots`).
+5. Leave Osaurus art in a sibling folder (e.g. `osaurus-ready/`) for manual
+   Osaurus/Anytype icon set. Tell the user Desktop may need a roster refresh.
+
+Paths and style notes: `profile-map.md` → **Custom photo avatars**.
+
 ## 6. Export / import between machines
 
 ```bash
@@ -175,4 +194,4 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Task-specific subagent routes | `delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |
 | Kanban one-liner | `hermes profile describe` |
-| Bot roster avatar/section | Desktop Bot Mode / `ui_meta` |
+| Bot roster avatar/section | `assets/avatar.png` + `ui_meta` (`profile-map.md`; fleet: recipe **5b**) |

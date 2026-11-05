@@ -27,6 +27,7 @@ Bare leftover directories are ignored by `hermes profile list`, gateways, and `-
 | `plugins/` | Profile-local plugins |
 | `mcp-tokens/` | MCP OAuth token cache |
 | `platforms/`, `pairing/` | Messaging adapter / pairing state |
+| `assets/avatar.png` | Custom Bot Mode photo (256×256 PNG); Primary uses `$HERMES_HOME/assets/avatar.png` |
 | `home/` | Tool `HOME` when `terminal.home_mode: profile` |
 | `auth.json` | Profile-local OAuth (else shared from root `$HERMES_HOME/auth.json`) |
 | `logs/`, `sessions/`, `cache/`, `runtime/` | Operational state |
@@ -131,12 +132,31 @@ display_name: Optional presentation label  # default id stays `default`
 ui_meta:
   hermes-bots:
     title: Display title
-    imageKind: shape
+    imageKind: shape   # or photo when assets/avatar.png is a custom image
     shape: blobatar
+    custom: true       # set with imageKind: photo for uploaded/generated art
     sectionId: …
     sectionName: …
     pinned: true
 ```
+
+### Custom photo avatars
+
+Desktop can upload; for a fleet install from files:
+
+| Profile | File |
+|---------|------|
+| Primary (`default`, display **P**) | `$HERMES_HOME/assets/avatar.png` |
+| Named `<slug>` | `$HERMES_HOME/profiles/<slug>/assets/avatar.png` |
+
+- Target size **256×256 PNG** (Hermes Desktop normalizes uploads to edge 256). Generate larger (≈1024), center-crop square, then `sips -z 256 256`.
+- After writing the PNG, set `ui_meta.hermes-bots.imageKind: photo` and `custom: true` (bump `_ui_meta_revisions.hermes-bots`). Leave section/pin/title alone unless asked.
+- Filename the source as the **Hermes slug** (ASCII). `p.png` → `default`. Reject accents (`théophile` → `theophile`) and misspellings (`sidonnie` → `sidonie`).
+- Install only **Hermes-runtime** Agents. Osaurus (e.g. Foyer) agents are not Hermes homes; keep their art aside for Osaurus/Anytype.
+- Style org default (when regenerating): soft 3D clay / plush, head-and-shoulders, solid soft background; match existing refs on `default` / `etienne` / `micheline`.
+- Bot Mode may need a Desktop roster refresh to show new photos.
+
+Fleet recipe: `recipes.md` → **Install custom Bot Mode avatars**.
 
 ### Description vs roster card subtitle
 

@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.33.0
+version: 1.34.0
 license: MIT
 metadata:
   category: agents
@@ -361,6 +361,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Twin of existing:** `create <new> --clone-from <src>` (add `--clone-all` only if needed)
 - **Empty orchestrator:** `create <slug> --no-skills`
 - **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
+- **Fleet Bot Mode avatars:** slug-named PNGs → 256×256 `assets/avatar.png` + `ui_meta` photo/custom (`recipes.md` **5b**, `profile-map.md`)
 - **Messaging:** unique token in that profile `.env` → `gateway start` / `install`
 - **Multi-bot group:** `messaging-groups.md` (tokens + allowlist + mention gates + welcome paste)
 - **Share package:** `export` / `import` or `profile install <git-url>`
