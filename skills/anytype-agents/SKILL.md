@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.42.1
+version: 1.43.1
 license: MIT
 metadata:
   category: agents
@@ -38,7 +38,7 @@ and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
 Hermes apply enables the **langfuse** plugin (`hermes-profiles`
 `anytype-apply.md`). **Most agents use Local parent** (chat = llamacpp `LFM3-1.7B-Q8_0` / effort
 none; approvals = Hermes builtin llamacpp `d1-2b-q4_k_m`; voice stack local
-Whisper + Edge TTS). **lfm3 cannot run on llamacpp.** Spawn routes live on
+Whisper + Edge TTS). Spawn routes live on
 **Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
 profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
 **Foyer** (dedicated Foyer profile, no Subagents) and **CLASQUIN / Arnold**

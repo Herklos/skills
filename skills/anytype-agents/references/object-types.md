@@ -350,8 +350,7 @@ agents inherit. Subagent-only profiles leave `stt_provider` / `tts_provider` as
 | Deep think | same as Coding | same | same | `auto` | none | Subagent `deep` |
 
 Parent Agents usually link **Local parent**. Subagents link specialist stacks.
-**LFM3-1.7B-Q8_0** and **d1** both run on Hermes builtin llamacpp (`local_runtime`); legacy Ollama `lfm3` is retired
-(lfm3 cannot run on llamacpp).
+**LFM3-1.7B-Q8_0** and **d1** both run on Hermes builtin llamacpp (`local_runtime`); legacy Ollama `lfm3` is retired.
 
 **Default template name:** `Harness profile default`. Body: `type-templates.md`.
 
