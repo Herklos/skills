@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.0.0
+version: 1.1.0
 license: MIT
 metadata:
   category: agents
@@ -51,17 +51,16 @@ export OSAURUS_API_KEY=osk-v1-…
 
 | File | When |
 |------|------|
-| `references/cli-map.md` | Serve/status/doctor, config, import, tools, env, paths |
-| `references/config-document.md` | Declarative YAML/JSON shape: agents, delegation, memory, harness_runtimes, secrets |
-| `references/bundles.md` | `osaurus-bundle.json`, agent JSON files, import validate/install/update/remove |
+| `references/cli-map.md` | Full CLI: serve/supervise/launchd, models, config, import, tools, mcp, coord, env, paths |
+| `references/config-document.md` | Declarative YAML/JSON: all sections, agent shape, memory, MCP/providers, delegation, schedules/watchers, sandbox outside document |
+| `references/bundles.md` | `osaurus-bundle.json`, agents/skills/MCP/harness/secrets, import CLI, installer + security checklists |
+| `references/harness-runtimes.md` | Claude Code / Pi runtimes (`agents[].runtime`); not Anytype Runtime type |
+| `references/tools-and-plugins.md` | Native plugins, Auto/Manual tools, remote MCP, ABI, `osaurus tools` / `mcp` / `.mcpb` |
 | `references/anytype-apply.md` | Anytype Agent + Runtime(osaurus) → config document or bundle |
-| `references/recipes.md` | Common create / update / export flows |
-| `references/troubleshooting.md` | CLI missing, queued imports, secrets, high-risk refuse |
+| `references/recipes.md` | Create / update / export / supervise / plugin / Anytype flows |
+| `references/troubleshooting.md` | CLI missing, queued imports, secrets, access key, tools, runtime confusion |
 
-Docs: https://docs.osaurus.ai/cli  
-Config: https://docs.osaurus.ai/configuration  
-Bundles: https://docs.osaurus.ai/bundles  
-Harness runtimes (Claude Code / Pi inside Osaurus): https://docs.osaurus.ai/harness-runtimes
+Docs: https://docs.osaurus.ai/cli · https://docs.osaurus.ai/configuration · https://docs.osaurus.ai/bundles · https://docs.osaurus.ai/harness-runtimes · https://docs.osaurus.ai/tools
 
 ## Mental model
 
@@ -202,6 +201,9 @@ Do not auto-apply from draft/proposed suggestions. Hermes-shaped fields
 - **Ship a pack:** scaffold bundle → Keychain secrets → `import validate` →
   `import install --yes`
 - **Export backup:** `config export -o …` (secrets stripped)
+- **Keepalive serve:** `serve --supervise` (+ LaunchAgent); see `cli-map.md`
+- **Plugin:** `tools search` → `install` → scope agent tools (`tools-and-plugins.md`)
+- **Harness runtime:** Claude Code / Pi via `harness-runtimes.md` + `--yes`
 - **Anytype apply:** `anytype-apply.md` after accepted suggestion or explicit ask
 - **Doctor:** `osaurus doctor --json` when serve/import fails
 

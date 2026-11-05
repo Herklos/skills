@@ -5,7 +5,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.31.0 | Lifecycle and config for Hermes Agent profiles |
-| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.0.0 | Define Osaurus agents via `osaurus config` / bundles |
+| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.1.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.42.0 | Org roster, typed inventory (incl. **Runtime**), Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
@@ -108,9 +108,18 @@ Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)
 
 Define **Osaurus** agents with declarative config (`osaurus config plan|apply`) or Osaurus Bundles (`osaurus import`). Mirrors hermes-profiles for the Osaurus platform: discover with `config export` / `import list`, plan before apply, secrets via `env:` / Keychain refs only.
 
-**References:** `cli-map`, `config-document`, `bundles`, `anytype-apply`, `recipes`, `troubleshooting`.
+**What it covers**
 
-Docs: [CLI](https://docs.osaurus.ai/cli) · [Configuration](https://docs.osaurus.ai/configuration) · [Bundles](https://docs.osaurus.ai/bundles) · Skill: [`skills/osaurus-agents/SKILL.md`](./skills/osaurus-agents/SKILL.md)
+- **CLI map:** serve / supervise / launchd, status, doctor, models (list/show/pull/run/bench), config, import, tools, mcp, coord, env, on-disk paths
+- **Config document:** all declarative sections (agents, delegation, memory, harness_runtimes, MCP/providers, schedules/watchers, …); merge-by-name; `--prune` / `--yes` high-risk
+- **Bundles:** `osaurus-bundle.json`, agents/skills/MCP/harness/settings, Keychain refs, installer + security checklists
+- **Harness runtimes:** Claude Code / Pi inside Osaurus (`agents[].runtime`); distinct from Anytype type `runtime`
+- **Tools & plugins:** native registry plugins, Auto/Manual tool modes, remote MCP, ABI notes, `.mcpb` vs Osaurus Bundle
+- **Anytype apply:** Agent.`runtime` → Runtime(`osaurus`) → config fragment or bundle after accepted suggestion or explicit ask
+
+**References:** `cli-map`, `config-document`, `bundles`, `harness-runtimes`, `tools-and-plugins`, `anytype-apply`, `recipes`, `troubleshooting`.
+
+Docs: [CLI](https://docs.osaurus.ai/cli) · [Configuration](https://docs.osaurus.ai/configuration) · [Bundles](https://docs.osaurus.ai/bundles) · [Harness runtimes](https://docs.osaurus.ai/harness-runtimes) · [Tools](https://docs.osaurus.ai/tools) · Skill: [`skills/osaurus-agents/SKILL.md`](./skills/osaurus-agents/SKILL.md)
 
 ---
 
