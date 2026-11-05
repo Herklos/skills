@@ -168,6 +168,26 @@ hermes -p <slug> config get display.show_reasoning
 Skin ≠ personality. Desktop theme/density live in `$HERMES_HOME/ui-preferences.json`
 (root home), not under `profiles/<slug>/`. See `workspace.md` / `display.md`.
 
+## Bot Mode description empty / card blank / Edit Profile vs subtitle
+
+Three different things: Edit Profile **Description** (`profile.yaml` `description`),
+roster **card subtitle** (last chat preview), and Bot Mode **title** (`ui_meta` /
+`display_name`). Full table: `profile-map.md` → **Description vs roster card subtitle**.
+
+```bash
+hermes profile describe <slug>                 # read; show does NOT print this
+hermes profile describe <slug> --text "…"      # write (description_auto: false)
+# Primary / P: slug is default — never describe P / profiles/p
+hermes profile describe default
+```
+
+- Dialog shows the value but file unchanged → Save was not applied; re-check with
+  `describe` / `profile.yaml` mtime.
+- Description set, card under the name still blank → expected when there is no
+  session preview; description still appears in Edit Profile.
+- Card has role-like text but `describe` says none → that text is chat preview,
+  not `profile.yaml` description.
+
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.

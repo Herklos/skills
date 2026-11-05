@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.25.0
+version: 1.26.0
 license: MIT
 metadata:
   category: agents
@@ -146,6 +146,11 @@ hermes profile describe --all --auto
 ```
 
 Persists in `<profile>/profile.yaml` as `description` / `description_auto`.
+`hermes profile show` does not print it. Desktop Edit Profile Description is this
+same field (Save → `profile describe <bot.name> --text`); Primary uses slug
+`default`, not display title `P`. The Bot Mode roster **card subtitle** is the
+last chat preview, not `description` — see `profile-map.md` → **Description vs
+roster card subtitle** and `troubleshooting.md`.
 
 ### Use / show / rename / alias
 

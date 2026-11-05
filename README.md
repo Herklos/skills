@@ -4,7 +4,7 @@ Two companion skills for running a multi-agent org: **Anytype** as the org sourc
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.25.0 | Lifecycle and config for Hermes Agent profiles |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.26.0 | Lifecycle and config for Hermes Agent profiles |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.35.0 | Org roster, typed inventory, Prompts, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
@@ -25,7 +25,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Browser and computer**: default computer is **Cua Spaces** (`terminal.backend: cua`); Anytype per-HQ Computer/Browser pairs decline into a stable HQ Space + Chromium in that Space; host desktop and Linux Bot Screen as exceptions
 - **Tools and limits**: toolsets, approvals, terminal backend, output/turn/compression caps
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
-- **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs
+- **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs; Bot Mode Edit Profile Description vs roster card chat preview (`profile-map.md`)
 - **Voice**: mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord voice channel. Defaults: local Whisper + Edge TTS
 - **Cron**: scheduled jobs and Bot routines per profile; Anytype Agenda → Hermes bind when asked
 - **Messaging groups**: multi-bot Telegram/Discord rooms from Anytype typed Group

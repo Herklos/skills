@@ -127,6 +127,7 @@ hermes -p <slug> gateway start|stop|restart|install
 ```yaml
 description: Optional kanban role blurb
 description_auto: false
+display_name: Optional presentation label  # default id stays `default`
 ui_meta:
   hermes-bots:
     title: Display title
@@ -136,6 +137,22 @@ ui_meta:
     sectionName: …
     pinned: true
 ```
+
+### Description vs roster card subtitle
+
+Three different fields are easy to confuse:
+
+| Surface | Source | Set / verify |
+|---------|--------|----------------|
+| Edit Profile **Description** | Top-level `profile.yaml` `description` | `hermes profile describe <slug> [--text …]`; Desktop Edit Profile Save |
+| Bot Mode **card subtitle** under the name | Last / canonical session **chat preview** (`last_session` / `canonical_session`), not `description` | Chat with the bot; empty preview → empty subtitle even when description is set |
+| Bot Mode **title** | `ui_meta.hermes-bots.title` (and often `display_name`) | Desktop Edit Profile title / pin / section |
+
+- `hermes profile show` does **not** print `description`. Use `hermes profile describe <slug>`.
+- Desktop Edit Profile seeds and saves description via roster `bot.description` → `cli.exec` `profile describe <bot.name> --text …`. For Primary, `bot.name` is **`default`** (never the display title `P`). `hermes profile describe P` fails; there is no `profiles/p`.
+- Confirm a UI save hit disk: `hermes profile describe <slug>` or read `<home>/profile.yaml` (`description` / `description_auto: false`). Typing in the dialog without Save leaves the file unchanged.
+- A bot can show a rich card subtitle with **no** `profile.yaml` description (preview from chat). A bot can have a full description and a **blank** card subtitle (no preview yet).
+- Gateway `profiles.list` returns `description` from `profile.yaml` (needs Hermes YAML/`ruamel` in the gateway process). Ad-hoc system Python without that stack may report empty meta; trust `hermes profile describe` / the running gateway.
 
 ## Doc links
 

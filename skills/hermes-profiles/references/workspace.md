@@ -102,8 +102,11 @@ hermes -p <slug> config set desktop.repo_scan_enabled true
 | Field | Role |
 |-------|------|
 | `display_name` | Presentation label (`hermes profile rename default <Name>` only renames presentation for default) |
-| `description` | Kanban / routing blurb (`hermes profile describe`) |
+| `description` | Kanban / Edit Profile Description (`hermes profile describe`); **not** the roster card subtitle |
 | `ui_meta.hermes-bots` | Bot Mode roster title, avatar, section (leave to Desktop unless asked) |
+
+Roster card subtitle under the name is last/canonical **chat preview**, separate
+from `description`. Details: `profile-map.md` → **Description vs roster card subtitle**.
 
 ## Git worktrees (brief)
 

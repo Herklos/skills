@@ -67,11 +67,13 @@ After apply, write back `hermes_profile` on the Agent if it was empty.
    `$HERMES_HOME/skills/org/<skill_key>/SKILL.md` (+ optional `skills/org/DESCRIPTION.md`).
    Do **not** wipe Hermes builtins (~50). Keep Anytype as procedure SoT; Hermes
    copy is the runnable router for chat/cron. Put Anytype object id in metadata.
-10. **Describe** (kanban / orchestrator routing blurb in `profile.yaml`):
+10. **Describe** (kanban / Edit Profile Description in `profile.yaml`):
    `hermes profile describe <slug> --text "<Agent.short_description>"`.
    Verify with `hermes profile describe <slug>` (plain `profile show` does **not**
    print description). For Primary (`default`), also set presentation name:
-   `hermes profile rename default P` → `display_name: P` (id stays `default`).
+   `hermes profile rename default P` → `display_name: P` (id stays `default`;
+   never `describe P` / `profiles/p`). Bot Mode **card subtitle** is chat
+   preview, not this field (`profile-map.md` → Description vs roster card subtitle).
 11. **Voice** align Agent modes even when off: `voice.auto_tts` ←
     `voice_auto_tts`; `voice.voice_chat_mode` ← `voice_chat_mode` (usually `off`).
     Only enable STT/TTS stack when `voice_enabled`. There is **no** `voice.enabled`.
