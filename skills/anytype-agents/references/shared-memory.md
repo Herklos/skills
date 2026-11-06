@@ -71,7 +71,10 @@ when Shared Rules version changes).
 Schedule `daily-memory-capture` (owner: the Memory Keeper, `0 5 * * *`
 Europe/Paris, draft + paused until roster confirm). Pre-check (no change = one
 log line), read Exclusions + tombstones, promote new Log facts, merge by topic,
-report drift, one Log. Simple work: the Memory Keeper. Real decisions (conflict,
+report drift, one Log. Simple work: the Memory Keeper (Agent `autonomy=change-with-gates`: may create
+atomic memories and Learnings, never edit others' memories unapproved; her system
+Prompt carries a "Memory layers" section and Primary's carries "Memory and
+Learnings"; other agents inherit via the Shared Rules pointer). Real decisions (conflict,
 superseding a human decision, rules / prompts / roster, personal data, forget):
 escalate to Primary as a `suggestion`.
 
