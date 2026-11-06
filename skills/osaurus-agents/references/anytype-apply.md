@@ -102,17 +102,23 @@ Anytype **Team** / **Group** do not become Osaurus entities of the same name.
 | Messaging Group (Telegram/Signal/…) | Channel allowlists under `channels`. Signal may be absent from the export surface (Discord/Slack/Telegram/iMessage/WhatsApp). Keep Signal traffic on Hermes until a supported channel exists |
 | Group without chat id | Document gap; skip channel writes |
 
-### Osaurus Workspaces (built-in team feature)
+### Osaurus Workspaces ≠ local org teams
 
-Osaurus **does** have a first-class team construct: **Workspaces**
-(Settings → Workspaces; docs.osaurus.ai/workspaces). They are for **people**
-sharing agents and a credit pool via Osaurus Router (roles Owner/Admin/Member/Viewer,
-shared agents as `Name@Workspace`, `delegation.spawnable_workspace_agents`,
-`workspace_auto_join`). They are **not** an Anytype Team/Subteam mirror.
+**Workspaces** (Settings → Workspaces; docs.osaurus.ai/workspaces) are a
+**multi-human** product: other Osaurus users join via invite, share agents over
+Router/relay, and spend a shared credit pool (roles Owner/Admin/Member/Viewer;
+shared agents addressed as `Name@Workspace`; Stripe/trial billing). They are
+for collaborating with *people*, not for modeling your local agent org.
 
-Do not invent one Workspace per Anytype HQ. Map org hierarchy with agents +
-chief `subagents` as above; use Workspaces only when the user wants multi-human
-sharing / pool billing.
+| Need | Use |
+|------|-----|
+| Local HQ / Subteam / messaging Group (Anytype) | Named agents + chief `subagents` + `delegation.spawnable_agents` + `channels` (above) |
+| Share an agent with another human's Osaurus | Create/join a **Workspace**, then share the agent |
+
+Do **not** create one Workspace per Anytype Team, Subteam, or Group. That path
+hits Router trial limits and monthly billing, and still does not recreate
+Anytype hierarchy. Only open a Workspace when the user explicitly wants
+multi-human sharing / pool billing.
 
 ## Avatars (post-apply; outside config document)
 

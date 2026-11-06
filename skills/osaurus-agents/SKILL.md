@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.5.1
+version: 1.5.2
 license: MIT
 metadata:
   category: agents
@@ -76,7 +76,7 @@ Docs: https://docs.osaurus.ai/cli · https://docs.osaurus.ai/configuration · ht
 | Harness runtime | Osaurus-internal: run chats on Claude Code / Pi (`agents[].runtime`). **Not** the Anytype `runtime` type |
 | Anytype Runtime | Catalog where the org agent runs: `grok-bot` \| `hermes` \| `osaurus` \| `noodle` |
 | Orchestrator | Default Osaurus agent; can spawn listed subagents |
-| Workspace | Built-in multi-human team (shared agents, credit pool); not an Anytype Team |
+| Workspace | Multi-**human** share (Router invite, credit pool); **not** a local Team/Subteam/Group |
 | Secrets | Never in documents; use `env:VAR` or `keychain:SERVICE/ACCOUNT`; sandbox keys in `ai.osaurus.agent-secrets` |
 | Custom avatar | `~/.osaurus/agents/avatars/{UUID}.png` + JSON `customAvatarFilename` (outside config YAML) |
 
@@ -177,7 +177,8 @@ Full layout: `references/bundles.md`.
 | Models download | `osaurus pull <hf-id>` then `osaurus list` |
 | Avatar | Outside config: `~/.osaurus/agents/avatars/{UUID}.png` + JSON `customAvatarFilename` |
 | Sandbox secrets | Keychain `ai.osaurus.agent-secrets` / `{UUID}.{KEY}` |
-| Human teams | Workspaces (Settings), not Anytype Team objects |
+| Share with other humans | Workspaces (Settings → Workspaces; Router/billing) |
+| Local org HQ / Subteam / Group | Agents + chief `subagents` + `channels` (not Workspaces) |
 
 ## Anytype → Osaurus
 
@@ -202,9 +203,10 @@ Do not auto-apply from draft/proposed suggestions. Hermes-shaped fields
 (`hermes_profile`, Cua pair, langfuse, Chrome `real_profile_pin`) do not map 1:1;
 translate deliberately.
 
-**Teams:** Anytype Team/Subteam → agents + chief subagents. Osaurus **Workspaces**
-are the built-in multi-human team feature (shared agents, credit pool); they are
-not an Anytype HQ mirror (docs.osaurus.ai/workspaces).
+**Local teams:** Anytype Team/Subteam/Group → agents + chief `subagents` +
+`channels`. **Workspaces** are only for sharing with other Osaurus users
+(Router); never mint one Workspace per Anytype HQ/Subteam/Group
+(`anytype-apply.md`).
 
 ## Org defaults (always on apply)
 
