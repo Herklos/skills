@@ -943,13 +943,16 @@ Discord. Do not apply until the user asks.
 
 | Key | Format | Notes |
 |-----|--------|-------|
-| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `fact` \| `preference` \| `profile` \| `exclusion` \| `other` (featured). Atomic decisions use `memory_decisions` |
+| `memory_kind` | select | `memory_decisions` \| `lessons` \| `resources` \| `operating_notes` \| `playbook` \| `fact` \| `preference` \| `profile` \| `exclusion` \| `learning` \| `other` (featured). Atomic decisions use `memory_decisions`; Learnings are a kind, not a type (`shared-memory.md`) |
 | `memory_scope` | select | `agent` \| `hq` \| `org` \| `human` (featured). `human` = owned by the human, no `owner_agent` |
 | `topic` | text | One topic per atomic memory; search it before creating (dedupe / merge) (featured) |
 | `observed_at` | date | When the fact was observed or decided (featured) |
 | `source_agent` | objects | Agent that produced the fact |
 | `source_url` | url | Source link |
 | `supersedes` | objects | Memory this one replaces |
+| `derived_from` | objects | Learning provenance: source Memories / Logs |
+| `applies_to` | objects | Learning scope: Agent / Team / Subteam |
+| `confidence` | select | Learning only: `low` \| `medium` \| `high` |
 | `lifecycle` | select | Shared `draft` \| `live` \| `archived` (featured) |
 | `owner_agent` | objects | Owning Agent (featured; empty when `memory_scope=human`) |
 | `owner_team` | objects | Optional |
