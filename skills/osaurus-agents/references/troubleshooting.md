@@ -36,17 +36,22 @@ Keychain item missing `-T /Applications/Osaurus.app`. Re-store with `-T`, then
 ## Bulk agent sandbox secrets hang / incomplete
 
 Per-agent secrets use Keychain service `ai.osaurus.agent-secrets`, account
-`{UUID}.{KEY}`. Bulk `security add-generic-password` can block on Allow dialogs.
-Use a short per-item timeout, click Allow once, re-run, and verify counts with
-`find-generic-password` (metadata only). HTTP `/v1/agents/{id}/secrets` may
-return `secure_channel_required`; prefer Keychain for local seeding.
+`{UUID}.{KEY}` (UUID as in `~/.osaurus/agents/{UUID}.json`). Use inline
+`security add-generic-password -U -s ai.osaurus.agent-secrets -a "$UUID.$KEY"
+-T /Applications/Osaurus.app -w "$VALUE"` wrapped in `/usr/bin/timeout 8`.
+Bulk loops can block on Allow dialogs: click Allow once, re-run, verify with
+`find-generic-password` (metadata only; never dump `-w` to logs). Skip accounts
+that already exist. HTTP `/v1/agents/{id}/secrets` may return
+`secure_channel_required`; prefer Keychain for local seeding. Full recipe:
+`anytype-apply.md` → Sandbox secrets.
 
 ## Avatars missing after config apply
 
-Avatars are outside the declarative document. Write
-`~/.osaurus/agents/avatars/{UUID}.png` and set `customAvatarFilename` on the
-agent JSON (or use General → Appearance). Reload Agents / restart Osaurus so
-the running store sees the field. See `anytype-apply.md` → Avatars.
+Avatars are outside the declarative document. Filename must be `{agentUUID}.png`
+under `~/.osaurus/agents/avatars/`, with matching `customAvatarFilename` on that
+agent’s JSON (clear mascot `avatar`). Patching JSON while Osaurus is running
+needs an **Agents reload or app restart** before portraits appear. UI fallback:
+General → Appearance. See `anytype-apply.md` → Avatars.
 
 ## Apply refused (risks)
 

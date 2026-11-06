@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.5.0
+version: 1.5.1
 license: MIT
 metadata:
   category: agents
@@ -76,7 +76,9 @@ Docs: https://docs.osaurus.ai/cli · https://docs.osaurus.ai/configuration · ht
 | Harness runtime | Osaurus-internal: run chats on Claude Code / Pi (`agents[].runtime`). **Not** the Anytype `runtime` type |
 | Anytype Runtime | Catalog where the org agent runs: `grok-bot` \| `hermes` \| `osaurus` \| `noodle` |
 | Orchestrator | Default Osaurus agent; can spawn listed subagents |
-| Secrets | Never in documents; use `env:VAR` or `keychain:SERVICE/ACCOUNT` |
+| Workspace | Built-in multi-human team (shared agents, credit pool); not an Anytype Team |
+| Secrets | Never in documents; use `env:VAR` or `keychain:SERVICE/ACCOUNT`; sandbox keys in `ai.osaurus.agent-secrets` |
+| Custom avatar | `~/.osaurus/agents/avatars/{UUID}.png` + JSON `customAvatarFilename` (outside config YAML) |
 
 Do not confuse **Anytype `runtime`** (platform: hermes/osaurus/…) with **Osaurus
 `agents[].runtime`** (builtin / Claude Code / Pi).
@@ -311,5 +313,8 @@ Details: `anytype-apply.md`, `recipes.md`, `config-document.md`.
 2. `config export` or `import list` (discover current state)
 3. Choose config document vs bundle
 4. `plan` / `validate`, then `apply` / `install` with `--yes` only when needed
-5. Verify in app (Agents list) or re-export
-6. On failure, `troubleshooting.md`
+5. Org apply extras: two-pass chief `subagents`; Keychain sandbox secrets; avatars
+   under `agents/avatars/` then reload Agents / restart app
+6. Verify in app (Agents list) or re-export; leave Anytype `Agent.runtime` alone
+   unless asked to migrate
+7. On failure, `troubleshooting.md`

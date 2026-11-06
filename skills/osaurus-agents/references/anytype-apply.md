@@ -117,31 +117,48 @@ sharing / pool billing.
 ## Avatars (post-apply; outside config document)
 
 Declarative `config plan|apply` and bundle agent JSON have **no** avatar field.
-The app stores:
+App equivalent of `AgentStore.writeCustomAvatar` / `setCustomAvatar`:
 
-- File: `~/.osaurus/agents/avatars/{agentUUID}.png` (or `.jpg`)
-- Agent record: `customAvatarFilename: "{agentUUID}.png"` (clears mascot `avatar`)
+1. Read each custom agent’s `id` (UUID) from `~/.osaurus/agents/{UUID}.json`.
+2. Write a **256×256** (or similar) PNG to
+   `~/.osaurus/agents/avatars/{UUID}.png`. Filename **must** be the agent UUID
+   plus extension (not the display-name slug).
+3. Patch that agent JSON: set `customAvatarFilename: "{UUID}.png"` and clear
+   mascot `avatar` (`null` or omit). `Agent` is `Codable`; the field round-trips
+   on the next app save.
+4. **Reload Agents or restart Osaurus.** Patching JSON while the app is running
+   does not refresh the in-memory store; UI keeps monograms until reload.
 
-Source portraits: `/Users/user/Documents/images/agents/avatars/{slug}.png`
-(ASCII slug; accents stripped). Overrides: `P` → `p.png`, `Clotilde` →
-`clothilde.png`; prefer `osaurus-ready/*-256.png` when present. Skip agents with
-no source (e.g. utility **Anytype**). After writing files + JSON, reload the
-Agents list (or restart Osaurus) so the in-memory store picks up
-`customAvatarFilename`. UI path: agent → General → Appearance.
+Map portrait **sources** by short-name slug (NFD, strip accents, lower-case) from
+the local avatar library (this machine: Documents `images/agents/avatars/`, with
+optional `osaurus-ready/*-256.png`). Known filename quirks: `P` → `p.png`,
+`Clotilde` → `clothilde.png`. Skip agents with no source (utility bots such as
+**Anytype**). UI path: agent → General → Appearance.
 
 ## Sandbox secrets (Anytype API and similar)
 
 Per-agent sandbox env comes from Keychain service `ai.osaurus.agent-secrets`,
-account `{UUID}.ANYTYPE_API_KEY` / `{UUID}.ANYTYPE_API_HOST` (uppercase UUID).
-Prefer `-T /Applications/Osaurus.app`. Shared installer item
+account `{UUID}.ANYTYPE_API_KEY` / `{UUID}.ANYTYPE_API_HOST` (use the UUID string
+exactly as in the agent JSON, typically uppercase). Prefer
+`-T /Applications/Osaurus.app`. Shared installer item
 `com.herklos.anytype-api` / `ANYTYPE_API_KEY` is optional convenience; sandboxes
-read the per-agent accounts.
+read the **per-agent** accounts.
 
-Bulk `security add-generic-password` often stalls on macOS Allow prompts. Seed
-with a short per-item timeout, verify coverage via
-`security find-generic-password` metadata (do not dump values), and finish after
-Allow. Loopback `GET/PUT /v1/agents/{id}/secrets` may require the secure channel
-(`secure_channel_required`); Keychain seeding is the reliable local path.
+Verified seed (inline `-w`; do not print values):
+
+```bash
+# value from Hermes .env / shared Keychain — never echo
+/usr/bin/timeout 8 security add-generic-password -U \
+  -s ai.osaurus.agent-secrets \
+  -a "${AGENT_UUID}.ANYTYPE_API_KEY" \
+  -T /Applications/Osaurus.app \
+  -w "$ANYTYPE_API_KEY"
+```
+
+Bulk loops often stall on macOS Allow prompts: short per-item timeout, click
+Allow once, re-run, verify with `security find-generic-password -s … -a …`
+(metadata only). Loopback `GET/PUT /v1/agents/{id}/secrets` may return
+`secure_channel_required`; Keychain seeding is the reliable local path.
 
 ## Stub merge-by-name
 
@@ -187,3 +204,5 @@ the user asked to delete unlisted ones.
 - Leave `orchestrator_spawnable: false` unless the Orchestrator should spawn it.
 - Mark related Anytype `suggestion` as `done` after a successful apply when tracking one.
 - Browser Use grants need `--yes`. Computer Use is a separate grant; Cua ≠ Computer Use.
+- Creating/updating Osaurus agents for testing does **not** change Anytype
+  `Agent.runtime` unless the user explicitly asks to migrate the catalog runtime.

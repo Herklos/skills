@@ -5,7 +5,7 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.46.0 | Lifecycle and config for Hermes Agent profiles (v0.23 hearth gateway, Bot Mode HQ sidebar sections, groups.context routing, plugins/curator) |
-| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.5.0 | Define Osaurus agents via `osaurus config` / bundles / tools (avatars, Workspaces, two-pass chiefs, sandbox secrets) |
+| [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.5.1 | Define Osaurus agents via `osaurus config` / bundles / tools (avatars, Workspaces, two-pass chiefs, sandbox secrets) |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.59.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Group purpose/notes/routing, Prompts, atomic Memories, versioned Shared Rules, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
