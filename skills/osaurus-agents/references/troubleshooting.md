@@ -33,6 +33,21 @@ Check `osaurus import list --json` and `~/.osaurus/import/results/`.
 Keychain item missing `-T /Applications/Osaurus.app`. Re-store with `-T`, then
 `osaurus import update --from <bundle> --yes`.
 
+## Bulk agent sandbox secrets hang / incomplete
+
+Per-agent secrets use Keychain service `ai.osaurus.agent-secrets`, account
+`{UUID}.{KEY}`. Bulk `security add-generic-password` can block on Allow dialogs.
+Use a short per-item timeout, click Allow once, re-run, and verify counts with
+`find-generic-password` (metadata only). HTTP `/v1/agents/{id}/secrets` may
+return `secure_channel_required`; prefer Keychain for local seeding.
+
+## Avatars missing after config apply
+
+Avatars are outside the declarative document. Write
+`~/.osaurus/agents/avatars/{UUID}.png` and set `customAvatarFilename` on the
+agent JSON (or use General → Appearance). Reload Agents / restart Osaurus so
+the running store sees the field. See `anytype-apply.md` → Avatars.
+
 ## Apply refused (risks)
 
 Review `plan` / validate `risks`, then pass `--yes` only after user confirmation.

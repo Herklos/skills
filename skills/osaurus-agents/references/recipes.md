@@ -79,10 +79,15 @@ Example pattern (Foyer-style): Sidonie chief, Philippe / Blanche / Bob specialis
    - `schedules:` for each live Agenda item (cron from `schedule_expr`)
    - leave `computer_use_enabled: false` when Anytype computer is Cua Spaces
 4. `config plan` → `apply --yes` if browser/channel high-risk lines appear.
-5. Report gaps: empty Group chat ids, Signal (if unsupported), voice Settings,
-   missing local model id, skills allow-lists, channel `inbound_agent` mapping.
+5. **Two-pass:** if chiefs applied before specialists existed, re-apply chief
+   `subagents` + `delegation.spawnable_agents` only.
+6. Seed `ai.osaurus.agent-secrets` (`{UUID}.ANYTYPE_API_KEY` / `_HOST`) and
+   custom avatars under `~/.osaurus/agents/avatars/` (`anytype-apply.md`).
+7. Report gaps: empty Group chat ids, Signal (if unsupported), voice Settings,
+   missing local model id, skills allow-lists, channel `inbound_agent` mapping,
+   agents still on monogram (no portrait source).
 
-Full Team/Group / schedule / model rules: `anytype-apply.md`.
+Full Team/Group / Workspaces / schedule / model / avatar rules: `anytype-apply.md`.
 
 ## Serve + supervise (keep-alive)
 

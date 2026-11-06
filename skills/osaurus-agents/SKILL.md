@@ -7,7 +7,7 @@ description: >
   does for Hermes. Use when the user mentions Osaurus agents, osaurus config,
   osaurus import, osaurus-bundle, or Anytype Runtime kind osaurus. Use when the
   user runs /osaurus-agents.
-version: 1.4.0
+version: 1.5.0
 license: MIT
 metadata:
   category: agents
@@ -173,6 +173,9 @@ Full layout: `references/bundles.md`.
 | Memory | top-level `memory:` or Settings → Memory |
 | Plugins | `osaurus tools install\|list\|upgrade` (outside config document) |
 | Models download | `osaurus pull <hf-id>` then `osaurus list` |
+| Avatar | Outside config: `~/.osaurus/agents/avatars/{UUID}.png` + JSON `customAvatarFilename` |
+| Sandbox secrets | Keychain `ai.osaurus.agent-secrets` / `{UUID}.{KEY}` |
+| Human teams | Workspaces (Settings), not Anytype Team objects |
 
 ## Anytype → Osaurus
 
@@ -186,12 +189,20 @@ Full layout: `references/bundles.md`.
    for live Agenda items (`anytype-apply.md`). Match agents by short **name**.
 4. `config plan` or `import validate`, then apply/install only when the user asks
    (`--yes` when browser/channel high-risk).
-5. Report gaps: voice (Settings UI), empty Group chat ids, Signal if unsupported,
-   Cua Spaces ≠ Computer Use, model id missing on host, skills allow-lists.
+5. Report gaps: voice (Settings UI), avatars (post-apply files / Appearance),
+   empty Group chat ids, Signal if unsupported, Cua Spaces ≠ Computer Use,
+   model id missing on host, skills allow-lists, sandbox secrets Keychain.
+6. After agents exist: re-apply chief `subagents` if needed; seed
+   `ai.osaurus.agent-secrets`; write `agents/avatars/{UUID}.png` +
+   `customAvatarFilename` (`anytype-apply.md`).
 
 Do not auto-apply from draft/proposed suggestions. Hermes-shaped fields
 (`hermes_profile`, Cua pair, langfuse, Chrome `real_profile_pin`) do not map 1:1;
 translate deliberately.
+
+**Teams:** Anytype Team/Subteam → agents + chief subagents. Osaurus **Workspaces**
+are the built-in multi-human team feature (shared agents, credit pool); they are
+not an Anytype HQ mirror (docs.osaurus.ai/workspaces).
 
 ## Org defaults (always on apply)
 

@@ -37,9 +37,11 @@ explicit user ask), same gate as hermes-profiles.
 | `browser` / org defaults | Apply **org capability defaults** (below). Browser Use is high-risk (`--yes`) when newly granting |
 | `computer` / `computer_surface: cua-spaces` | **Do not** auto-enable `computer_use_enabled`. Cua Spaces ≠ Osaurus Computer Use. Leave false unless the user wants native Osaurus Computer Use |
 | `voice_enabled` / TTS / STT | **Not** in the declarative config document (Settings → Voice). Report as `needs_user_action` |
+| Agent portrait / `avatar` files | **Not** in declarative config. Post-apply: write `~/.osaurus/agents/avatars/{UUID}.png` and set agent JSON `customAvatarFilename: "{UUID}.png"` (clear mascot `avatar`). Or Settings → agent → General → Appearance. See Avatars below |
 | Skills Query / skill keys | `agents[].skills` allow-list + bundle `skills/` (omit = leave unchanged) |
 | Tool profile | `agents[].tools` manual list / plugins / mcp_servers |
 | Working directory | App working folder or bundle `working_folder` (may `needs_user_action`) |
+| Sandbox API keys (e.g. Anytype) | Keychain service `ai.osaurus.agent-secrets`, account `{agentUUID}.{KEY}` (and `{UUID}.ANYTYPE_API_HOST`). Not in YAML. See Secrets below |
 | `hermes_profile`, langfuse, Chrome `real_profile_pin` | Hermes-only; do not map without an explicit approved translation |
 
 ## Org capability defaults (always)
@@ -100,6 +102,47 @@ Anytype **Team** / **Group** do not become Osaurus entities of the same name.
 | Messaging Group (Telegram/Signal/…) | Channel allowlists under `channels`. Signal may be absent from the export surface (Discord/Slack/Telegram/iMessage/WhatsApp). Keep Signal traffic on Hermes until a supported channel exists |
 | Group without chat id | Document gap; skip channel writes |
 
+### Osaurus Workspaces (built-in team feature)
+
+Osaurus **does** have a first-class team construct: **Workspaces**
+(Settings → Workspaces; docs.osaurus.ai/workspaces). They are for **people**
+sharing agents and a credit pool via Osaurus Router (roles Owner/Admin/Member/Viewer,
+shared agents as `Name@Workspace`, `delegation.spawnable_workspace_agents`,
+`workspace_auto_join`). They are **not** an Anytype Team/Subteam mirror.
+
+Do not invent one Workspace per Anytype HQ. Map org hierarchy with agents +
+chief `subagents` as above; use Workspaces only when the user wants multi-human
+sharing / pool billing.
+
+## Avatars (post-apply; outside config document)
+
+Declarative `config plan|apply` and bundle agent JSON have **no** avatar field.
+The app stores:
+
+- File: `~/.osaurus/agents/avatars/{agentUUID}.png` (or `.jpg`)
+- Agent record: `customAvatarFilename: "{agentUUID}.png"` (clears mascot `avatar`)
+
+Source portraits: `/Users/user/Documents/images/agents/avatars/{slug}.png`
+(ASCII slug; accents stripped). Overrides: `P` → `p.png`, `Clotilde` →
+`clothilde.png`; prefer `osaurus-ready/*-256.png` when present. Skip agents with
+no source (e.g. utility **Anytype**). After writing files + JSON, reload the
+Agents list (or restart Osaurus) so the in-memory store picks up
+`customAvatarFilename`. UI path: agent → General → Appearance.
+
+## Sandbox secrets (Anytype API and similar)
+
+Per-agent sandbox env comes from Keychain service `ai.osaurus.agent-secrets`,
+account `{UUID}.ANYTYPE_API_KEY` / `{UUID}.ANYTYPE_API_HOST` (uppercase UUID).
+Prefer `-T /Applications/Osaurus.app`. Shared installer item
+`com.herklos.anytype-api` / `ANYTYPE_API_KEY` is optional convenience; sandboxes
+read the per-agent accounts.
+
+Bulk `security add-generic-password` often stalls on macOS Allow prompts. Seed
+with a short per-item timeout, verify coverage via
+`security find-generic-password` metadata (do not dump values), and finish after
+Allow. Loopback `GET/PUT /v1/agents/{id}/secrets` may require the secure channel
+(`secure_channel_required`); Keychain seeding is the reliable local path.
+
 ## Stub merge-by-name
 
 UI-created agents often ship with a generic “friendly everyday assistant”
@@ -119,9 +162,14 @@ the user asked to delete unlisted ones.
 5. `osaurus config plan /tmp/osaurus-desired.yaml`
 6. Confirm high-risk lines (browser, channel writes, prune); then
    `osaurus config apply …` (+ `--yes` when required).
-7. Re-export; verify prompt length / `subagents` / capabilities. Report exit
-   code `3` gaps and channel/voice/skills leftovers.
-8. Optionally note apply time on Agent.`notes` / a Log (no secret values).
+7. **Two-pass chiefs:** create/update all agents first; if chiefs were applied
+   before their reports existed, `subagents.agents` may stay empty. Re-apply a
+   fragment that only patches chiefs' `subagents` (+ `delegation.spawnable_agents`)
+   after every specialist name exists.
+8. Seed sandbox secrets + custom avatars (outside YAML; see sections above).
+9. Re-export; verify prompt length / `subagents` / capabilities. Report exit
+   code `3` gaps and channel/voice/avatar/skills leftovers.
+10. Optionally note apply time on Agent.`notes` / a Log (no secret values).
 
 ## Ordered apply (bundle)
 
