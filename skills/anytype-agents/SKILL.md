@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.57.0
+version: 1.58.0
 license: MIT
 metadata:
   category: agents
@@ -109,7 +109,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | Suggestion | Typed `suggestion` object: improvement feedback (model/subagent/skill/harness/…); indexes via `suggestions_page` (`suggestions.md`) |
 | Schedule | Typed `schedule` object: recurring / oneshot / event job; Agenda indexes are Queries via `agenda_page` |
 | Agenda | Query of Schedules filtered by `owner_agent` (Calendar on `next_run`; no Agenda type) |
-| Group | Typed `group` object: messaging roster + `welcome_prompt` → Prompt + platform fields; Agent/Team/Subteam link via `messaging_group`. Org default platform = Hermes Bot Mode hosted room (`platform_chat_id` = Hermes `room_id`). Not auto-synced |
+| Group | Typed `group` object: messaging roster + `welcome_prompt` → Prompt + platform fields; Agent/Team/Subteam link via `messaging_group`. Org default platform = Hermes Bot Mode hosted room (`platform_chat_id` = Hermes `room_id`). Not auto-synced. **Desktop Bot Mode sidebar folders** (Board / Engineering / …) are Hermes-local (`hermes-profiles` `bot-mode-sections.md`); keep Group.`parent_team` on the owning HQ so the Desktop map matches — there is no Anytype “section” property |
 | Shared Rules | Mandatory rules every agent must follow (type `prompt`, `prompt_kind=shared_rules`) |
 | Skills | Typed procedures + owner Queries; resolve most-specific first: Agent → Subteam → Team → Project → Global |
 | Drafts | Agent designs not live until approved (often type `prompt` with `prompt_kind=draft`) |
@@ -439,7 +439,7 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New Schedule:** create `schedule` with `owner_agent` + `schedule_key` → appears on Agenda Query → optional Calendar on `next_run` → Hermes apply via `cron.md` when asked
 - **New Suggestion:** create `suggestion` with `owner_agent` + kind/status → appears on Suggestions Query / Inbox → approve agent+chief (P org-wide); no Hermes auto-apply (`suggestions.md`)
 - **New HQ:** create `team` (`kind: HQ`) → create Standing instructions Prompt + Team.`standing_instructions` (`hq-standing-instructions.md`) → create `{HQ} – Subteams` Query + Team.`subteams_page` → create HQ Computer + Browser pair (`hq-runtime-pair.md`) → create live Cua Space + set Computer.`cua_space` (`cua-hq-spaces.md`) → link both on the HQ → slim body (Subteams Query + Standing pointer) → link Agents → create/update typed **Group** + welcome Prompt (`prompts.md` / `handoff-templates.md`)
-- **New Group:** prefer join HQ/domain Group first; mint `group` + welcome Prompt only for a new HQ or distinct domain room → set `members` / `hermes_profiles` / `platform=hermes` → link Agent/HQ `messaging_group` → welcome rewrite → Hermes Bot Mode room via `messaging-groups.md` when asked
+- **New Group:** prefer join HQ/domain Group first; mint `group` + welcome Prompt only for a new HQ or distinct domain room → set `members` / `hermes_profiles` / `platform=hermes` → link Agent/HQ `messaging_group` → welcome rewrite → Hermes Bot Mode room via `messaging-groups.md` when asked → file the room under the HQ Desktop sidebar section via `bot-mode-sections.md` when asked (Anytype stays on `parent_team` only)
 - **Fleet messaging + deferred delegation:** when user asks to apply for agents that use Groups/Subagents but Hermes is still incomplete → hermes-profiles `anytype-apply.md` Fleet apply (Bot Mode `groups.create` + `platform_chat_id` writeback; `model_map` for Subagent parents; skip `profile_routes` strong-fit; no invented Telegram ids)
 - **Missing messaging_group:** live Agents without a Group → add to HQ Group members + hermes_profiles + Agent.`messaging_group` + welcome rewrite (Eng pattern: Clovis/Denise/Joachim → Engineering Group)
 - **New Subteam:** create `subteam` with `parent_team` → link parent HQ's Computer + Browser pair → link HQ map → optional member agents

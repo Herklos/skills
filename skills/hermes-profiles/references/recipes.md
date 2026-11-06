@@ -56,14 +56,20 @@ hermes profile describe scout --text "Researches topics and writes cited notes."
 hermes profile describe --all --auto   # fill missing only
 ```
 
-## 5. Point Bot Mode section (optional)
+## 5. Point Bot Mode sidebar section
 
-Leave `ui_meta` to Desktop unless asked. For CLI-only identity:
+Full playbook: **`bot-mode-sections.md`**. Org default: one section per HQ /
+Board; file bots via `ui_meta.hermes-bots.sectionId` + `sectionName`; file Group
+Chats via Desktop `group-chats` / `moveGroupChatsToSection` (machine-local).
 
 ```bash
-hermes profile describe forge --text "…"
-# display name via rename of default only, or Desktop title field
+# After fetching section ids from Desktop or bot-sections-v1:
+# profiles.configure with merged hermes-bots { sectionId, sectionName, … }
+# Quit Desktop before LevelDB edits (section rename, group-chats seed).
 ```
+
+Leave layout to Desktop drag-and-drop for one-offs. Fleet / rename (e.g. Pinned
+→ Board): follow `bot-mode-sections.md`.
 
 ## 5b. Install custom Bot Mode avatars
 
@@ -179,6 +185,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Multi-bot rooms (Bot Mode preferred; Telegram/Discord when asked) | `messaging-groups.md` |
 | Anytype Agent → live Hermes apply / create-if-missing / delete orphans | `anytype-apply.md` |
 | Bot Mode custom photo avatars | `avatars.md` |
+| Bot Mode sidebar sections (HQ folders + Group Chats) | `bot-mode-sections.md` |
 
 ## Decision guide: what to edit where
 
@@ -201,4 +208,4 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Task-specific subagent routes | `delegation.md` |
 | API keys / bot tokens / allowlist IDs | profile `.env` (never echo values) |
 | Kanban one-liner | `hermes profile describe` |
-| Bot roster avatar/section | `avatars.md` (fleet: recipe **5b**); layout in `profile-map.md` |
+| Bot roster avatar / section | `avatars.md` (fleet: recipe **5b**); `bot-mode-sections.md` (recipe **5**); layout fields in `profile-map.md` |

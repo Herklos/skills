@@ -135,10 +135,14 @@ ui_meta:
     imageKind: shape   # or photo when assets/avatar.png is a custom image
     shape: blobatar
     custom: true       # set with imageKind: photo for uploaded/generated art
-    sectionId: …
-    sectionName: …
+    sectionId: …       # Desktop sidebar folder id (from bot-sections-v1)
+    sectionName: …     # Display name (Board, Engineering, …)
     pinned: true
 ```
+
+Bot → section membership syncs with the profile. The section **catalog**
+(`bot-sections-v1`) and Group Chat → section (`group-chats`) are Desktop Local
+Storage only. Fleet / HQ map: **`bot-mode-sections.md`** (also `recipes.md` **5**).
 
 ### Custom photo avatars
 

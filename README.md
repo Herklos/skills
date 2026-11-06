@@ -4,9 +4,9 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 
 | Skill | Version | Role |
 |-------|---------|------|
-| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.45.0 | Lifecycle and config for Hermes Agent profiles (v0.23 hearth gateway, groups.context routing, plugins/curator) |
+| [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.46.0 | Lifecycle and config for Hermes Agent profiles (v0.23 hearth gateway, Bot Mode HQ sidebar sections, groups.context routing, plugins/curator) |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.4.0 | Define Osaurus agents via `osaurus config` / bundles / tools |
-| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.57.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Group purpose/notes/routing, Prompts, atomic Memories, versioned Shared Rules, suggestions, and Projects via Anytype MCP |
+| [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.58.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Group purpose/notes/routing, Prompts, atomic Memories, versioned Shared Rules, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
 
@@ -28,6 +28,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Security**: approvals / YOLO floor, privacy redaction, pairing, checkpoints and rollback, backup
 - **Workspace and display**: `terminal.cwd`, projects, repo scan, skins, Desktop prefs; Bot Mode Edit Profile Description vs roster card chat preview (`profile-map.md`)
 - **Bot Mode avatars**: fleet photo install via `profiles.set_asset` + seed Desktop `bot-meta-v2` with 256 data URLs (`avatars.md`); bare file copies / clear-only get overwritten by SVG backfill
+- **Bot Mode sections**: HQ sidebar folders (Board / Engineering / …); bot `sectionId`/`sectionName` on profile; Group Chat `group-chats` Local Storage (`bot-mode-sections.md`)
 - **Voice**: mic loop + STT + TTS (`voice.*` / `stt.*` / `tts.*`); messaging `/voice`; Discord voice channel. Defaults: local Whisper + Edge TTS
 - **Cron**: scheduled jobs and Bot routines per profile; Anytype Agenda → Hermes bind when asked
 - **Messaging groups**: Hermes Bot Mode hosted rooms from Anytype typed Group; purpose / notes / unaddressed routing (`everyone` \| `lead` \| `auto`); join HQ/domain Group first for new specialists
@@ -37,7 +38,7 @@ Manage Hermes Agent **profiles**. A profile is one agent's home directory under 
 - **Analytics**: Agent.`analytics_enabled` → enable **langfuse** on apply (`anytype-apply.md`); copy `HERMES_LANGFUSE_*` from default when needed
 - **Delegation safety (Local parent):** always set `model_map.default`; SOUL/Shared Rules require `option` on every `delegate_task`; rebuild schema with `/delegation model_map --now` or `/new`
 
-**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `plugins-and-skills`, `avatars`, `anytype-apply`, `recipes`, `troubleshooting`.
+**References** (loaded on demand): `profile-map`, `models`, `delegation`, `soul-templates`, `memory`, `browser-and-computer`, `runtime-limits-and-tools`, `security`, `workspace`, `display`, `voice`, `cron`, `messaging-groups`, `plugins-and-skills`, `avatars`, `bot-mode-sections`, `anytype-apply`, `recipes`, `troubleshooting`.
 
 **Typical flows**
 

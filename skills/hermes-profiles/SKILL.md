@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.45.0
+version: 1.46.0
 license: MIT
 metadata:
   category: agents
@@ -41,6 +41,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/messaging-groups.md` | **Hermes Bot Mode hosted Group Chats** (preferred) + optional Telegram/Discord; Anytype typed **Group** → room_id writeback |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
 | `references/avatars.md` | **Bot Mode custom photo avatars** (fleet: quit Desktop → `set_asset` → seed `bot-meta-v2` with 256 data URLs) |
+| `references/bot-mode-sections.md` | **Bot Mode sidebar sections** (HQ folders; bot `sectionId`/`sectionName`; Group Chat `group-chats`; LevelDB when Desktop quit) |
 | `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (create-if-missing, **delete orphans**, ordered fast path, model label map, write discipline, gaps) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues; **v0.23 upgrade / breaking renames** |
 | `references/plugins-and-skills.md` | `hermes plugins update`, `plugins.auto_apply`, Verified tier, **`hermes curator lock`** for org skills |
@@ -235,7 +236,7 @@ pointers** in SOUL (do not paste HQ Standing instructions libraries). See
 
 - `description`, `description_auto` via `hermes profile describe`
 - `display_name` for presentation
-- `ui_meta.hermes-bots` for Bot Mode roster presentation (leave unless asked)
+- `ui_meta.hermes-bots` for Bot Mode roster presentation (title / avatar / **sectionId** + **sectionName**; fleet sections: `bot-mode-sections.md`)
 
 ### config.yaml
 
@@ -391,6 +392,7 @@ lifecycle). Optional Webapp: off by default; `webapp.enabled` or
 - **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
 - **Delete orphans from Anytype:** inventory Hermes dirs with no live Agent (archived / temporary / absorbed roles); confirm; `hermes profile delete <slug> --yes` (`anytype-apply.md` → Delete orphan profiles; recipe **10**)
 - **Fleet Bot Mode avatars:** quit Desktop → `profiles.set_asset` → `ui_meta` photo/custom → seed `bot-meta-v2` with 256 data URLs (`avatars.md`; recipe **5b**)
+- **Fleet Bot Mode sections:** fetch `bot-sections-v1` → stamp bot `sectionId`/`sectionName` (merge `hermes-bots`) → seed Group Chat `group-chats.sectionId` under matching HQ (`bot-mode-sections.md`; recipe **5**)
 - **Messaging (external platform):** unique token in that profile `.env` → `gateway start` / `install` (only when user asks for Telegram/Discord)
 - **Multi-bot group:** `messaging-groups.md` (prefer Hermes Bot Mode hosted rooms via `groups.create` / Desktop; Anytype join-HQ-first; optional Telegram tokens/allowlists only when asked)
 - **Fleet messaging + deferred delegation:** `anytype-apply.md` → Fleet apply; Bot Mode `groups.create` when chat id empty; `model_map` via JSON `config set` for Subagent parents still unconfigured (`delegation.md` Fleet apply); skip `profile_routes` parents

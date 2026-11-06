@@ -105,7 +105,10 @@ sqlite3 ~/.hermes/state.db "SELECT room_id, name FROM hosted_rooms WHERE disband
 ```
 
 Rooms also appear in Desktop Bots → group rows. Docs: Bot Mode → Groups and
-group chats.
+group chats. To file a Group Chat under an HQ sidebar folder (Board,
+Engineering, …), see **`bot-mode-sections.md`** (Desktop `group-chats.sectionId`
+or `moveGroupChatsToSection`; machine-local, separate from Anytype
+`parent_team`).
 
 ### Anytype writeback after create
 
