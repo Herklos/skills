@@ -311,6 +311,11 @@ full-sync an Agent into Hermes:
    the copy exists.
 6. Playbook: `hermes-profiles` → `anytype-apply.md` (Org skills step).
 
+**Global HTTP skill:** `anytype-api` is special — full tree under
+`$HERMES_HOME/skills/org/anytype-api/` (router + `references/`), symlinked into
+named profiles, mirrored as a filled Anytype skill object. Build/refresh:
+`anytype-api-skill.md`. Do not reintroduce `@anyproto/anytype-mcp`.
+
 ## Out of scope
 
 - Backup / restore / snapshot / Mémoire dump pages stay `page`

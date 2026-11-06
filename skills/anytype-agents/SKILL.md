@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.58.0
+version: 1.59.0
 license: MIT
 metadata:
   category: agents
@@ -54,10 +54,11 @@ profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
 | `references/type-templates.md` | Dumped default template bodies (incl. Subagent / Harness / Group / runtime catalogs) for bootstrap and drift |
 | `references/page-templates.md` | Agent / HQ / Subteam / Group / skill / project body shapes |
 | `references/suggested-runtime.md` | Hermes apply property worksheet (not Agent page body); execution order in hermes-profiles `anytype-apply.md` |
-| `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules |
+| `references/shared-rules-starter.md` | Bootstrap or refresh Shared Rules (compact core + topic Prompts) |
+| `references/anytype-api-skill.md` | Build/refresh global HTTP `anytype-api` skill (Hermes + Anytype; replaces MCP) |
 | `references/examples.md` | Fictional Northwind Labs org walkthrough |
 | `references/handoff-templates.md` | Handoffs, briefs, welcome paste |
-| `references/mcp-recipes.md` | MCP search/create/patch/archive patterns |
+| `references/mcp-recipes.md` | Legacy MCP search/create/patch patterns; prefer HTTP via `anytype-api-skill.md` |
 | `references/hq-runtime-pair.md` | Per-HQ Cua Spaces Computer + Hermes Chromium Browser create, link, migrate |
 | `references/cua-hq-spaces.md` | Create live Cua Space per HQ Computer; store full id in Computer.`cua_space` |
 | `references/project-pm.md` | Epic / User story / Task types, kinds (incl. spike), filtered Roadmap/Backlog/TODO Queries, migrate |
@@ -324,10 +325,11 @@ HQ Group; skip only when the user deferred that HQ's messaging.
 
 ### Edit Shared Rules
 
-1. Read the current Shared Rules object fully (type `prompt`, `prompt_kind=shared_rules`)
-2. Primary (or the documented owner) runs rollout: edit rules → per-agent checklist → completion log
-3. Confirm before changing HARD / standing rules
-4. Doc edit alone does not refresh live prompts (re-copy from linked Agent Prompts when applying)
+1. Prefer the **compact core** index (`prompt_kind=shared_rules`) plus **topic library Prompts** (`shared-rules-starter.md`). Do not grow a single giant fenced rule dump on the core object.
+2. Edit the topic Prompt that owns the rule; bump core `version` / notes when the index map changes
+3. Primary runs rollout: edit → per-agent checklist → completion log (pointer-only SOULs usually need no paste)
+4. Confirm before changing HARD / standing rules
+5. Doc edit alone does not refresh live prompts that still embed an old fence
 
 ### Create or update a Prompt
 
@@ -344,6 +346,7 @@ HQ Group; skip only when the user deferred that HQ's messaging.
 4. Respect no-usage-logging rules if the Shared Rules forbid counters
 5. Non-trivial skills: review with the documented skills/HR owner (`reviewed_by`)
 6. Mark `skill_status=active` only after the authoring checklist
+7. **Global Anytype HTTP skill** (`anytype-api`): follow `anytype-api-skill.md` (Hermes `skills/org/anytype-api/` + full Anytype body; no MCP)
 
 ### Write an agent Log
 
@@ -453,8 +456,9 @@ they ask. Skip archive/bots-to-archive sections when they say to ignore them.
 - **New portfolio project:** create/extend `project` + status/category → link Projects hub → PM Queries (`project-pm.md`)
 - **New PM item:** create `epic` / `user_story` / `task` with `linked_projects` (+ Task `kind`, incl. `spike`)
 - **Migrate old pages:** `set_type` + `set_properties.set` on hub inventory only (`object-types.md`); PM collections → typed + Queries (`project-pm.md`); agent/group fences → Prompt objects (`prompts.md`); Group `page` → `group` (keep `welcome_prompt`)
-- **Shared Rules change:** edit Prompt → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
-- **MCP ops:** follow `mcp-recipes.md` with etags and dry-run when unsure
+- **Shared Rules change:** edit topic Prompt + compact core index → rollout checklist (`shared-rules-starter.md`) → runtime refresh reminder
+- **Global anytype-api skill:** build/refresh via `anytype-api-skill.md` (HTTP env + Hermes org skill + Anytype object; remove MCP)
+- **MCP ops:** prefer HTTP (`anytype-api-skill.md`); legacy patterns in `mcp-recipes.md` with etags and dry-run when unsure
 
 ## Workflow checklist
 
