@@ -68,6 +68,46 @@ Bérénice/`berenice` with filled `hermes_profile` but no dirs; created via
 `--clone-from ambre`, then Local parent + SOUL + describe. Foyer Sidonie /
 Philippe / Blanche / Bob stayed Osaurus-only.
 
+## Delete orphan profiles (inventory → delete)
+
+Inverse of **Create missing profiles**. Use when Hermes dirs remain after an
+Anytype Agent was archived, marked temporary, absorbed into another role, or
+never minted as a live Agent (common after roster cleanup).
+
+1. **Inventory**
+   - Hermes: `hermes profile list` + `ls ~/.hermes/profiles` (every named dir
+     with an identity file counts).
+   - Anytype: `type: agent`, fields `name`, `lifecycle`, `hermes_profile`,
+     `runtime`, `role`.
+   - **Orphan candidate** when there is no `lifecycle=live` Agent whose
+     `hermes_profile` equals that slug (and Primary/`default` is never an
+     orphan). Also candidate when the only matching Agent is
+     `archived` / `draft` / library Prompt only, and the user agrees the
+     Hermes home is obsolete.
+   - **Keep** when a live Hermes-runtime Agent still points at the slug, or
+     the user plans to revive the role.
+2. **Pre-delete checks**
+   - Not seated on a live Bot Mode room:
+     `sqlite3 ~/.hermes/state.db "SELECT room_id, name, members_json FROM hosted_rooms WHERE disbanded_at IS NULL;"`
+     (search `members_json` for the slug). Remove from the room first if found.
+   - Cron: `hermes -p <slug> cron list` — note any jobs; delete drops them.
+   - Stale `gateway.lock` / list status `running` without a live process is
+     harmless; `profile delete` stops a real gateway if one is up.
+3. **Delete** (confirm slug with the user first):
+   ```bash
+   hermes profile delete <slug> --yes
+   ```
+   Cannot delete `default`. Leaves aliases under `~/.local/bin/<slug>` cleaned
+   by the CLI.
+4. **Anytype** — leave archived Prompts, Logs, Skills, and Agent pages unless
+   the user asks to Bin them. Optionally clear a stale Agent.`hermes_profile`
+   on an archived Agent if it still names the deleted slug.
+5. Report what was deleted and any rooms/crons that blocked a candidate.
+
+Example (2026-11-06): `camille` (Weekly Metrics temporary) and `colette`
+(Design, absorbed; Prompt archived) had stub SOULs, no live Agents, no room
+seats, no cron → deleted after confirm.
+
 ## Fast path (ordered)
 
 1. **Read Anytype once** (batch gets): Agent props, linked `system_prompt` (`format=md`),

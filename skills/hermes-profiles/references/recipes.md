@@ -120,7 +120,7 @@ hermes -p smith gateway install
 hermes profile alias smith
 ```
 
-## 10. Safe delete
+## 10. Safe delete (named or orphan)
 
 ```bash
 hermes profile show old-bot
@@ -128,6 +128,24 @@ hermes profile show old-bot
 hermes profile delete old-bot
 # or hermes profile delete old-bot --yes after explicit approval
 ```
+
+**Orphan cleanup** (Hermes home left after Anytype Agent was archived, temporary,
+or absorbed; inverse of recipe **2b**):
+
+1. Inventory: `hermes profile list` + `ls ~/.hermes/profiles` vs Anytype
+   `type:agent` with `lifecycle=live` and Hermes runtime.
+2. Candidate when: no live Agent with that `hermes_profile`, or Agent is
+   archived/draft and user agrees the Hermes home is obsolete.
+3. Before delete: not a member of any live hosted room
+   (`sqlite3 ~/.hermes/state.db` → `hosted_rooms.members_json` where
+   `disbanded_at IS NULL`); no jobs the user wants to keep (`hermes -p <slug> cron list`).
+4. Stale `gateway.lock` / list status `running` with no matching process is fine;
+   `hermes profile delete` stops the gateway if needed.
+5. Confirm slug(s) with the user → `hermes profile delete <slug> --yes`.
+6. Leave Anytype archive history alone (Prompts, Logs, Skills) unless asked.
+
+Full checklist: `anytype-apply.md` → **Delete orphan profiles**.
+Cannot delete `default`.
 
 ## Decision guide: create flags
 
@@ -159,7 +177,7 @@ Lifecycle recipes stay above. Topic recipes live in the matching reference
 | Voice / STT / TTS | `voice.md` |
 | Scheduled tasks / Bot routines | `cron.md` |
 | Multi-bot rooms (Bot Mode preferred; Telegram/Discord when asked) | `messaging-groups.md` |
-| Anytype Agent → live Hermes apply / create-if-missing | `anytype-apply.md` |
+| Anytype Agent → live Hermes apply / create-if-missing / delete orphans | `anytype-apply.md` |
 | Bot Mode custom photo avatars | `avatars.md` |
 
 ## Decision guide: what to edit where

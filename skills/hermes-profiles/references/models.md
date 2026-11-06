@@ -63,36 +63,50 @@ model:
 
 Mid-session: `/model` in chat. New sessions pick up `config.yaml` changes; open chats keep their start model until switched.
 
-## Local parent (llamacpp chat + llamacpp approval)
+## Local parent (Mistral chat + llamacpp approval)
 
-**Org default for Local parent / Foyer agents** (both on Hermes builtin llama.cpp):
+**Org default for Local parent agents** (Foyer stays dual-local; see below):
 
 | Role | Provider | Model | Notes |
 |------|----------|-------|-------|
-| **Chat / route picking** (`model.*`) | `llamacpp` | `LFM3-1.7B-Q8_0` | Effort **none**. GGUF under `~/.hermes/models/LFM3-1.7B-Q8_0.gguf`. Needs llama.cpp build that supports LFM3 (e.g. metal **b12110+**). |
-| **Approvals** (`auxiliary.approval.*`) | `llamacpp` | `d1-2b-q4_k_m` | Same managed runtime (`local_runtime`); GGUF `d1-2B-Q4_K_M.gguf` |
+| **Chat / route picking** (`model.*`) | `mistral` | `zai-glm-5-3-flash` | Effort **low**. Custom provider `providers.mistral` → `https://api.mistral.ai/v1`; key `HERMES_CUSTOM_MISTRAL_API_KEY`. Display name GLM-5.3-Flash. |
+| **Approvals** (`auxiliary.approval.*`) | `llamacpp` | `d1-2b-q4_k_m` | Managed runtime (`local_runtime`); GGUF `d1-2B-Q4_K_M.gguf`. |
 
-Parent answers peers / light asks on LFM3 and picks Subagent routes when needed
+**Foyer** (sidonie / philippe / blanche / bob): keep dual local chat
+`llamacpp` / `LFM3-1.7B-Q8_0` + same d1 approvals. Do not migrate Foyer to Mistral
+unless the user asks.
+
+Parent answers peers / light asks on Flash and picks Subagent routes when needed
 (`delegation.md`). Hermes has no separate routing-model slot: route picking uses
 `model.*`. Smart command approvals use d1 via `auxiliary.approval`.
 
-Anytype **Local parent** / **Foyer** store chat as `model_provider: llamacpp`,
-`model_default: LFM3-1.7B-Q8_0`, `model_effort: none`, plus
-`aux_approval_provider: llamacpp`, `aux_approval_model: d1-2b-q4_k_m`. Prefer
-those fields when applying; use the exact id Hermes shows after **Add model file**.
+Anytype **Local parent** stores chat as `model_provider: mistral`,
+`model_default: zai-glm-5-3-flash`, `model_effort: low`, `model_harness` →
+**Mistral** catalog, plus `aux_approval_provider: llamacpp`,
+`aux_approval_model: d1-2b-q4_k_m`. **Foyer** harness stays
+`llamacpp` / `LFM3-1.7B-Q8_0` / none.
 
-### Config shape
+### Config shape (Local parent)
 
 ```yaml
 local_runtime:
   enabled: true
-  backend: auto          # or cuda / metal / vulkan / cpu
+  backend: auto          # needed for aux approval d1
 
 model:
-  provider: llamacpp
-  default: LFM3-1.7B-Q8_0
+  provider: mistral
+  default: zai-glm-5-3-flash
   api_mode: chat_completions
-  # base_url usually points at managed llama-server (e.g. http://127.0.0.1:18434/v1)
+  base_url: https://api.mistral.ai/v1
+  key_env: HERMES_CUSTOM_MISTRAL_API_KEY
+
+providers:
+  mistral:
+    name: Mistral
+    base_url: https://api.mistral.ai/v1
+    key_env: HERMES_CUSTOM_MISTRAL_API_KEY
+    discover_models: true
+    model: zai-glm-5-3-flash
 
 auxiliary:
   approval:
@@ -101,39 +115,48 @@ auxiliary:
 ```
 
 ```bash
-hermes -p <slug> config set model.provider llamacpp
-hermes -p <slug> config set model.default LFM3-1.7B-Q8_0
+# Ensure key in profile .env (copy from default; do not print)
+# HERMES_CUSTOM_MISTRAL_API_KEY=…
+
+hermes -p <slug> config set model.provider mistral
+hermes -p <slug> config set model.default zai-glm-5-3-flash
 hermes -p <slug> config set model.api_mode chat_completions
-hermes -p <slug> config set model.base_url http://127.0.0.1:18434/v1   # match live server.json
+hermes -p <slug> config set model.base_url https://api.mistral.ai/v1
+hermes -p <slug> config set model.key_env HERMES_CUSTOM_MISTRAL_API_KEY
+hermes -p <slug> config set providers.mistral.name Mistral
+hermes -p <slug> config set providers.mistral.base_url https://api.mistral.ai/v1
+hermes -p <slug> config set providers.mistral.key_env HERMES_CUSTOM_MISTRAL_API_KEY
+hermes -p <slug> config set providers.mistral.discover_models true
+hermes -p <slug> config set providers.mistral.model zai-glm-5-3-flash
 hermes -p <slug> config set local_runtime.enabled true
 hermes -p <slug> config set local_runtime.backend auto
-hermes -p <slug> config unset model.api_key   # clear stale ollama key if migrating
 hermes -p <slug> config set auxiliary.approval.provider llamacpp
 hermes -p <slug> config set auxiliary.approval.model d1-2b-q4_k_m
 ```
 
-Add LFM3 and d1 GGUFs via Desktop **Add model file** (or place under
-`~/.hermes/models/`). Hermes manages llama-server via `local_runtime`.
+### Foyer (dual local) config
 
-### Migrate off Ollama `lfm3`
+```bash
+hermes -p <slug> config set model.provider llamacpp
+hermes -p <slug> config set model.default LFM3-1.7B-Q8_0
+hermes -p <slug> config set model.api_mode chat_completions
+hermes -p <slug> config set model.base_url http://127.0.0.1:18434/v1
+hermes -p <slug> config set local_runtime.enabled true
+hermes -p <slug> config set auxiliary.approval.provider llamacpp
+hermes -p <slug> config set auxiliary.approval.model d1-2b-q4_k_m
+```
 
-Old org shape was `ollama-launch` / `lfm3`. To migrate a profile:
+Add LFM3 and d1 GGUFs via Desktop **Add model file** when Foyer/local approval
+needs them. Hermes manages llama-server via `local_runtime`.
 
-1. Confirm `~/.hermes/models/LFM3-1.7B-Q8_0.gguf` exists and `hermes pm doctor`
-   shows a new-enough `llamacpp-metal` (LFM3 needs ~b11938+).
-2. Apply the config sets above; clear `model.api_key` / Ollama `11434` base_url.
-3. Update disabled MoA stubs that still reference `ollama-launch`/`lfm3`.
-4. Restart / reload sessions so open chats pick up the new model.
+### Migrate notes
 
-Notes:
-
-- `local_runtime.backend: auto` picks CUDA / Metal / Vulkan / CPU.
-- Chat and approval share the managed llama.cpp runtime; only one GGUF is loaded
-  at a time (Hermes swaps as needed).
+- **2026-11-06:** most Hermes profiles + Anytype Local parent → Mistral Flash;
+  Foyer 4 left on LFM3. Ledger `/tmp/mistral-flash-migrate/`.
+- Older Ollama `lfm3` / dual-local Local parent shape is retired for non-Foyer.
 - No cloud `fallback_providers` on Local parent / Foyer by org default.
-- Cloning a profile with default clone flags excludes local model trees; re-link
-  or re-download GGUFs on the new profile if needed.
-- Do **not** point chat back at Ollama for LFM3 unless the user explicitly asks.
+- Cloning a profile with default clone flags excludes local model trees and may
+  omit `HERMES_CUSTOM_MISTRAL_API_KEY`; copy the key into the new profile `.env`.
 
 ## Auxiliary models
 

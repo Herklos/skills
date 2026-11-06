@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.42.0
+version: 1.44.0
 license: MIT
 metadata:
   category: agents
@@ -41,7 +41,7 @@ the `hermes` CLI over hand-editing for lifecycle and config.
 | `references/messaging-groups.md` | **Hermes Bot Mode hosted Group Chats** (preferred) + optional Telegram/Discord; Anytype typed **Group** → room_id writeback |
 | `references/recipes.md` | Lifecycle create/clone/gateway recipes (config topics point at each ref) |
 | `references/avatars.md` | **Bot Mode custom photo avatars** (fleet: quit Desktop → `set_asset` → seed `bot-meta-v2` with 256 data URLs) |
-| `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (create-if-missing inventory, ordered fast path, model label map, write discipline, gaps) |
+| `references/anytype-apply.md` | **Anytype Agent → live Hermes apply** (create-if-missing, **delete orphans**, ordered fast path, model label map, write discipline, gaps) |
 | `references/troubleshooting.md` | List/gateway/alias/session issues |
 
 Stubs (redirect only): `models-and-delegation.md`, `workspace-and-display.md`.
@@ -181,6 +181,10 @@ hermes profile delete <slug> --yes
 
 Cannot delete `default`. Use `hermes uninstall` only for a full wipe the user requested.
 
+**Orphans** (Hermes dir with no live Anytype Agent): inventory vs Anytype, confirm,
+then delete. Checklist: `anytype-apply.md` → **Delete orphan profiles**; recipe
+**10** in `recipes.md`. Do not delete seats still listed on a live hosted room.
+
 ### Share
 
 ```bash
@@ -245,7 +249,7 @@ Full guide: `references/models.md`.
 | Concern | Config / CLI |
 |---------|----------------|
 | Main / decision / routing model | `model.*` / `hermes -p <slug> model` / `/model` |
-| Local parent (chat + approval) | Chat `llamacpp` / `LFM3-1.7B-Q8_0`; approval `auxiliary.approval` = `llamacpp` / `d1-2b-q4_k_m` + `local_runtime` (`models.md`) |
+| Local parent (chat + approval) | Chat `mistral` / `zai-glm-5-3-flash`; approval `auxiliary.approval` = `llamacpp` / `d1-2b-q4_k_m` + `local_runtime` (Foyer stays LFM3 chat; `models.md`) |
 | Side jobs | `auxiliary.<task>.*` (default `auto` = main) |
 | Backup mid-turn | `fallback_providers` / `hermes -p <slug> fallback` |
 | MoA | `moa.presets` / `hermes -p <slug> moa configure` |
@@ -369,6 +373,7 @@ One gateway process per profile. Separate bot tokens per profile.
 - **Twin of existing:** `create <new> --clone-from <src>` (add `--clone-all` only if needed)
 - **Empty orchestrator:** `create <slug> --no-skills`
 - **Create missing from Anytype:** inventory live Hermes-runtime Agents vs `~/.hermes/profiles`; create gaps with `--clone-from` peer; replace SOUL; Local parent; describe (`anytype-apply.md` → Create missing profiles). Skip Osaurus / archived.
+- **Delete orphans from Anytype:** inventory Hermes dirs with no live Agent (archived / temporary / absorbed roles); confirm; `hermes profile delete <slug> --yes` (`anytype-apply.md` → Delete orphan profiles; recipe **10**)
 - **Fleet Bot Mode avatars:** quit Desktop → `profiles.set_asset` → `ui_meta` photo/custom → seed `bot-meta-v2` with 256 data URLs (`avatars.md`; recipe **5b**)
 - **Messaging (external platform):** unique token in that profile `.env` → `gateway start` / `install` (only when user asks for Telegram/Discord)
 - **Multi-bot group:** `messaging-groups.md` (prefer Hermes Bot Mode hosted rooms via `groups.create` / Desktop; Anytype join-HQ-first; optional Telegram tokens/allowlists only when asked)

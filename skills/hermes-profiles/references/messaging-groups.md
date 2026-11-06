@@ -119,9 +119,12 @@ group chats.
 
 First pass created HQ rooms plus temporary satellite B overflow rooms. Refactor
 replaced satellites with **Subteam Groups** (Development, Ops, Customer &
-Analytics, Investments, Tax, Companies, Personal, HR, Legal, Compliance, …),
-slimmed HQ Groups to chief + leads, removed Foyer Groups (Ana/Kitchen/Wedding)
-per user deferral, and disbanded all `*-group-b` plus Foyer Hermes rooms.
+Analytics, Investments, Tax, Companies Finance, Personal Finance, HR, Legal,
+Compliance, …), slimmed HQ Groups to chief + leads, removed Foyer Groups
+(Ana/Kitchen/Wedding) per user deferral, and disbanded all `*-group-b` plus
+Foyer Hermes rooms. Follow-up same day: Growth got Marketing / Sales &
+Acquisition / Partnerships & BD Subteam Groups + `anytype-growth-group-leads`
+(flat `anytype-growth-group` disbanded).
 
 ## Optional: Telegram / Discord (only when asked)
 
