@@ -145,8 +145,8 @@ Canonical welcome paste lives on the linked **Welcome prompt** property
 ## Hermes / platform
 Prefer `platform=hermes` and `platform_chat_id` = Hermes hosted `room_id`
 (`anytype-<slug>`). Require mention / Exclusive bot mentions are for external
-platforms. `hermes_profiles` seats the Bot Mode room (split at 6 → satellite B
-in `notes`). Apply via hermes-profiles `messaging-groups.md` when asked.
+platforms. `hermes_profiles` seats the Bot Mode room (max 6; overflow → Subteam
+Groups, never satellite B). Apply via hermes-profiles `messaging-groups.md` when asked.
 ```
 
 Skip duplicating member lists in markdown when `members` is filled. Full Prompt

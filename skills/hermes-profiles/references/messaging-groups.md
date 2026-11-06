@@ -27,27 +27,29 @@ Anytype stores who belongs, the welcome text, and intended platform settings.
 It does not create the Hermes room by itself. Apply into Hermes when the user
 asks.
 
-## Anytype: join HQ Group vs create a new room
+## Anytype: HQ Group vs Subteam Group (Subgroup)
 
-Every **live** Agent should have Agent.`messaging_group` filled. Prefer joining
-the owning HQ (or existing domain) Group over minting one room per specialist.
+Every **live** Agent should have Agent.`messaging_group` filled, except when the
+user has **deferred** messaging for that HQ (org example: Foyer agents may have
+empty `messaging_group` until rooms are requested again).
 
-**Join (default for new specialists under an HQ that already has a Group):**
+**Overflow rule (Bot Mode 2–6 seats):** do **not** create satellite `* B` rooms.
+When an HQ roster would exceed 6 Hermes seats, split onto **Subteam Groups**:
 
-1. Search `type: group` for the HQ / domain room
-2. Patch Group.`members` (+ HQ.`members` when they report there)
-3. Append slug to Group.`hermes_profiles` (comma list)
-4. Set Agent.`messaging_group` → Group id
-5. Rewrite welcome Prompt (delete stale blocks → `insert_blocks`)
-6. Defer Hermes room membership apply until the user asks
+1. HQ Group = chief + Subteam leads only (≤6)
+2. Each Subteam that needs a chat gets its own typed Group (`parent_team` = HQ;
+   Subteam.`messaging_group` → that Group)
+3. Specialists: Agent.`messaging_group` → **Subteam Group** (not the HQ Group)
+4. Solo Subteams (1 specialist): keep the lead on the HQ Group, or seat HQ chief
+   as a bridge so the Subgroup has ≥2 Hermes members
 
-**Create a new typed Group only when** there is a new HQ, or a domain that
-already owns a distinct chat (Veille & Technology, Wedding, Ana, Kitchen, …).
-Example: Clovis / Denise / Joachim joined **Engineering Group** rather than
-getting three new rooms; Octave stays on Veille & Technology Group.
+**Join an existing Subteam/HQ Group** for new specialists under a Subteam that
+already has a Group. Mint a new typed Group only for a new HQ or a Subteam that
+does not yet have a room.
 
 Gap inventory: `type: agent`, `lifecycle = "live"`, fields include
-`messaging_group`. Empty → join HQ or domain Group.
+`messaging_group`. Empty → join Subteam Group (preferred) or HQ Group; skip only
+when the user deferred that HQ’s messaging.
 
 ## Create a Hermes Bot Mode Group Chat (preferred)
 
@@ -73,11 +75,11 @@ gateway session WebSocket (host-scoped ticket), or the Desktop UI.
 - **2–6 members** per room (`MIN_DISCUSSION_MEMBERS` / `MAX_DISCUSSION_MEMBERS`).
 - Members must be profiles the multiplex gateway **serves**.
 - Room id should be stable (org convention: `anytype-<group-slug>`).
-- When Anytype `hermes_profiles` has more than 6 slugs: seat the first 6 in the
-  primary room, then create a **satellite B** room for overflow (include one
-  bridge chief from the primary roster so the satellite stays tied to the HQ).
-  Record satellite room ids in Group.`notes`. Primary keeps `platform_chat_id`;
-  satellites are notes-only unless the user wants a second Anytype Group.
+- When an HQ would exceed 6 seats: create **Subteam Groups** (see above). Never
+  mint `*-group-b` / “satellite B” overflow rooms.
+- Disbanded room ids **cannot be reused** (`groups.disband` retires the id). To
+  resize a roster, create a new `room_id`, write back Anytype `platform_chat_id`,
+  then disband the old room.
 
 ### Member shape (`groups.create`)
 
@@ -111,15 +113,15 @@ group chats.
 |-------|-------|
 | `platform` | `hermes` (mint once; do not parallel `create_missing_options` or you get duplicate select options) |
 | `platform_chat_id` | Hermes `room_id` (e.g. `anytype-engineering-group`) |
-| `notes` | Satellite room ids + overflow seats when split |
+| `notes` | Apply notes; list linked Subteam Groups when HQ was split |
 
-### Fleet example (2026-11-05)
+### Fleet example (2026-11-05 → 2026-11-06)
 
-Created 13 primary hosted rooms (one per live Anytype Group) plus 5 satellite
-B rooms for overflow (Engineering, Board, Finance, Legal & HR, Product). Wrote
-`platform_chat_id` on all 13 Groups; `platform=hermes` on the first batch
-(remaining Groups need `platform=hermes` after deduping duplicate select
-options in Anytype UI).
+First pass created HQ rooms plus temporary satellite B overflow rooms. Refactor
+replaced satellites with **Subteam Groups** (Development, Ops, Customer &
+Analytics, Investments, Tax, Companies, Personal, HR, Legal, Compliance, …),
+slimmed HQ Groups to chief + leads, removed Foyer Groups (Ana/Kitchen/Wedding)
+per user deferral, and disbanded all `*-group-b` plus Foyer Hermes rooms.
 
 ## Optional: Telegram / Discord (only when asked)
 
@@ -176,11 +178,13 @@ Groups:
 
 ### Bot Mode path (preferred)
 
-1. Inventory live Groups + `hermes_profiles`.
-2. For each Group with empty `platform_chat_id`: create hosted room(s) via
-   `groups.create` (2–6; satellite B for overflow).
-3. Write back `platform_chat_id` (+ `platform=hermes`, `notes` for satellites).
-4. No Telegram tokens required.
+1. Inventory live Groups + `hermes_profiles` (each Group must be ≤6 slugs).
+2. If an HQ roster is oversized: mint Subteam Groups first; slim HQ; never
+   create satellite B rooms.
+3. For each Group with empty `platform_chat_id`: `groups.create` (2–6).
+4. Write back `platform_chat_id` + `platform=hermes`.
+5. Disband obsolete rooms with `groups.disband` (`room_id` + `cancel_id`) after
+   writeback (retired ids cannot be reused).
 
 ### External platform path (only when asked)
 

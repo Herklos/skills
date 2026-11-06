@@ -162,13 +162,14 @@ Philippe / Blanche / Bob stayed Osaurus-only.
     and **`/delegation model_map --now` or `/new`** after route changes.
 14. **Messaging** only when user asks (`messaging-groups.md`). **Org default:
     Hermes Bot Mode hosted rooms** (`groups.create` / Desktop Manage groups;
-    2–6 members; satellite B for overflow). Write `platform=hermes` +
-    `platform_chat_id=<room_id>`. No Telegram tokens required for Bot Mode.
-    External Telegram/Discord only when asked: tokens never auto-cloned;
-    allowlists only with a real external chat id; if the user wants gates
-    without a room yet, set mention gates and leave allowlists empty.
-    Do not invent Telegram groups or chat ids. Commented `# TELEGRAM_BOT_TOKEN=`
-    counts as missing for the external path.
+    2–6 members). Overflow → **Subteam Groups** (never satellite B). Write
+    `platform=hermes` + `platform_chat_id=<room_id>`. Resize = new `room_id` +
+    writeback + `groups.disband` (retired ids cannot be reused). No Telegram
+    tokens required for Bot Mode. External Telegram/Discord only when asked:
+    tokens never auto-cloned; allowlists only with a real external chat id; if
+    the user wants gates without a room yet, set mention gates and leave
+    allowlists empty. Do not invent Telegram groups or chat ids. Commented
+    `# TELEGRAM_BOT_TOKEN=` counts as missing for the external path.
 
 ## Model label map (resolve before writing routes)
 
@@ -253,9 +254,10 @@ When the user asks to apply **messaging groups** and/or **deferred delegation**
 for every agent that already uses them in Anytype but Hermes is still wrong:
 
 1. Messaging → `messaging-groups.md` **Fleet apply** (preferred Bot Mode path:
-   `groups.create` for empty `platform_chat_id`, satellite B when >6 slugs,
-   write back `platform=hermes` + room_id). External Telegram/Discord gates +
-   allowlists only when the user names that platform.
+   Subteam Groups when an HQ would exceed 6; `groups.create` for empty
+   `platform_chat_id`; write back `platform=hermes` + room_id; never satellite
+   B). External Telegram/Discord gates + allowlists only when the user names
+   that platform.
 2. Delegation → `delegation.md` **Fleet apply** (`model_map` for Subagent
    parents still missing options/default; skip `profile_routes` parents and
    agents with zero Subagents).

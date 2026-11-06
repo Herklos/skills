@@ -104,10 +104,11 @@ Never reuse the same bot token across two profiles.
 
 Full guide: `messaging-groups.md`. **Org default: Hermes Bot Mode hosted room.**
 
-1. Confirm Anytype Group `hermes_profiles` (comma slugs); split at 6 → primary + satellite B
-2. Create hosted room(s) via Desktop **Manage groups** / **New Group Chat**, or JSON-RPC `groups.create` on the gateway session WebSocket (host-scoped ticket). No `hermes group` CLI. Room id convention: `anytype-<group-slug>`
-3. Write back Anytype `platform=hermes` + `platform_chat_id=<room_id>` (+ `notes` for satellites)
+1. Confirm Anytype Group `hermes_profiles` (comma slugs, ≤6). If an HQ would exceed 6, mint **Subteam Groups** and slim the HQ first (never satellite B)
+2. Create hosted room(s) via Desktop **Manage groups** / **New Group Chat**, or JSON-RPC `groups.create` on the gateway session WebSocket (host-scoped ticket). No `hermes group` CLI. Room id convention: `anytype-<group-slug>` (new id when resizing; disbanded ids cannot be reused)
+3. Write back Anytype `platform=hermes` + `platform_chat_id=<room_id>` (+ `notes` listing Subteam Groups when an HQ was split)
 4. Paste welcome from the Group's `welcome_prompt` into the Bot Mode room once
+5. Disband obsolete rooms with `groups.disband` (`room_id` + `cancel_id`) after writeback
 
 **External Telegram/Discord only when the user asks:** one token per profile `.env`, platform room, allowlists, mention gates. Do not invent Telegram groups for the org Bot Mode default.
 

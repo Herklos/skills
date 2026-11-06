@@ -6,7 +6,7 @@ description: >
   export/import, install distributions, edit SOUL/config/model, and run per-profile
   gateways. Use when the user mentions Hermes profiles, hermes -p, Bot Mode roster,
   or profile lifecycle. Use when the user runs /hermes-profiles.
-version: 1.41.0
+version: 1.42.0
 license: MIT
 metadata:
   category: agents
@@ -311,12 +311,14 @@ Full guide: `references/messaging-groups.md`. **Org default: Hermes Bot Mode
 hosted Group Chats** (Desktop Bots → Manage groups / New Group Chat, or
 `groups.create` RPC; 2–6 bots; stored in `hosted_rooms`). Do not create
 Telegram/Discord rooms unless the user asks. Write the Hermes `room_id` back to
-Anytype Group.`platform_chat_id` (and `platform=hermes`). When a Group has more
-than 6 `hermes_profiles`, seat six in the primary room and create a satellite
-B room for overflow. External Telegram/Discord still need one token + allowlist
-+ mention gates per profile. Intended rooms live as Anytype typed **Group**
-objects; decline only when the user asks. **Join HQ/domain Group first** for
-new specialists. Groups are not `delegation.backend` modes (`delegation.md`).
+Anytype Group.`platform_chat_id` (and `platform=hermes`). When an HQ would exceed
+6 seats, split onto **Subteam Groups** (HQ = chief + Subteam leads; specialists
+on the Subteam Group). Never mint satellite `*-group-b` rooms. Disbanded
+`room_id`s cannot be reused; resize = new id + writeback + `groups.disband`.
+External Telegram/Discord still need one token + allowlist + mention gates per
+profile. Intended rooms live as Anytype typed **Group** objects; decline only
+when the user asks. **Join Subteam/HQ Group first** for new specialists. Groups
+are not `delegation.backend` modes (`delegation.md`).
 
 ### Anytype suggestions → Hermes apply
 

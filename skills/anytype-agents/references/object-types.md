@@ -909,10 +909,10 @@ Subagent routes, while the Group stays the shared human chat.
 | `slug` | text | Stable lowercase id (e.g. `engineering`) (featured) |
 | `mission` | text | Short purpose of the room |
 | `routing_summary` | text | One-line who answers what |
-| `hermes_profiles` | text | Comma list of member Hermes slugs (checklist; Bot Mode max 6 per room → satellite B for overflow) |
+| `hermes_profiles` | text | Comma list of member Hermes slugs (checklist; Bot Mode max 6 per room; overflow → Subteam Groups, never satellite B) |
 | `require_mention` | checkbox | Intended external-platform mention gate (Telegram/Discord) |
 | `exclusive_bot_mentions` | checkbox | Intended external-platform exclusive mentions |
-| `notes` | text | Apply / sync notes (satellite room ids when split) |
+| `notes` | text | Apply / sync notes (linked Subteam Groups when an HQ was split) |
 
 Also `tag`, `links`, `backlinks`. Canonical roster is `members`; keep each
 Agent.`messaging_group` pointing here. Body keeps Members + Welcome pointer
@@ -926,18 +926,20 @@ only (`page-templates.md` / **Group default**).
 |-----------|--------|
 | New live specialist under an HQ that already has a Group | **Join** that Group: add to `members` + `hermes_profiles`, set Agent.`messaging_group`, rewrite welcome |
 | New HQ (or first room for that HQ) | **Create** typed `group` + welcome Prompt; link HQ.`messaging_group` |
-| Domain already owns its own room (Veille, Wedding, Ana, Kitchen, …) | Keep/join that domain Group; do not also force HQ Group membership for messaging |
-| Live Agent with empty `messaging_group` | Treat as a gap: join HQ or existing domain Group (inventory via search) |
+| Subteam needs its own chat (HQ would exceed 6) | **Create** Subteam Group; specialists → that Group; HQ stays chief + leads |
+| Domain already owns its own room (Veille, …) | Keep/join that domain Group; do not also force HQ Group membership for messaging |
+| Live Agent with empty `messaging_group` | Gap unless the user deferred that HQ (e.g. Foyer): join Subteam or HQ Group |
 
-Prefer one Engineering Group for Eng specialists (Clovis / Denise / Joachim
-pattern) over one Group per hire. Octave stays on Veille & Technology Group.
+Prefer Subteam Groups for specialists when an HQ would exceed 6 (Development /
+Ops / …). HQ Group = chief + Subteam leads. Never mint satellite `* B` rooms.
 
 **Hermes decline (preferred):** create Bot Mode hosted room(s) via
-`groups.create` (2–6 members; satellite B if more than 6 `hermes_profiles`);
-set `platform=hermes` + `platform_chat_id=<room_id>`; paste welcome from
-`welcome_prompt`. Do **not** create Telegram groups unless asked. External
-path (tokens + allowlists + mention gates) only when the user names Telegram /
-Discord. Do not apply until the user asks.
+`groups.create` (2–6 members); overflow → Subteam Groups first; set
+`platform=hermes` + `platform_chat_id=<room_id>`; paste welcome from
+`welcome_prompt`. Resize = new `room_id` + writeback + `groups.disband`
+(retired ids cannot be reused). Do **not** create Telegram groups unless asked.
+External path (tokens + allowlists + mention gates) only when the user names
+Telegram / Discord. Do not apply until the user asks.
 
 ## Memory (`api_key`: `memory`)
 

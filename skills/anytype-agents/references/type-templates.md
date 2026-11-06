@@ -114,8 +114,9 @@ asked). Do not paste a second welcome fence here.
 ## Hermes / platform
 Prefer `platform=hermes` and `platform_chat_id` = Hermes hosted `room_id`.
 Require mention / Exclusive bot mentions apply to external platforms.
-`hermes_profiles` is the seat checklist (max 6 per Bot Mode room → satellite B).
-Apply via hermes-profiles `messaging-groups.md` when asked (no auto-push).
+`hermes_profiles` is the seat checklist (max 6 per Bot Mode room; overflow →
+Subteam Groups). Apply via hermes-profiles `messaging-groups.md` when asked
+(no auto-push).
 ```
 
 ---

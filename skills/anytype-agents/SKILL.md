@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.54.0
+version: 1.55.0
 license: MIT
 metadata:
   category: agents
@@ -187,37 +187,42 @@ Confirm with the user before creating chiefs, Board seats, shared-rule edits, ar
 
 **Groups are human-visible messaging rooms.** They are not Hermes `model_map` /
 `profile_routes` (those are spawn backends on the Agent). Every **live** Agent
-must have `messaging_group` set. Prefer one room per HQ (or per clear domain
-room like Veille / Wedding / Ana) over one room per specialist.
+should have `messaging_group` set, except when the user has **deferred**
+messaging for that HQ (org example: Foyer agents may have empty
+`messaging_group` until rooms are requested again).
 
-**Join first (default for new specialists under an existing HQ):**
+**Overflow (Bot Mode 2–6):** do **not** create satellite `* B` rooms. When an HQ
+roster would exceed 6 Hermes seats, split onto **Subteam Groups**: HQ Group =
+chief + Subteam leads (≤6); specialists → Subteam Group; Subteam.`messaging_group`
+→ that Group. Solo Subteams may seat the HQ chief as a bridge (≥2 members).
 
-1. Find the HQ (or domain) Group via `type: group` + `parent_team` / name search
-2. Add the Agent to Group.`members` and to HQ.`members` when they report there
-3. Append the Agent's `hermes_profile` slug to Group.`hermes_profiles` (comma list)
-4. Set Agent.`messaging_group` → that Group id (and keep Agent.`team` on the HQ or Subteam)
+**Join first (default for new specialists under an existing Subteam/HQ Group):**
+
+1. Find the Subteam Group (preferred) or HQ Group via `type: group` + name / `parent_team`
+2. Add the Agent to Group.`members` (and HQ.`members` when they report there)
+3. Append the Agent's `hermes_profile` slug to Group.`hermes_profiles` (comma list, keep ≤6)
+4. Set Agent.`messaging_group` → that Group id (and keep Agent.`team` on the Subteam or HQ)
 5. Rewrite the Group welcome Prompt (delete stale body blocks, then `insert_blocks`;
-   `mcp-recipes.md` → Rewrite a Group welcome). Name Clovis/Denise/Joachim-style
-   joiners in Team + sub-team bullets
+   `mcp-recipes.md` → Rewrite a Group welcome)
 6. Hermes apply only when the user asks (`hermes-profiles` `messaging-groups.md`)
 
-**Mint a new Group only when** the room has a distinct audience (new HQ, or a
-domain that already owns its own chat such as Veille & Technology, Wedding, Ana /
-Kitchen). Do not create three specialist Groups for three Eng hires under
-Engineering HQ.
+**Mint a new Group when** there is a new HQ, or a Subteam that needs its own
+chat (Development, Ops, Customer & Analytics, …), or a distinct domain room
+(Veille & Technology). Do not create one Group per hire under an HQ that already
+fits ≤6, and do not mint satellite B overflow rooms.
 
 **New Group create steps:**
 
 1. Create type **`group`** (or `set_type` a legacy Group `page` in place) with `lifecycle`, `parent_team`, `members`, `slug`, optional `mission` / `routing_summary`
 2. Create a **Prompt** (`prompt_kind=welcome`, `owner_group`, `audience=group`); set Group.`welcome_prompt` (`prompts.md`)
-3. Set platform intent: prefer `platform=hermes` for Bot Mode rooms; optional `platform_chat_id` (Hermes `room_id` once created), `hermes_profiles` (comma slugs), `require_mention`, `exclusive_bot_mentions`, `notes`. Use `telegram` / `discord` only when the user asks for an external platform
+3. Set platform intent: prefer `platform=hermes` for Bot Mode rooms; optional `platform_chat_id` (Hermes `room_id` once created), `hermes_profiles` (comma slugs ≤6), `require_mention`, `exclusive_bot_mentions`, `notes`. Use `telegram` / `discord` only when the user asks for an external platform
 4. Point Agent.`messaging_group` (and HQ/Subteam.`messaging_group` when the room is theirs) at this Group
 5. Body from **Group default** / `page-templates.md` (Members + Welcome pointer only; no second welcome fence)
-6. Hermes apply only via `hermes-profiles` `messaging-groups.md` when the user asks. Preferred apply: create Bot Mode hosted rooms (`groups.create`, 2–6 members; satellite B if more than 6) and write `platform_chat_id`. Do **not** invent Telegram groups or tokens. External-platform gates-only path remains for Telegram/Discord when those are requested
+6. Hermes apply only via `hermes-profiles` `messaging-groups.md` when the user asks. Preferred apply: `groups.create` (2–6), write `platform_chat_id`; overflow → Subteam Groups first. Resize = new `room_id` + writeback + `groups.disband` (retired ids cannot be reused). Do **not** invent Telegram groups or tokens.
 
 **Inventory gap check:** search `type: agent` with `lifecycle = "live"` and
-`fields` including `messaging_group`. Any live Agent with empty `messaging_group`
-should join the owning HQ Group (or the domain Group if one already exists).
+`fields` including `messaging_group`. Empty → join Subteam Group (preferred) or
+HQ Group; skip only when the user deferred that HQ's messaging.
 
 ### Create or update a Subteam
 
