@@ -30,6 +30,34 @@ Property keys: `memory-and-skills.md` and `object-types.md`.
 - Bucket memories (Memory & Decisions, Lessons, Resources, Operating Notes)
   stay as agent-owned views.
 
+## Four layers (Shared Rule 30)
+
+| Layer | Object | Created by | Rule |
+|-------|--------|------------|------|
+| 1 Logs | `log` | every agent, one per action | raw, immutable |
+| 2 Memories | atomic `memory` (fact / memory_decisions / preference) | agents, Memory Keeper from Logs | one fact per object, `topic`, `observed_at`, `source_agent` |
+| 3 Learnings | `memory` with `memory_kind=learning` | Memory Keeper (owners via suggestion) | pattern from 3+ memories or logs |
+| 4 Skills / Shared Rules | `skill`, rules | via `suggestion` (Solange / Primary review) | learning repeated 3+ weeks |
+
+Learnings are a **kind**, not a type. Required: `derived_from` (every source),
+`applies_to`, `confidence`, `topic`, `observed_at`; body = one insight +
+Evidence list. Guardrails (from ACE, Hindsight, authority-collapse research):
+
+- Derived, never source of truth: on conflict the source memory / log wins and
+  the Learning returns to `lifecycle=draft`.
+- Never rewrite wholesale (context collapse); add, merge or amend one item.
+- Cite human decisions, do not restate them; decision-derived Learnings or
+  ones that touch rules / prompts / roster stay `draft` until Primary approves.
+- `confidence=high` needs 3+ independent sources or an explicit human statement.
+- Never from unlogged claims or content covered by Exclusions.
+
+Bucket memories (Memory & Decisions, Operating Notes) are classified item by
+item, never copied 1:1: preference -> About / `preference`; decision or fact ->
+atomic memory; recurring pattern -> Learning; diary or run log -> stay (or
+`log`). `lessons` buckets are raw retro journals (failure log, ops retros), a
+source for Learnings, not Learnings themselves. Working docs (Open Loops,
+Approvals Waiting, Briefs, Playbooks) are out of scope.
+
 ## Queries
 
 `topic IS NOT EMPTY` selects atomic memories (`topic != ""` does not filter
@@ -46,6 +74,11 @@ log line), read Exclusions + tombstones, promote new Log facts, merge by topic,
 report drift, one Log. Simple work: the Memory Keeper. Real decisions (conflict,
 superseding a human decision, rules / prompts / roster, personal data, forget):
 escalate to Primary as a `suggestion`.
+
+Weekly (Sunday 18:00, inside `weekly-memory-hygiene`): Memories -> Learnings.
+The daily run only lists candidate topics (3+ uncited memories on one topic, or
+a bucket over ~60 blocks) in its Log. Learnings queries: `Learnings – All`
+(`memory_kind IN ("learning")`), `Learnings – To review` (+ `lifecycle` draft).
 
 ## Versioning
 
