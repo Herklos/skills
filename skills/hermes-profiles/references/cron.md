@@ -33,7 +33,7 @@ hermes -p <slug> gateway start   # agent jobs need the gateway
 | Surface | Examples |
 |---------|----------|
 | Chat slash | `/cron add "every 2h" "Check server status"` · `/cron list` · `/cron pause\|resume\|run\|remove <id\|name>` |
-| CLI | `hermes -p <slug> cron create\|list\|edit\|pause\|resume\|run\|cancel\|remove\|status\|tick\|doctor` |
+| CLI | `hermes -p <slug> cron create\|list\|edit\|pause\|resume\|run\|cancel\|remove\|status\|tick\|doctor\|runs\|incidents\|notepad` |
 | Natural language | "Every weekday at 9am, summarize HN AI news and send it on Telegram." → `cronjob_manage` |
 
 Prefer tool/CLI/dashboard over hand-editing `cron/jobs.json` (write-safety and
@@ -78,13 +78,13 @@ model/reasoning pins.
 | `schedule` | Natural (`every 2h`, `in 30m`) or cron expr |
 | `prompt` | Full self-contained task (fresh session; no prior chat) |
 | `skills` / `--skill` | Zero or more skills loaded before the prompt |
-| `deliver` | `origin` · `local` · `telegram:<chat>` · `all` · `bot-chat` · … |
+| `deliver` | `origin` · `local` · `telegram:<chat>` · `all` · `bot-chat` · `bot-chat:<profile>` · **`room:<room_id>`** (Bot Mode Group Chat) · … |
 | `workdir` | Absolute project dir (injects AGENTS.md / .cursorrules; tools cwd) |
 | `timezone` | Wall-clock zone for cron exprs (else profile `timezone`) |
 | `no_agent` + `script` | Script-only; stdout delivered; empty stdout = silent |
 | `enabled_toolsets` | Per-job tool allowlist (else cron-platform / defaults) |
 | Model / reasoning pin | See above |
-| `--grace-minutes` / catch-up | Missed-run window |
+| `--grace-minutes` / catch-up | Missed-run window (see below) |
 | `--paused` | Create without scheduling until `resume` |
 
 Cron-run sessions **cannot** create more cron jobs unless
@@ -93,9 +93,19 @@ Cron-run sessions **cannot** create more cron jobs unless
 ## Delivery (short)
 
 Final agent response (or script stdout) goes to the job's `deliver` target.
-The prompt should not try to "send" itself. Common targets: origin chat,
-`local` (files under `cron/output/`), platform chat ids, `all` (every home
-channel), `bot-chat` (deliver into a profile's Bot Chat as an incoming turn).
+The prompt should not try to "send" itself. Common targets:
+
+| Target | Effect |
+|--------|--------|
+| (omit) / `origin` | Chat/topic the job was created from |
+| `local` | Files under `cron/output/` only |
+| `all` | Every connected home channel (resolved at fire time) |
+| `bot-chat` / `bot-chat:<profile>` | Inject into that Bot Chat as a real message |
+| **`room:<room_id>`** | Post into a Bot Mode Group Chat; starts a round **only for members the output @mentions** |
+| `telegram:<chat_id>` / `…:thread` | External platform (only when asked) |
+
+Comma-combine (e.g. `origin,all`). Use Anytype Group.`platform_chat_id` as
+`room_id` when delivering into org rooms (`messaging-groups.md`).
 
 Markers in agent replies: `[SILENT]` suppresses successful delivery; `[CRON_FAILURE]`
 marks the run failed. Script jobs signal failure with non-zero exit.
@@ -107,6 +117,44 @@ Related config: `cron.wrap_response`, `cron.delivery.notify`,
 ```bash
 hermes -p <slug> config set approvals.cron_mode deny
 ```
+
+## Cancel in-flight + missed runs
+
+```bash
+hermes -p <slug> cron cancel <job_id_or_name>
+hermes -p <slug> cron cancel <job_id_or_name> --reason "wedged on staging API"
+```
+
+`cancel` stops the **current** run only (schedule untouched). It is a request,
+not a hard kill; the run books a `cancelled` row (no failure notice, no streak).
+Safe no-op when nothing is running. Also: Desktop **Stop**, API
+`POST /api/cron/jobs/{id}/cancel`, agent `cronjob_manage` action `cancel`.
+`remove` cancels an in-flight run first.
+
+**Missed occurrences (cron expressions):** catch-up window = half the period,
+clamped 2 minutes–2 hours, unless overridden:
+
+```bash
+hermes -p <slug> cron edit <id> --grace-minutes 0     # never catch up
+hermes -p <slug> cron edit <id> --grace-minutes 30
+hermes -p <slug> config set cron.catch_up_missed false  # fleet: skip catch-up
+```
+
+`once` / `interval` schedules have no wall-clock miss. Recurring jobs that were
+**paused** over a due slot keep that slot due on resume (one catch-up, or skip
+when catch-up is off).
+
+## Ops surfaces (pointer)
+
+```bash
+hermes -p <slug> cron runs <id>           # durable execution attempts
+hermes -p <slug> cron incidents           # failure incidents
+hermes -p <slug> cron incidents ack <id>
+hermes -p <slug> cron notepad <id>        # durable KV across runs for one job
+```
+
+Full behavior: official cron docs. Recurring jobs share a prompt-cache key
+(v0.23 latency work); prefer stable prompts for fleet jobs.
 
 ## Fleet health
 
@@ -197,6 +245,9 @@ to "that server issue" fail.
 | Cheap recurring fleet | `cron.model` (+ leave jobs unpinned) |
 | Lock one job's model | `cron edit <id> --pin` or `--model`/`--provider` |
 | Watchdog / heartbeat | `--no-agent --script …` (empty stdout = silent) |
+| Post into Bot Mode room | `--deliver room:<platform_chat_id>` + @mentions in prompt |
+| Stop wedged run | `cron cancel <id>` (schedule stays) |
+| Skip missed fires | `--grace-minutes 0` or `cron.catch_up_missed: false` |
 | Repo-aware audit | `--workdir /absolute/path` |
 | Unattended approvals | `approvals.cron_mode: deny` (or `approve` if trusted) |
 | Document intent | Anytype **Schedule** on Agenda Query (`agenda_page`); Suggested runtime summary optional |

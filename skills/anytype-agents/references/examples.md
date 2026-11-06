@@ -46,11 +46,11 @@ Central home for teams and shared rules.
 - Prefer `subteam` objects; do not create new Sub-teams as `team` with `kind: Sub-team`
 
 ## Harnesses (type `harness`)
-- Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model
+- Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model, Mistral
 
 ## Harness profiles (type `harness_profile`)
-- **Local parent** → chat `llamacpp` / `LFM3-1.7B-Q8_0` / none; aux approval `llamacpp` / `d1-2b-q4_k_m`; no cloud fallbacks (**most Agents**)
-- **Foyer** → same dual local; voice-friendly; no Subagents (home agents)
+- **Local parent** → chat `mistral` / `zai-glm-5-3-flash` / low; aux approval `llamacpp` / `d1-2b-q4_k_m`; no cloud fallbacks (**most Agents**)
+- **Foyer** → dual local `llamacpp` / `LFM3-1.7B-Q8_0` + d1 approvals; voice-friendly; no Subagents (home agents)
 - **CLASQUIN** → Anthropic Claude Sonnet 5.5 high; no fallbacks (Arnold)
 - Chiefs / Coding / Reviewing / Browser / Web/MCP / Deep think → Subagent specialist stacks
 - Agents link `harness_profile` (not a harness select)

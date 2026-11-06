@@ -18,11 +18,13 @@ Related: `models.md` for main / auxiliary / fallback / MoA. The parent **routing
 **task-specific models** via the official **`advanced-delegation`** plugin
 (`delegation.backend: model_map`).
 
-**Org default (Anytype Local parent):** most parents use **llamacpp `LFM3-1.7B-Q8_0`** as
-`model.*` (chat + route picking) and **llamacpp `d1-2b-q4_k_m`** for
-`auxiliary.approval`. That parent answers other agents / light asks itself when
-no Subagent is needed, and picks named `model_map` routes (from Anytype Subagent
-objects) for specialized work. Exceptions: Foyer and CLASQUIN (no Subagents).
+**Org default (Anytype Local parent):** most parents use **`mistral` /
+`zai-glm-5-3-flash`** as `model.*` (chat + route picking) and **llamacpp
+`d1-2b-q4_k_m`** for `auxiliary.approval`. That parent answers other agents /
+light asks itself when no Subagent is needed, and picks named `model_map`
+routes (from Anytype Subagent objects) for specialized work. Exceptions:
+**Foyer** (dual local LFM3 chat + d1 approvals, no Subagents) and **CLASQUIN /
+Arnold** (Anthropic Claude subscription only, no Subagents).
 
 ### Three layers: rooms vs routing model vs task routes
 
@@ -112,7 +114,7 @@ delegation:
   max_iterations: 250
   backends:
     model_map:
-      default: fast                   # REQUIRED on Local parent: unrouted children use this (never inherit lfm3)
+      default: fast                   # REQUIRED on Local parent: unrouted children use this (never inherit parent Flash)
       options:
         - name: fast                  # what the agent picks
           description: Cheap and quick; lookups, summaries, simple edits.
@@ -162,12 +164,12 @@ Schema is built at session start. Mid-chat mode changes need `/new` or `--now`.
 
 ### Org enforcement (Local parent + model_map) — mandatory
 
-Three mitigations after unrouted children inherited parent **lfm3**
-(Octave `deleg_e2211d4e`, 2026-11-05):
+Three mitigations after unrouted children inherited the parent local/chat model
+(Octave `deleg_e2211d4e`, 2026-11-05; same risk with Flash as parent):
 
 1. **`model_map.default`** — always set to a live Subagent `task_key` on Local
    parents (`hermes -p <slug> config set delegation.backends.model_map.default <key>`).
-   Unrouted `delegate_task` must not fall through to lfm3.
+   Unrouted `delegate_task` must not fall through to the parent chat model.
 2. **Always pass `option`** — SOUL + Shared Rules (rule 26): every spawn sets
    `option` to a route matching Subagent `task_key`, with full `goal` + `context`.
 3. **Rebuild tool schema** — after any `model_map` / mode change, `/delegation model_map --now`
@@ -175,8 +177,8 @@ Three mitigations after unrouted children inherited parent **lfm3**
    Stale sessions can omit the `option` enum even when config is correct.
 
 Verify: `hermes -p <slug> delegation config --show` prints `default: <key>`.
-Child `manifest.json` / `task_json` must show the route model, not `lfm3`, when
-the parent intended a Subagent.
+Child `manifest.json` / `task_json` must show the route model, not the parent
+chat model, when the parent intended a Subagent.
 
 ### Profile routes (`profile_routes`)
 
@@ -224,10 +226,39 @@ inactive). Strong-fit parents (2026-11-05): `sidonie`, `kleber`, `henri`,
 | `delegation.independent_completions` | Per-task/group wake-ups vs one consolidated return |
 | `delegation.request_overrides` | Extra API kwargs / `extra_body` on every child call |
 | `delegation.base_url` + `api_key` | Direct endpoint instead of named provider (default backend) |
+| `delegation.surface_child_process_notifications` | Surface child `notify_on_complete` to parent (default false) |
+| `delegation.prefix_stagger_seconds` | Opt-in batch stagger so parallel children can share prompt cache (plugin / newer Hermes; verify with `config get`) |
 | `auxiliary.review` | Dedicated model for `/review` (separate from `delegate_task`) |
 
-`/review` uses a background reviewer; pin with `auxiliary.review` if desired.
-Monitor with `/agents` (Ctrl+T).
+### Structured output (`output_schema`)
+
+Each task may carry an optional JSON Schema. The child must return only that
+JSON; on validation failure Hermes gives **one** correction turn. Result gains
+`schema_valid` / `schema_errors`; a miss after retry still returns
+`status: completed` with raw `summary` (parent extracts what it can). Keep
+schemas forgiving. Maps well from Anytype Subagent.`deliver_back` when you
+want a machine-checkable contract in SOUL / Shared Rules.
+
+### Images on `delegate_task`
+
+Optional per-task `images` list (up to 8: paths, http(s), or `data:`). Vision
+children get native multimodal content; non-vision children get path hints and
+are told to use `vision_analyze`. Best-effort: bad paths never break the spawn.
+
+### Child processes and handoff
+
+Child background processes are killed when the child finishes unless the child
+**waits**, **kills**, or **`process_manage(action="handoff")`** (up to 3 per
+child). Unread exits attach as `unread_completions`; still-running orphans are
+named on the result. Default: suppress child process notifications in the
+parent (`surface_child_process_notifications: false`); the delegation summary
+is the deliverable.
+
+### `/review`
+
+`/review` [focus…] spawns a full-privilege background reviewer on the same rail
+as `delegate_task` (last ~10 messages as evidence). Pin with `auxiliary.review`.
+Separate from `/refine` (memory/skills). Monitor with `/agents` (Ctrl+T).
 
 ## Recipe: local routing model + task-specific workers (`model_map`)
 
@@ -252,8 +283,9 @@ local_runtime:
   backend: auto                           # cuda / metal / vulkan / cpu
 
 model:
-  provider: llamacpp                      # Local parent chat (LFM3-1.7B-Q8_0)
-  default: LFM3-1.7B-Q8_0
+  provider: mistral                       # Local parent chat (org default)
+  default: zai-glm-5-3-flash
+  # effort: low                         # when the provider accepts it
 
 auxiliary:
   approval:
@@ -318,9 +350,9 @@ routes from Anytype **Subagent** objects (see below).
 When the org uses skill `anytype-agents`, most parents link **Local parent** as
 `harness_profile` and zero or more typed **`subagent`** objects
 (`parent_agent` + Agent.`subagents`). Decline Local parent → parent `model.*`
-(llamacpp/LFM3-1.7B-Q8_0) + `auxiliary.approval` (llamacpp/d1). Treat Subagents as the
-source of truth for `model_map` routes. Do not invent a Subagent for “quick
-peer answers”; that stays on the local parent.
+(`mistral` / `zai-glm-5-3-flash`) + `auxiliary.approval` (llamacpp/d1). Treat
+Subagents as the source of truth for `model_map` routes. Do not invent a
+Subagent for “quick peer answers”; that stays on the local parent.
 
 **When to apply:** push `model_map` / new Subagent routes into live Hermes only
 after an accepted Anytype **`suggestion`** (kinds `new_subagent` / `model_fit` /
@@ -343,9 +375,10 @@ Steps:
    (`type: subagent`, filter by `parent_agent` or Agent.`subagents`).
 2. Decline parent Agent.`harness_profile` (usually **Local parent**) into
    `model.*` + `auxiliary.approval` + `local_runtime` for d1: prefer profile
-   `model_provider` / `model_default` (org: `llamacpp` / `LFM3-1.7B-Q8_0`) and
+   `model_provider` / `model_default` (org: `mistral` / `zai-glm-5-3-flash`) and
    `aux_approval_*` (`llamacpp` / `d1-2b-q4_k_m`); see `models.md`
    **Local parent**. Also map `fallback_*` and other `aux_*` when filled.
+   Foyer stays `llamacpp` / `LFM3-1.7B-Q8_0` + d1.
 3. For each live Subagent, open its `harness_profile` and take `model_*` /
    effort (honor `model_override` / `spawn_effort` when set) plus `fallback_1_*`
    / `fallback_2_*` → that option's `fallback_providers`.
@@ -357,11 +390,11 @@ Steps:
    then `…default <task_key>` then `…backend model_map`. Interactive
    `delegation config` or a surgical YAML subtree edit also work.
 7. **Always set `model_map.default`** to one live Subagent `task_key` when the
-   parent is Local (lfm3). Light peer answers still stay on the parent without
+   parent is Local (Flash). Light peer answers still stay on the parent without
    spawning; but if the parent calls `delegate_task` without `option`, children
-   must **not** inherit lfm3 (set `default` to the most common route: `web` /
-   `deep` / `fast`). Keep parent top-level `fallback_providers` empty on Local
-   parent.
+   must **not** inherit the parent chat model (set `default` to the most common
+   route: `web` / `deep` / `fast`). Keep parent top-level `fallback_providers`
+   empty on Local parent.
 8. Enforce in SOUL + Shared Rules: every `delegate_task` sets **`option`** to a
    live route matching Subagent `task_key`, with full `goal` + `context`.
 9. After route edits: `/delegation model_map --now` or `/new` so the `option`
@@ -449,7 +482,7 @@ alone; messaging gates applied in the same pass (`messaging-groups.md`).
 |------|-----------|
 | Shared human chat room for HQ/domain bots | Anytype typed **Group** + Agent.`messaging_group` (`messaging-groups.md`); join HQ Group before minting a new room |
 | Parallel research / isolated workers | `tools enable delegation` + `delegate_task` |
-| **Local parent router (org default)** | Anytype Local parent → `model.*` LFM3-1.7B-Q8_0 (llamacpp) + `auxiliary.approval` d1; answer peers without spawning |
+| **Local parent router (org default)** | Anytype Local parent → `model.*` mistral/`zai-glm-5-3-flash` + `auxiliary.approval` d1; answer peers without spawning |
 | **Routing model** (who picks routes) | Parent `model.*` — see `models.md` |
 | **Task-specific models** (named routes) | `plugins install advanced-delegation` + `delegation.backend: model_map` + `backends.model_map.options`; set Agent.`delegation_backend=model_map` |
 | Routes from Anytype Subagent objects | Decline table above; keep Agent.`subagents` in sync |

@@ -7,7 +7,7 @@ description: >
   teams without assuming a fixed space. Use when the user mentions Anytype
   Agents, HQ, Board, shared agent rules, agent prompts, roster routing, or
   Projects linked from agents. Use when the user runs /anytype-agents.
-version: 1.55.0
+version: 1.57.0
 license: MIT
 metadata:
   category: agents
@@ -36,12 +36,12 @@ lives on **Harness profile**; Agent holds enablement / modes
 and optional STT/TTS overrides. Apply into Hermes via `hermes-profiles`
 `voice.md`. **Analytics** is Agent checkbox `analytics_enabled`: when true,
 Hermes apply enables the **langfuse** plugin (`hermes-profiles`
-`anytype-apply.md`). **Most agents use Local parent** (chat = llamacpp `LFM3-1.7B-Q8_0` / effort
-none; approvals = Hermes builtin llamacpp `d1-2b-q4_k_m`; voice stack local
+`anytype-apply.md`). **Most agents use Local parent** (chat = Mistral `zai-glm-5-3-flash` / effort
+low; approvals = Hermes builtin llamacpp `d1-2b-q4_k_m`; voice stack local
 Whisper + Edge TTS). Spawn routes live on
 **Subagent** objects (Agent.`subagents` / Subagent.`parent_agent`) with richer
 profiles (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think). Exceptions:
-**Foyer** (dedicated Foyer profile, no Subagents) and **CLASQUIN / Arnold**
+**Foyer** (dual local LFM3 chat + d1 approvals, no Subagents) and **CLASQUIN / Arnold**
 (Anthropic Claude subscription only, no Subagents). Decline into Hermes via
 `hermes-profiles` `delegation.md`.
 
@@ -94,7 +94,7 @@ Read with `format: "md"` for body; `outline: true` for structure; full object fo
 | HQ / Team | Typed `team` object (`kind`: Board / HQ) under Agents |
 | Subteam | Typed `subteam` object: domain / pod under an HQ (preferred over `team` + `kind: Sub-team`) |
 | Subagent | Typed `subagent` object: spawn/route config (task_key, harness_profile, scope, tools) under an Agent |
-| Harness | Typed `harness` catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model |
+| Harness | Typed `harness` catalog: Claude, Codex, Grok, GitHub Copilot, Muse, NVIDIA NIM, Local model, Mistral |
 | Harness profile | Typed `harness_profile`: Hermes-shaped model / fallback / aux stack; agents and subagents link here |
 | Browser | Typed `browser` catalog: `is_real` / `browser_engine` / `real_profile_pin` + source + identity + headed; agents / teams / subteams link here |
 | Computer | Typed `computer` catalog: surface + scope + desktop; agents / teams / subteams link here |
@@ -215,10 +215,10 @@ fits ≤6, and do not mint satellite B overflow rooms.
 
 1. Create type **`group`** (or `set_type` a legacy Group `page` in place) with `lifecycle`, `parent_team`, `members`, `slug`, optional `mission` / `routing_summary`
 2. Create a **Prompt** (`prompt_kind=welcome`, `owner_group`, `audience=group`); set Group.`welcome_prompt` (`prompts.md`)
-3. Set platform intent: prefer `platform=hermes` for Bot Mode rooms; optional `platform_chat_id` (Hermes `room_id` once created), `hermes_profiles` (comma slugs ≤6), `require_mention`, `exclusive_bot_mentions`, `notes`. Use `telegram` / `discord` only when the user asks for an external platform
+3. Set platform intent: prefer `platform=hermes` for Bot Mode rooms; optional `platform_chat_id` (Hermes `room_id` once created), `hermes_profiles` (comma slugs ≤6), `mission` / `shared_notes`, `unaddressed_routing` (default `everyone`), `lead_agent` when routing=`lead`, `require_mention`, `exclusive_bot_mentions`, `notes`. Use `telegram` / `discord` only when the user asks for an external platform
 4. Point Agent.`messaging_group` (and HQ/Subteam.`messaging_group` when the room is theirs) at this Group
 5. Body from **Group default** / `page-templates.md` (Members + Welcome pointer only; no second welcome fence)
-6. Hermes apply only via `hermes-profiles` `messaging-groups.md` when the user asks. Preferred apply: `groups.create` (2–6), write `platform_chat_id`; overflow → Subteam Groups first. Resize = new `room_id` + writeback + `groups.disband` (retired ids cannot be reused). Do **not** invent Telegram groups or tokens.
+6. Hermes apply only via `hermes-profiles` `messaging-groups.md` when the user asks. Preferred apply: `groups.create` (2–6), write `platform_chat_id`; then `groups.context` for purpose/notes/routing; overflow → Subteam Groups first. Resize = new `room_id` + writeback + `groups.disband` (retired ids cannot be reused). Do **not** invent Telegram groups or tokens.
 
 **Inventory gap check:** search `type: agent` with `lifecycle = "live"` and
 `fields` including `messaging_group`. Empty → join Subteam Group (preferred) or
@@ -246,15 +246,16 @@ HQ Group; skip only when the user deferred that HQ's messaging.
 ### Create or update a Harness / Harness profile
 
 1. **Harness** (catalog): type `harness` with `slug` in
-   `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | `local-model`
+   `claude` | `codex` | `grok` | `github-copilot` | `muse` | `nvidia-nim` | `local-model` | `mistral`
 2. **Harness profile** (stack): type `harness_profile` with Hermes-shaped fields:
    `model_provider` / `model_default` / `model_effort` / `model_harness`,
    `fallback_1_*` / `fallback_2_*`, `aux_<task>_*` for vision / compression /
    web_extract / skills_hub / title_generation / **approval**, and optional voice
    stack (`stt_*` / `tts_*` / `voice_notes`). **Local parent** org default:
-   chat `llamacpp` / `LFM3-1.7B-Q8_0` / none; `aux_approval_*` = `llamacpp` /
+   chat `mistral` / `zai-glm-5-3-flash` / low; `aux_approval_*` = `llamacpp` /
    `d1-2b-q4_k_m`; STT `local`/`base` + TTS `edge`/`en-US-AriaNeural`; no cloud
-   fallbacks. **Foyer** mirrors Local parent (voice-friendly, no Subagents).
+   fallbacks. **Foyer** stays dual local (`llamacpp` / `LFM3-1.7B-Q8_0` + d1
+   approvals; voice-friendly; no Subagents).
    **CLASQUIN** = Anthropic Claude subscription only. Specialist stacks
    (Chiefs, Coding, Reviewing, Browser, Web/MCP, Deep think) leave STT/TTS as
    `none` and other aux at `auto`

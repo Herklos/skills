@@ -199,3 +199,27 @@ race). Reopen and confirm disk widths stay 256. Full playbook: `avatars.md`.
 ## Secrets in chat
 
 If a secret was pasted into the conversation, rotate it and scrub `.env` / provider dashboards. Do not commit `.env`.
+
+## Hermes v0.23.0 upgrade / breaking renames
+
+Release: https://github.com/NousResearch/hermes-agent/releases/tag/v0.23.0
+(rolls up v0.22.1–v0.22.7). After `hermes update`:
+
+| Change | Action |
+|--------|--------|
+| Old `browser_*` / agent-browser tools removed | Use **`browser_exec`** only; Camofox homes get the `camofox` plugin auto-installed |
+| `hermes mcp serve` | Rename clients to **`hermes mcp-serve`** |
+| Word / PowerPoint / Excel skills | Merged into **`microsoft-office`**; remove old copies when ready |
+| Webapp | **Off by default**; enable `webapp.enabled` or Settings → Web Access; open with `hermes webapp` |
+| Desktop OS | macOS **13+**, 64-bit Windows (Electron 44) |
+| Plugins after update | `hermes plugins update` (or `--yes` for scripts); caution scan may ask; `--force` only when user confirms |
+| Silent default model | Product default is GLM-5.3 when unset; org pins Local parent Flash / Foyer LFM3 / CLASQUIN |
+| Session ownership | One gateway owns each session; CLI/Desktop/cron attach as clients (see SKILL Gateway) |
+
+Session UX (docs): `/model reset` returns to configured default without losing
+chat; `/rewind` (Esc Esc) forks or edits from an earlier message. Opt-in
+`compression.prepare_ahead: true` pre-builds the next summary. Vault key can
+move to OS keychain: `hermes vault key migrate --to keychain` /
+`vault.key_storage: keychain` (`browser-and-computer.md` / credential-vault docs).
+
+Plugins and skill locks: `plugins-and-skills.md`.

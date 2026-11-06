@@ -255,7 +255,7 @@ Subagents. Distinct from **`subteam`** (org domain).
 | `toolsets` | text | Enabled toolsets for the child (e.g. `web,terminal,file` or `inherit`) |
 | `spawn_effort` | select | Optional override: `low` \| `medium` \| `high` (else use profile primary effort). Display name **Spawn effort** (avoids clash with a numeric Effort property) |
 | `model_override` | text | Optional pin over the linked Harness profile primary |
-| `deliver_back` | text | What the child must return to the parent (summary shape) |
+| `deliver_back` | text | What the child must return to the parent (summary shape). Prefer a JSON-shaped contract the parent can pass as Hermes `delegate_task` `output_schema` when structured returns matter |
 | `system_prompt` | objects | Optional child **Prompt** when the spawn needs its own system text (else inherit parent) |
 | `avatar` | files | Optional spawn portrait (featured; shared key with Agent). Leave empty until images are ready |
 | `notes` | text | Extra apply notes |
@@ -329,6 +329,7 @@ profile to refresh every linked agent's intended `model.*`,
 | `aux_skills_hub_*` | same | Hermes `auxiliary.skills_hub.*` |
 | `aux_title_generation_*` | same | Hermes `auxiliary.title_generation.*` |
 | `aux_approval_provider` / `aux_approval_model` / `aux_approval_effort` | text / text / select | Hermes `auxiliary.approval.*`. Local parent / Foyer: `llamacpp` / `d1-2b-q4_k_m` |
+| `aux_group_router_provider` / `aux_group_router_model` / `aux_group_router_effort` | text / text / select | Hermes `auxiliary.group_router.*` (cheap model for Bot Mode **auto** unaddressed routing; v0.23+). Leave empty until auto routing is in use |
 | `notes` | text | When to use this profile |
 | `stt_provider` | select | `local` \| `groq` \| `openai` \| `mistral` \| `xai` \| `elevenlabs` \| `deepinfra` \| `none` (featured). Display name **STT provider** |
 | `stt_model` | text | e.g. `base`, `whisper-large-v3-turbo` |
@@ -907,8 +908,11 @@ Subagent routes, while the Group stays the shared human chat.
 | `platform` | select | Prefer `hermes` (Bot Mode). Also `telegram` \| `discord` \| `slack` \| `whatsapp` \| `other` \| `none` (featured). Mint `hermes` once (sequential); parallel `create_missing_options` duplicates the option |
 | `platform_chat_id` | text | Hermes hosted `room_id` (e.g. `anytype-engineering-group`) or external chat id (featured); leave empty until real |
 | `slug` | text | Stable lowercase id (e.g. `engineering`) (featured) |
-| `mission` | text | Short purpose of the room |
-| `routing_summary` | text | One-line who answers what |
+| `mission` | text | Short purpose of the room → Hermes room `purpose` |
+| `routing_summary` | text | One-line who answers what (human); optional paste into `shared_notes` |
+| `shared_notes` | text | Standing room notes → Hermes room `notes` (feeds lead/auto routing) |
+| `unaddressed_routing` | select | `everyone` \| `lead` \| `auto` (featured). Who answers when nobody is @mentioned. Org default **`everyone`**. Hermes `groups.context` `routing`. `auto` confirmed on Hermes ≥0.23 (`auxiliary.group_router`) |
+| `lead_agent` | objects | Lead Agent when `unaddressed_routing=lead` (featured). Decline → Hermes `lead_member_id` = that Agent.`hermes_profile` |
 | `hermes_profiles` | text | Comma list of member Hermes slugs (checklist; Bot Mode max 6 per room; overflow → Subteam Groups, never satellite B) |
 | `require_mention` | checkbox | Intended external-platform mention gate (Telegram/Discord) |
 | `exclusive_bot_mentions` | checkbox | Intended external-platform exclusive mentions |
@@ -917,6 +921,11 @@ Subagent routes, while the Group stays the shared human chat.
 Also `tag`, `links`, `backlinks`. Canonical roster is `members`; keep each
 Agent.`messaging_group` pointing here. Body keeps Members + Welcome pointer
 only (`page-templates.md` / **Group default**).
+
+**Unaddressed routing (Hermes Bot Mode):** after `groups.create`, apply purpose /
+notes / routing via Desktop Group settings or `groups.context` RPC
+(`hermes-profiles` → `messaging-groups.md`). Do not invent Telegram behavior.
+Keep `everyone` until the user asks for `lead` (HQ chief) or `auto`.
 
 **Default template name:** `Group default`. Body: `type-templates.md`.
 
@@ -1036,7 +1045,7 @@ The agent's **Agenda** is a Query over these objects (no Agenda type).
 | `timezone` | text | e.g. `Europe/Paris` (featured) |
 | `next_run` | date | Next fire / Calendar anchor (featured); Date Objects |
 | `intent` | text | Short what/when (featured) |
-| `deliver` | text | Hermes deliver target |
+| `deliver` | text | Hermes deliver target (`origin`, `local`, `bot-chat`, **`room:<platform_chat_id>`**, `telegram:…`, …) |
 | `skills` | text | Comma skill keys |
 | `workdir` | text | Absolute cwd when needed |
 | `model_pin` | text | Per-job pin note |

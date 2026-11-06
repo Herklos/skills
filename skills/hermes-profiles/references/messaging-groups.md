@@ -200,6 +200,95 @@ Earlier fleet pass (2026-11-05 morning): mention gates on ~50 profiles while
 chat ids were still empty. Evening pass: Hermes hosted rooms + Anytype
 writeback (this doc).
 
+## Room purpose, notes, and unaddressed routing (v0.23+)
+
+After a room exists, set **purpose**, **shared notes**, and who answers when a
+human message names nobody. Official Bot Mode docs:
+https://hermes-agent.nousresearch.com/docs/user-guide/bot-mode#groups-and-group-chats
+
+### Modes (gateway-owned rooms)
+
+| `routing` | Behavior |
+|-----------|----------|
+| `everyone` | **Default.** Unaddressed human message wakes every member (normal rounds) |
+| `lead` | Unaddressed message goes to the **lead** first; lead returns JSON `{"assign":["handle",…]}`; gateway records `room.assignment` and only chosen members answer. Lead alone if assign is empty |
+| `auto` | **v0.23+.** Short tool-less router call over purpose + notes + member descriptions + recent messages; UI shows “Assigned to X”. Pin cheap model with `auxiliary.group_router`. Falls back to everyone on failure. Confirmed on installed Hermes **0.23.0** (`gateway/hosted_room_context.py` accepts `everyone`\|`lead`\|`auto`; `hosted_room_router.py` + `auxiliary.group_router`) |
+
+@mentions, `@all` / `@everyone`, scheduled posts, and replies inside an existing
+thread **skip** lead/auto routing.
+
+### Apply via RPC (`groups.context`)
+
+Same session WebSocket as `groups.create` (not `gateway.sock`):
+
+```json
+{
+  "method": "groups.context",
+  "params": {
+    "room_id": "anytype-engineering-group",
+    "purpose": "Engineering HQ coordination: chiefs + Subteam leads.",
+    "notes": "Prefer @marcel for Dev, @gaston for Ops. Escalate Sev-1 to @etienne.",
+    "routing": "lead",
+    "lead_member_id": "etienne"
+  }
+}
+```
+
+Keys (from gateway `session_group_controls`): `room_id`, optional `event_id`,
+`purpose`, `notes`, `routing`, `lead_member_id`. Desktop path: room header →
+**Group settings** (purpose / notes / who answers).
+
+Purpose and notes are injected into member turn prompts (user-role context), not
+the system prompt. Keep them short; they feed lead (and auto) routing.
+
+### Anytype decline
+
+| Anytype Group field | Hermes |
+|---------------------|--------|
+| `mission` | Room `purpose` |
+| `shared_notes` | Room `notes` |
+| `unaddressed_routing` (`everyone` \| `lead` \| `auto`) | `routing` |
+| `lead_agent` → Agent.`hermes_profile` | `lead_member_id` when routing=`lead` |
+| `routing_summary` | Human one-liner; optional paste into notes |
+
+Org default until the user picks otherwise: **`everyone`**. Strong-fit later:
+HQ Groups → `lead` = HQ chief; dense Subteam Groups → try `auto` (pin `auxiliary.group_router`).
+
+Optional: pin `auxiliary.group_router` on a parent / default profile when using
+`auto` (Hermes model picker → auxiliary → Group router). Document intent on
+Harness profile `aux_group_router_*`.
+
+### Cron → room
+
+Deliver a Schedule into a Bot Mode room (starts a round only for members the
+output @mentions):
+
+```bash
+hermes -p <slug> cron create "0 9 * * 1-5" \
+  "Post the Eng standup digest. @etienne @marcel" \
+  --name eng-standup \
+  --deliver "room:anytype-engineering-group"
+```
+
+Format from the `cronjob` tool: `room:<room_id>` (not a Telegram id). Use the
+Anytype Group.`platform_chat_id` as `room_id`. See `cron.md`.
+
+### Bot-to-bot loops
+
+Bot Mode DMs use `message_agent`. Exchanges are capped after the last human
+message (release notes: `max_hops` default **4**). External Telegram/Discord
+still use `gateway.bot_loop_guard` (`enabled`, `max_events`, `window_seconds`,
+`cooldown_seconds`) as in the Optional Telegram section above. Bots should not
+ping each other in endless loops; prefer @mention scope in rooms.
+
+### Multi-connection Desktop (short)
+
+Desktop can keep several gateways connected. A room whose members are all on
+the **active** connection is **gateway-owned** (keeps running when Desktop
+closes). A room that **mixes** machines is Desktop-driven (classic). Prefer
+same-gateway HQ/Subteam rooms for org apply. Docs: Bot Mode → rooms across
+machines.
+
 ## Safety
 
 - Confirm before creating many rooms, `--clone-channels`, or copying tokens.
@@ -207,6 +296,8 @@ writeback (this doc).
 - Editing Anytype Group membership does not auto-update hosted room rosters;
   re-run `groups.create` / Desktop Manage members / `groups` member RPCs as
   needed.
+- Changing `routing` / lead / purpose needs `groups.context` or Group settings;
+  Anytype fields alone do not push.
 - Parallel Anytype `create_missing_options` for the same select name creates
   duplicate options (ambiguous later). Mint `hermes` once, sequentially.
 - During org redesign, document intended groups in Anytype and **defer** Hermes
