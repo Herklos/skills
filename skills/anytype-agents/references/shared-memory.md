@@ -58,10 +58,25 @@ atomic memory; recurring pattern -> Learning; diary or run log -> stay (or
 source for Learnings, not Learnings themselves. Working docs (Open Loops,
 Approvals Waiting, Briefs, Playbooks) are out of scope.
 
+### Worked example: Primary's `Memory & Decisions` (2026-11-06)
+
+Preferences -> About Herklos + 11 `Pref –` memories. Decision log (~40 dated
+bullets) -> 17 atomic `memory_decisions` + 4 `fact`s; entries already codified
+as Shared Rules 8 / 11 / 12 / 13 / 14 / 15 / 16, org-map and job descriptions
+(in the system Prompt) and run diaries were skipped; superseded ones (Option E
+"Board retired", Eng roster 2026-10-08) created as `lifecycle=archived` with the
+superseding source named. Patterns -> 2 draft Learnings with `derived_from`
+(act-only-on-change, escalation-quality). Original page kept with a "Migrated"
+line. `lessons` stubs and working docs (Open Loops, Approvals, Briefs) untouched.
+
 ## Queries
 
 `topic IS NOT EMPTY` selects atomic memories (`topic != ""` does not filter
-empties). Compact grammar: schema kind `filters`. Typical set: Memories –
+empties). Compact grammar: schema kind `filters`. **Gotcha:** a compact string
+with `AND` / `OR` silently dropped a clause (Decisions query returned all 51
+buckets). For compound filters use structured `filters` via `update_view`
+(`{"property":"topic","condition":"not_empty"}`, `{"operator":"or","filters":[...]}`)
+and check the count after creating the query. Typical set: Memories –
 Human, Memories – Atomic (All), Memories – Decisions (atomic), Memories –
 Facts, Rules – Changelog, Agents – Drift (literal version in the filter; bump
 when Shared Rules version changes).
