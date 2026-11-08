@@ -2,9 +2,9 @@
 name: any-agents
 description: >
   Set up, run, configure, or debug AI agents and teams on any + anyrt (anybao).
-  Use for anyrt serve, overlays, tiers, triggers, connectors, sync. Use when
-  the user runs /any-agents.
-version: 1.2.0
+  Use for anyrt serve, overlays, tiers, triggers, connectors, MCP servers
+  (mcp.server.* / agent:mcp@v1), sync. Use when the user runs /any-agents.
+version: 1.3.0
 license: MIT
 metadata:
   category: agents
@@ -57,6 +57,7 @@ effects are required. Details: `reference/security.md`.
 | `reference/agents-and-teams.md` | New agent overlays; team spaces; multi-serve |
 | `reference/triggers.md` | Cron / once / event triggers |
 | `reference/connectors.md` | Shipped connectors + writing a new one |
+| `reference/tools-and-mcp.md` | Agent tools + MCP client (`mcp.server.*` / `mcp.key.*`) |
 | `reference/http-api.md` | Verified `/v1` curls |
 | `reference/ui-and-observability.md` | `/ui`, any-tui, `trace follow`, desktop any-ui |
 | `reference/debugging.md` | `trace` / `replay` / `drift`; common failures |
@@ -78,6 +79,8 @@ Scripts: `scripts/any-health.sh`, `agent-ready.sh`, `chat.sh`, `set-tier.sh`,
 | Overlay | Repo space of programs/skills; `[overlays]` aliases (usually `agent`, `connectors`) |
 | Serve | `anyrt serve`: one process watches one working space; elects with other devices |
 | Trigger | `agent_triggers` record: `cron` / `once` / `event` |
+| Tool | Guest program with `__any_tool__ = True` (`use("agent:…")`) |
+| MCP server | `mcp.server.<id>` row + optional `mcp.key.<id>`; called via `agent:mcp@v1` |
 | Subagent | In-process quiet `toolcaller` child (`subagent@v1`), same space |
 | Team HQ | Convention: one `any` space per team + one serve (or shared rules space) |
 
@@ -185,11 +188,21 @@ REPO=$(curl -s -X POST "$ANY_ADDR/v1/spaces" -H 'Content-Type: application/json'
 Running serve picks up deploys on the next conversation. Restart only after
 binary/kernel changes. Details: `reference/agents-and-teams.md`.
 
-### 5. Teams, triggers, connectors
+### 5. Teams, triggers, connectors, MCP
 
 - Teams / multi-agent: `reference/agents-and-teams.md`
 - Schedules: `reference/triggers.md`
 - Connectors: `reference/connectors.md`
+- Tools + MCP servers: `reference/tools-and-mcp.md`
+
+```bash
+# Host: Mac / Linux — MCP server row (HTTP only; no stdio)
+# In .connectors.env:  mcp.key.myserver=…
+# In anybao.toml [config] or via config@v1.set:
+# "mcp.server.myserver" = { transport = "http", url = "https://…/mcp",
+#   api_key_ref = "mcp.key.myserver", description = "…" }
+# Cell: use("agent:mcp@v1").call("myserver", "<tool>", {…})
+```
 
 ### 6. Debug / follow a run
 
@@ -221,6 +234,7 @@ See `reference/debugging.md` and `reference/ui-and-observability.md`.
 - **OpenRouter / Ollama tier:** `models.md`
 - **Cron every 4h:** `triggers.md`
 - **GitHub connector:** `.connectors.env` + `connectors.md`
+- **HTTP MCP server:** `mcp.server.*` + `mcp.key.*` → `tools-and-mcp.md`
 - **Export spaces:** `./scripts/export-ndjson.sh`
 - **Watch chat / bao status:** `/ui` or any-tui (`ui-and-observability.md`)
 - **Watch tool/LLM effects live:** `anyrt trace follow --program toolcaller`

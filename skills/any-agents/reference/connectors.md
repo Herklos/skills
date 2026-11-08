@@ -3,6 +3,10 @@
 Shipped in `repos/_connectors` (overlay alias `connectors`). Guest
 import: `use("connectors:linear@v1")`, etc.
 
+For **MCP** servers (HTTP tools/list + tools/call via `agent:mcp@v1`),
+see `reference/tools-and-mcp.md` — that path uses `mcp.server.*` /
+`mcp.key.*`, not `connector.key.*`.
+
 ## Enable shipped connectors
 
 Host: **Mac / Linux**. Put refs in `.connectors.env` next to

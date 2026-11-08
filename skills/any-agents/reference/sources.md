@@ -1,6 +1,6 @@
 # Sources
 
-Read for skill version **1.2.0** on **2026-11-08**. Prefer live main
+Read for skill version **1.3.0** on **2026-11-08**. Prefer live main
 over this snapshot when they disagree; update this file when you re-verify.
 Live smoke also pinned: any `v0.3.8-nightly.20261107.1` @`0b73c01`,
 anyrt **0.11.1** (anybao checkout under `/tmp/any-agents-smoke`),
@@ -25,11 +25,14 @@ any-tui **0.6.0** (built `/tmp/any-tui`).
 | https://raw.githubusercontent.com/anyproto/anybao/main/docs/testing-agent-changes.md | same |
 | https://raw.githubusercontent.com/anyproto/anybao/main/docs/adr/README.md | ADR index 001–033 |
 | ADR-006, 009, 015, 018 (data, overlays, election, events) | same |
+| ADR-032 MCP client (`docs/adr/032-mcp-client.md`) | Accepted 2026-10-22; read from smoke anybao |
 | https://raw.githubusercontent.com/anyproto/anybao/main/repos/CLAUDE.md | same |
 | https://raw.githubusercontent.com/anyproto/anybao/main/repos/_agent/README.md | same |
 | https://raw.githubusercontent.com/anyproto/anybao/main/repos/_connectors/README.md | same |
+| `repos/_agent/programs/mcp@v1`, `skills/browser.md` | MCP tool + browser skill |
 | `runtime/src/config_defaults.json` | same |
 | `repos/_agent/programs/remind@v1.py`, `config@v1`, `subagent@v1` | same |
+| https://docs.any.org/agents/tools.html | tools = programs; connectors overlay |
 
 ## Secondary
 

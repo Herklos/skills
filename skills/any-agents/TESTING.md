@@ -38,6 +38,7 @@ Live smoke root: `/tmp/any-agents-smoke` (`any` + `anybao` checkouts,
 | Embedded `/ui` | `GET http://127.0.0.1:2046/ui` → **200** HTML debug harness |
 | any-tui | Built **0.6.0** (`cargo build --release`); launched with `--api http://127.0.0.1:2046/v1 --agent-space bao`. Default API in binary help is still **:7001** — must override |
 | `anyrt trace follow` | Subcommand present (`--program`, `--addr` URL, `--space`); live effect stream |
+| MCP client (ADR-032) | Docs + `mcp@v1` + `browser` skill present in smoke anybao. Config = `mcp.server.*` + `mcp.key.*`; **http only**, no stdio. Live call against a real MCP server **UNVERIFIED** this session |
 
 ## Open questions — answers
 
