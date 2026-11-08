@@ -189,6 +189,15 @@ Cursor: install from the marketplace UI, or use `.agents/plugins/marketplace.jso
 
 Validate: `claude plugin validate .`
 
+## Other skills and tools I use
+
+- [Anthropic skills](https://github.com/anthropics/skills)
+- [Vercel agent-browser](https://github.com/vercel-labs/agent-browser)
+- [Vercel agent-desktop](https://github.com/vercel-labs/agent-desktop)
+- [Expo skills](https://github.com/expo/skills)
+- [Temporal developer skill](https://github.com/temporalio/skill-temporal-developer)
+- [Vercel agent skills](https://github.com/vercel-labs/agent-skills)
+
 ## License
 
 MIT. See [LICENSE](./LICENSE).
