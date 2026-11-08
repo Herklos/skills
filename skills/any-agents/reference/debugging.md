@@ -26,16 +26,25 @@ curl -s -X POST "$A/v1/spaces/$SPACE/query" -H 'Content-Type: application/json' 
        \"sort\": [\"-seq\"], \"limit\": 1}" | jq -r '.records[0].traceRef'
 ```
 
-Control API (serve log `control=127.0.0.1:7010`): `GET /status`,
-`GET /election` — UNVERIFIED exact JSON against your build; prefer log
-lines and `any devices list`.
+Control API (serve log `control=127.0.0.1:7010`), verified anyrt **0.11.1**:
+
+```bash
+curl -fsS http://127.0.0.1:7010/status | jq '{role: .envelope.data.role, state: .envelope.data.state, winner: .envelope.data.winner}'
+# ready when role == "active" (state idle|… while serving)
+curl -fsS http://127.0.0.1:7010/election | jq '{active, app, peerId, winner}'
+```
+
+Authoritative boot line: `wait set clear — agent ready`. Also
+`any devices list`.
 
 ## Common failures
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
 | `401 auth.required` | No account on this data dir | `any init` or `any auth login` |
-| "Not ready yet" | Overlays still syncing / program miss | Wait for `overlays synced — agent ready`; check join/invite |
+| "Not ready yet" | Overlays still syncing / program miss | Wait for `wait set clear — agent ready`; check join/invite |
+| Boot warns `no anthropic key` | Missing `.connectors.env` | Add `llm.key.anthropic=…` beside config; agent replies asking for a provider until set |
+| `cannot read programs … 404` on overlay | Guest overlay not synced yet | Wait for sync; public invites in committed `anybao.toml` need network |
 | Anthropic 400 workspace | Unscoped / identity-linked API key | Create workspace-scoped key |
 | Anthropic 400 credits | Billing, not key shape | Console Plans & Billing (subscription ≠ API credits) |
 | No reply, standby log | Another device holds bao election | Activate this device; check `chat-watch` pin |
@@ -43,6 +52,7 @@ lines and `any devices list`.
 | Relay flapping | Copied `wallet.key` / two processes one key | Fresh mnemonic restore per device |
 | Empty config query | Used dataset key `agent_config` instead of collection id | Resolve collection via types/datasets |
 | Port confusion | anyrt still on :7001, any on :2046 | Align `addr` / `ANY_LISTEN_ADDR` |
+| CLI `cannot reach … http://http//…` | Passed URL to `--addr` | Use `host:port` only (`127.0.0.1:2046`) |
 
 Per-turn cost: `trace show --stats`. Retention: `[traces]`
 `retain_conversations` / `retain_jobs` / `max_bytes` in host config

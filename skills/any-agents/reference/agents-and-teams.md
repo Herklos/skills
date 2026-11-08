@@ -105,7 +105,7 @@ When the org roster lives in Anytype (`anytype-agents` skill):
 
 ## Check it worked
 
-- `anyrt serving space=… chat=…` then `overlays synced — agent ready`
+- `anyrt serving space=… chat=…` then `wait set clear — agent ready`
 - Chat reply from the expected `agent.name`
 - `anyrt trace ls --program toolcaller` shows the turn
 - Second agent: separate listen port; messages in **its** space only

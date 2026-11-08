@@ -5,8 +5,18 @@ Host: **Mac**. Goal: `any` listening, account present, `anyrt serve` ready.
 ## Prerequisites
 
 - Git, Go 1.26.2+, `make`, `curl`, `jq`
-- For anyrt: nix (`nix develop` / `direnv allow`) **or** recent Rust + Python 3.14 + [`uv`](https://docs.astral.sh/uv/)
+- For anyrt: nix (`nix develop` / `direnv allow`) **or** recent Rust + Python **≥3.14** + [`uv`](https://docs.astral.sh/uv/)
 - Optional: Homebrew for toolchain packages
+
+**Python note (verified 2026-11-08):** anybao `requires-python = ">=3.14"`.
+On Mac, `python3` is often 3.12 (conda/system). Install and point uv:
+
+```bash
+# Host: Mac
+brew install python@3.14
+# uv discovers /usr/local/bin/python3.14; or force:
+UV_PYTHON=python3.14 uv sync
+```
 
 ## 1. Build and run `any`
 
@@ -47,7 +57,7 @@ any auth status
 ```
 
 Check: `curl -fsS http://127.0.0.1:2046/v1/health | jq` and
-`curl -fsS http://127.0.0.1:2046/v1/account | jq -r .metadata.name`.
+`curl -fsS http://127.0.0.1:2046/v1/account | jq -r .id`.
 
 ## 2. Build anyrt
 
@@ -105,11 +115,16 @@ Watch for:
 
 ```
 anyrt serving space=<id> chat=<id> control=127.0.0.1:7010
-overlays synced — agent ready
+wait set clear — agent ready
 ```
 
-Messages before ready get "Not ready yet". Record space/chat ids for
-`any chat` / `scripts/chat.sh`.
+(Older README/docs may still say `overlays synced — agent ready`; the
+runtime log line is `wait set clear — agent ready`.) Without
+`.connectors.env` / `llm.key.anthropic`, the agent still becomes ready
+and answers that it needs a language-model key.
+
+Record space/chat ids for `any chat` / `scripts/chat.sh`. CLI
+`--addr` is `host:port` (e.g. `127.0.0.1:2046`), not a URL.
 
 Check: `../any-agents/scripts/agent-ready.sh` (or wait on the log) then
 one `any chat send …`.

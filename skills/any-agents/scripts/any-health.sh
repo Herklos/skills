@@ -34,13 +34,14 @@ jq -c '{status: "up", addr: "'"$A"'", health: .}' < /tmp/any-health-body.$$ 2>/d
 
 AUTH=$(curl -s -o /tmp/any-auth.$$ -w '%{http_code}' --connect-timeout 2 "$A/v1/auth" || echo 000)
 if [ "$AUTH" = "200" ]; then
-  NAME=$(jq -r '.accountId // .metadata.name // .status // "authorized"' < /tmp/any-auth.$$ 2>/dev/null || echo authorized)
+  # any 0.3.8-nightly: {authorized, accountId, mode, …} — no metadata.name here
+  NAME=$(jq -r '.accountId // .status // "authorized"' < /tmp/any-auth.$$ 2>/dev/null || echo authorized)
   echo "auth: ok ($NAME)"
 else
-  # try account endpoint
   ACCT=$(curl -s -o /tmp/any-acct.$$ -w '%{http_code}' --connect-timeout 2 "$A/v1/account" || echo 000)
   if [ "$ACCT" = "200" ]; then
-    jq -r '"auth: ok account=" + (.metadata.name // .id // "yes")' < /tmp/any-acct.$$
+    # account body: {id, techSpaceId} (metadata.name absent on smoke build)
+    jq -r '"auth: ok account=" + (.id // .metadata.name // "yes")' < /tmp/any-acct.$$
   elif [ "$ACCT" = "401" ]; then
     echo "auth: required (401) — run any init or any auth login" >&2
     rm -f /tmp/any-health-body.$$ /tmp/any-auth.$$ /tmp/any-acct.$$

@@ -79,6 +79,7 @@ curl -fsS http://127.0.0.1:2046/v1/health | jq
 cd /opt/anybao
 git clone https://github.com/anyproto/anybao .
 # nix develop  OR  install rustup + uv + python3.14
+# anybao requires Python >=3.14 (UV_PYTHON=python3.14 uv sync if needed)
 uv sync
 make kernel
 make runtime
@@ -118,7 +119,7 @@ WantedBy=multi-user.target
 # Host: Linux — as root
 systemctl enable --now anyrt.service
 journalctl -u anyrt.service -f
-# expect: overlays synced — agent ready
+# expect: wait set clear — agent ready
 ```
 
 Check: `scripts/any-health.sh` and `scripts/agent-ready.sh` from an

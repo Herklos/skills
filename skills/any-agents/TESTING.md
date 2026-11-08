@@ -1,80 +1,69 @@
 # TESTING.md — any-agents skill
 
-Date: **2026-11-08**. Authoring machine: macOS (Darwin), toolchain present
-(`curl`, `jq`, `make`, `go`, `rustc`, `uv`). **Full end-to-end
-`any` + `anyrt serve` + chat was not run in this session** (no local
-checkout bootstrapped here). Commands and shapes below come from
-upstream sources at the commits in `reference/sources.md`, cross-checked
-across README / docs / ADRs / official anyrt quickstart.
+Date: **2026-11-08**. Authoring machine: macOS (Darwin). Toolchain:
+`curl`, `jq`, `make`, `go`, `rustc`, `uv`, Homebrew `python@3.14`.
 
-## What was verified (source read / cross-check)
+Live smoke root: `/tmp/any-agents-smoke` (`any` + `anybao` checkouts,
+`ANY_DATA_DIR=…/data`).
+
+## What was verified (live + sources)
 
 | Item | Result |
 |------|--------|
-| Default `any` listen port | **2046** (`docs/05-config.md`, README `LISTENING 127.0.0.1:2046`, website anyrt quickstart `addr = "http://127.0.0.1:2046"`) |
-| anybao README / anybao.toml comment | Still mention **7001** as local any — **stale vs any default**; skill prefers 2046 and env/config discovery |
-| Desktop embedded any (skill-bao-config) | Default **31330** (`ANY_DESKTOP_PORT`) — separate from CLI `any run` |
-| P2P / relay config | Documented in `docs/05-config.md` + `docs/30-global-p2p.md` + SDK `global-p2p.md` |
-| One agent per any server | Explicit note in `website/02-quickstart/anyrt.md` |
-| Trigger create HTTP | Official anyrt quickstart §5 (bundle child + modify) |
-| Election / pins | ADR-015, ADR-018 |
-| Connectors refs | `_connectors/README.md` |
-| LLM tier shape + defaults | `llm-models.md`, `config_defaults.json`, `skill-bao-config.md` |
-| Ollama / llama.cpp / Grok tiers | Declared backends; **no golden parity** for ollama-qwen3; Grok not in parity table → marked UNVERIFIED |
-| Sync node minimal set | any-sync-dockercompose README service list |
-| Scripts syntax | Written; `chmod +x` applied |
-| Live smoke 2026-11-08 | Built `any` v0.3.8-nightly @0b73c01 under `/tmp/any-agents-smoke`; `init`+`run` on :2046; `any-health.sh` OK; space create OK; `export-ndjson.sh` OK; `catalog/general-chat/setup` OK; `chat.sh` send OK after fix; `set-tier` N/A without bao/anyrt; anyrt **not** built (host Python 3.12, anybao wants 3.14) |
-| `any chat list` | **Does not exist** on live CLI (anybao README / prompt were wrong). Reads = HTTP `…/query` on `chat_messages` or `query-subscribe`. Skill + `chat.sh` corrected. |
+| Default `any` listen port | **2046** |
+| anybao README / anybao.toml comment | Still mention **7001** — stale; skill uses 2046 + discovery |
+| Desktop embedded any | Default **31330** (`ANY_DESKTOP_PORT`) — separate from CLI `any run` |
+| `any` build / init / run | `v0.3.8-nightly.20261107.1` @`0b73c01`; `LISTENING 127.0.0.1:2046` |
+| `/v1/health` | `{status, version, startedAt, networkId, account, bootstrapping, crdtVersion}` |
+| `/v1/auth` | `{authorized, accountId, mode, capabilities, accounts[]}` |
+| `/v1/account` | `{id, techSpaceId}` — **no** `metadata.name` on this build |
+| CLI `--addr` | **`host:port` only**. Passing `http://…` yields `http://http//…` dial errors |
+| `any chat list` / `any query` | **Do not exist**. Reads = HTTP `…/query` on `chat_messages` or `query-subscribe` |
+| `scripts/any-health.sh` | OK against live :2046 |
+| `scripts/chat.sh` | Send + recent messages OK |
+| `scripts/set-tier.sh` | Upserted `llm.tier.codegen`; `rejections: null` |
+| `scripts/export-ndjson.sh` | OK earlier in session |
+| Python for anybao | **≥3.14** required. Host default `python3` was 3.12 (conda). Fix: `brew install python@3.14`; `uv sync` linked `.venv` → `/usr/local/opt/python@3.14/…` |
+| `anyrt` build | `uv sync` + `make kernel` + `make runtime` → **0.11.1** |
+| `anyrt serve` | Boot ~8s; log `anyrt serving space=… chat=… control=127.0.0.1:7010` then **`wait set clear — agent ready`** |
+| Ready phrase drift | Runtime emits `wait set clear — agent ready`. README / some docs still say `overlays synced — agent ready` |
+| Control `GET /status` | `{beatSec, envelope:{type:"bao.status", data:{identity, role, state, winner}}}`. Ready ⇒ `role == "active"` |
+| Control `GET /election` | `{active, app:"bao", enabled, peerId, winner}` |
+| `scripts/agent-ready.sh` | Fixed in 1.1.0 to treat `envelope.data.role == "active"` as ready (pre-fix timed out) |
+| Chat without LLM key | Conversation starts; agent replies asking to choose a provider / needs a model key. Boot warns `no anthropic key` |
+| Overlay guest warnings | Boot may `WARN credentials: cannot read programs … 404` until overlay sync; serve can still become ready |
+| Full LLM reply (Anthropic/OpenRouter) | **UNVERIFIED** this session (no key supplied) |
+| Second device / second agent / cron | **UNVERIFIED** this session |
+| Ollama / llama.cpp / Grok tiers | Example JSON in `models.md` still **UNVERIFIED** live |
 
 ## Open questions — answers
 
-1. **Default any port:** **2046**. Change via `listen.addr`,
-   `ANY_LISTEN_ADDR`, or `any run --addr`. anyrt `addr` must match.
-   anybao README’s 7001 is outdated relative to any main + docs site.
-2. **iroh / relay:** `p2p.global.relayUrls` (+ pkarr URLs); production
-   relays auto-filled on embedded production network; custom nodeconf
-   requires naming relays. `insecureRelay` for http://. Self-hosted
-   relay **config shape verified in docs**; live self-host lab
-   **UNVERIFIED** in this session.
-3. **Several agents one serve:** **No** — one serve per any server;
-   multiple overlays ≠ multiple chat agents. Second agent → second any
-   (data-dir + port) + second serve. Subagent tool = in-process only.
-4. **Triggers / split:** Create via `agent_triggers` modify; pins are
-   device-specific with no auto-failover; election moves `chat-watch`
-   + standing built-ins only.
-5. **Ollama / llama.cpp / Grok:** Example JSON in `models.md` marked
-   **UNVERIFIED** — test before production use.
-6. **Minimal self-hosted sync:** coordinator + node×3 + filenode +
-   consensusnode + Mongo + Redis + Garage (dockercompose). Production
-   network embedded if you do not set nodeconf.
+1. **Default any port:** **2046**. anybao README’s 7001 is outdated.
+2. **Ready signal:** Prefer log `wait set clear — agent ready` or control
+   `/status` with `envelope.data.role == "active"`.
+3. **Several agents one serve:** **No** — one serve per any server.
+4. **Python:** anybao needs **≥3.14**; on Mac use Homebrew `python@3.14`
+   / `UV_PYTHON=python3.14`.
+5. **CLI addr:** Always `host:port` for `--addr`; full URL only for HTTP/`ANY_ADDR`.
 
 ## Prompt vs sources (follow sources)
 
-- Prompt said anybao uses 7001; **any default is 2046** — skill uses
-  discovery + 2046.
-- Prompt / anybao README said `any chat list`; **live CLI has no such
-  command** — skill uses HTTP query / `query-subscribe`.
-- Prompt folder name `reference/` (singular) — used (sibling skills use
-  `references/`).
-- Full acceptance (anyrt reply, second device, two tiers, second agent,
-  cron) still needs anyrt build + model key on a machine with Python 3.14
-  / nix.
+- Prompt / anybao README 7001 → skill uses discovery + 2046.
+- Prompt / README `any chat list` → HTTP query / `query-subscribe`.
+- README ready phrase `overlays synced…` → runtime `wait set clear…`.
+- Full acceptance (paid model reply, second device, two tiers, cron)
+  still needs a model key + extra hosts.
 
-## Suggested live validation plan
+## Suggested further validation
 
 ```bash
-# Host: Mac
-./scripts/any-health.sh          # expect fail until any runs
-# build any + anyrt per install-macos.md
-./scripts/any-health.sh          # up + auth
-./scripts/agent-ready.sh         # after anyrt serve
+# Host: Mac — with .connectors.env llm.key.anthropic=…
+./scripts/agent-ready.sh
 ./scripts/chat.sh "$SP" "$CHAT" "ping"
-./scripts/set-tier.sh codegen '…' # anthropic or openrouter
-# optional local ollama tier — mark verified if reply works
+# expect an agent-tagged model reply, not only the “need a language model” stub
 # second ANY_DATA_DIR + mnemonic-stdin
-# second any --addr :2047 + second anyrt for team agent
-# create cron trigger per triggers.md; wait for lastRunAt
-./scripts/export-ndjson.sh /tmp/any-export "$SP"
+# second any --addr 127.0.0.1:2047 + second anyrt for team agent
+# cron trigger per triggers.md; wait for lastRunAt
 ```
 
 Record outcomes back into this file when run.

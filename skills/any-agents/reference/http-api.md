@@ -10,9 +10,14 @@ Host for all curls: **Mac / Linux**.
 
 ```bash
 A="${ANY_ADDR:-http://127.0.0.1:2046}"
+# CLI flag --addr wants host:port (no scheme):
+#   any --addr 127.0.0.1:2046 status
 curl -fsS "$A/v1/health" | jq
+# → status, version, startedAt, networkId, account, bootstrapping, crdtVersion
 curl -fsS "$A/v1/auth" | jq
-curl -fsS "$A/v1/account" | jq -r .metadata.name
+# → authorized, accountId, mode, capabilities, accounts[]
+curl -fsS "$A/v1/account" | jq -r '.id // .metadata.name'
+# → id, techSpaceId  (no metadata.name on any 0.3.8-nightly smoke)
 ```
 
 `401 auth.required` → run `any init` or `any auth login`.
@@ -49,11 +54,12 @@ CLI equivalent: `any query-subscribe …`.
 
 ## Chat
 
-Prefer CLI for send (there is **no** `any chat list` in current `any` —
-reads use HTTP query or `any query-subscribe`):
+Prefer CLI for send (there is **no** `any chat list` / `any query` in
+current `any` — help text that says “reads via any query” means HTTP
+`…/query` or `any query-subscribe`):
 
 ```bash
-any chat send "$SP" "$CHAT" --text "hello"
+any --addr 127.0.0.1:2046 chat send "$SP" "$CHAT" --text "hello"
 curl -fsS -X POST "$A/v1/spaces/$SP/query" -H 'Content-Type: application/json' \
   -d "{\"objectId\":\"$CHAT\",\"dataset\":\"chat_messages\",\"sort\":[\"-createdAt\"],\"limit\":5}" | jq
 ```
@@ -73,7 +79,7 @@ curl -s -X POST "$A/v1/spaces/$SP/objects/$CHAT/chat/messages" \
 Agent-tagged message (automated):
 
 ```bash
-ME="$(curl -s "$A/v1/account" | jq -r .metadata.name) (agent)"
+ME="$(curl -s "$A/v1/account" | jq -r '.id // .metadata.name') (agent)"
 curl -s -X POST "$A/v1/spaces/$SP/objects/$CHAT/chat/messages" \
   -H 'Content-Type: application/json' \
   -d "{\"text\": \"ping\", \"agent\": {\"name\": \"$ME\"}}" | jq

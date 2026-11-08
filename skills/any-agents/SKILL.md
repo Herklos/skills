@@ -4,7 +4,7 @@ description: >
   Set up, run, configure, or debug AI agents and teams on any + anyrt (anybao).
   Use for anyrt serve, overlays, tiers, triggers, connectors, sync. Use when
   the user runs /any-agents.
-version: 1.0.0
+version: 1.1.0
 license: MIT
 metadata:
   category: agents
@@ -31,9 +31,12 @@ experiment account. Re-read sources before changing runtime behaviour
 2. Point `anyrt` at that same URL (`anybao.toml` `addr`, or `--addr`).
 3. Confirm account: `any auth status` (or `GET /v1/auth`). Without an account,
    data routes return `401 auth.required`.
-4. Confirm anyrt readiness: log line `overlays synced — agent ready`.
+4. Confirm anyrt readiness: log line `wait set clear — agent ready`
+   (or `scripts/agent-ready.sh`, which treats control `GET /status`
+   `envelope.data.role == "active"` as ready).
 5. Never print, log or commit the account mnemonic or secret values.
 6. Runtime behaviour changes require an ADR in anybao first.
+7. CLI `--addr` is `host:port` (no `http://`). HTTP scripts use a full URL.
 
 ## Security (read first)
 
@@ -122,13 +125,14 @@ export ANY_DATA_DIR="${ANY_DATA_DIR:-$HOME/.any}"
 # Host: Mac / Linux — second shell
 any auth status
 git clone https://github.com/anyproto/anybao && cd anybao
-# nix develop   # or recent Rust + Python 3.14 + uv
+# nix develop   # or: brew install python@3.14 && UV_PYTHON=python3.14
+# Default `python3` on many Macs is 3.12; anybao requires >=3.14
 uv sync && make kernel && make runtime
 # .connectors.env next to anybao.toml (gitignored):
 # llm.key.anthropic=sk-ant-…   # workspace-scoped Anthropic key
-printf 'addr = "http://127.0.0.1:2046"\n' > /tmp/check-addr.toml  # match real listen
+# anybao.toml addr must match any listen (default http://127.0.0.1:2046)
 ./runtime/target/release/anyrt serve
-# wait for: overlays synced — agent ready
+# wait for: wait set clear — agent ready
 ```
 
 Check: `./scripts/agent-ready.sh` and one chat turn (`reference/http-api.md`).
