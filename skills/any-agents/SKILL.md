@@ -140,7 +140,9 @@ Space and chat ids are in the `anyrt serving space=… chat=…` log line.
 ```bash
 # Host: Mac / Linux
 any chat send <bao-space-id> <chat-id> --text "hi, what can you do?"
-any chat list <bao-space-id> <chat-id> --limit 5
+# read via HTTP query (no `any chat list` in current CLI)
+curl -s -X POST "$ANY_ADDR/v1/spaces/<space>/query" -H 'Content-Type: application/json' \
+  -d '{"objectId":"<chat>","dataset":"chat_messages","sort":["-createdAt"],"limit":5}' | jq
 # or: ./scripts/chat.sh <space> <chat> "hi"
 ```
 

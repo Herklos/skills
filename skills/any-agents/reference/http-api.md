@@ -49,11 +49,13 @@ CLI equivalent: `any query-subscribe …`.
 
 ## Chat
 
-Prefer CLI when available:
+Prefer CLI for send (there is **no** `any chat list` in current `any` —
+reads use HTTP query or `any query-subscribe`):
 
 ```bash
 any chat send "$SP" "$CHAT" --text "hello"
-any chat list "$SP" "$CHAT" --limit 5
+curl -fsS -X POST "$A/v1/spaces/$SP/query" -H 'Content-Type: application/json' \
+  -d "{\"objectId\":\"$CHAT\",\"dataset\":\"chat_messages\",\"sort\":[\"-createdAt\"],\"limit\":5}" | jq
 ```
 
 HTTP (shapes from skill-bao-config / testing docs):

@@ -22,7 +22,9 @@ across README / docs / ADRs / official anyrt quickstart.
 | LLM tier shape + defaults | `llm-models.md`, `config_defaults.json`, `skill-bao-config.md` |
 | Ollama / llama.cpp / Grok tiers | Declared backends; **no golden parity** for ollama-qwen3; Grok not in parity table → marked UNVERIFIED |
 | Sync node minimal set | any-sync-dockercompose README service list |
-| Scripts syntax | Written; `chmod +x` applied; **not executed against a live server** |
+| Scripts syntax | Written; `chmod +x` applied |
+| Live smoke 2026-11-08 | Built `any` v0.3.8-nightly @0b73c01 under `/tmp/any-agents-smoke`; `init`+`run` on :2046; `any-health.sh` OK; space create OK; `export-ndjson.sh` OK; `catalog/general-chat/setup` OK; `chat.sh` send OK after fix; `set-tier` N/A without bao/anyrt; anyrt **not** built (host Python 3.12, anybao wants 3.14) |
+| `any chat list` | **Does not exist** on live CLI (anybao README / prompt were wrong). Reads = HTTP `…/query` on `chat_messages` or `query-subscribe`. Skill + `chat.sh` corrected. |
 
 ## Open questions — answers
 
@@ -50,11 +52,13 @@ across README / docs / ADRs / official anyrt quickstart.
 
 - Prompt said anybao uses 7001; **any default is 2046** — skill uses
   discovery + 2046.
+- Prompt / anybao README said `any chat list`; **live CLI has no such
+  command** — skill uses HTTP query / `query-subscribe`.
 - Prompt folder name `reference/` (singular) — used (sibling skills use
   `references/`).
-- Prompt acceptance criteria require clean Mac/Linux E2E, second device,
-  two tiers, second agent, scheduled trigger — **not executed here**;
-  treat as the validation plan for the next session.
+- Full acceptance (anyrt reply, second device, two tiers, second agent,
+  cron) still needs anyrt build + model key on a machine with Python 3.14
+  / nix.
 
 ## Suggested live validation plan
 
