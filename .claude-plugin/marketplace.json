@@ -26,6 +26,18 @@
       "category": "productivity"
     },
     {
+      "name": "monocode-agents",
+      "description": "Create and manage MonoCode Monos as persistent agents.",
+      "source": "./skills/monocode-agents",
+      "category": "productivity"
+    },
+    {
+      "name": "monocode-operator",
+      "description": "Use the MonoCode operator bridge for project and Mono operations.",
+      "source": "./skills/monocode-operator",
+      "category": "productivity"
+    },
+    {
       "name": "any-agents",
       "description": "Install and operate agents/teams on open-source any + anyrt (anybao).",
       "source": "./skills/any-agents",

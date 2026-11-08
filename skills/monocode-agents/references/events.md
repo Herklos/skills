@@ -1,0 +1,14 @@
+# Events and triggers
+
+Check the installed version and target before proposing an integration. Evidence below is upstream documentation, not an end-to-end test of this installation.
+
+- [Changelog 0.1.52](https://github.com/hardbeat920/monocode/blob/main/CHANGELOG.md) documents **Automations** reacting to GitHub, GitLab, Linear and Azure DevOps Inbox events and running agents in a selected workspace. Jira issue events were added in 0.1.55. This establishes event-triggered workspace automation, not delivery to a particular persistent Mono or its Soul and memory. Confirm target options in the actual UI before promising that behavior. GitHub integration uses the machine's `gh` login according to the changelog; do not assume a webhook registration mechanism.
+- The same changelog documents **Mono habits** as recurring schedules while MonoCode is open, and notifications to a Mono when sessions it delegated finish. Neither establishes arbitrary incoming event subscriptions. A scheduled habit could inspect an external source if its tools and permissions allow it, but polling is a proposed integration, not a verified webhook or real-time trigger. It can miss events and depends on the app running, source access, and schedule.
+- No documented general incoming webhook, SSE subscription, or external event endpoint for triggering a Mono was found in the README, changelog search, agent-access and remote-access guides reviewed. This is a search limitation, not proof no version or extension supports one. MCP server configuration or a provider's streaming transport alone does not establish an event-to-Mono trigger.
+- [Agent access](https://github.com/hardbeat920/monocode/blob/main/docs/agent-access.md) describes thread-scoped `app` access during an active agent turn, including `sessions.send` to an idle project session. It does not document an externally callable Mono chat endpoint. Environment variables or internal endpoints are not a supported integration contract. Do not expose them or invent an API.
+
+For a custom bridge, first establish a supported target and authorization; receiving a webhook or SSE stream is only the input half. Without a documented way to deliver to the intended Mono, an end-to-end bridge remains unverified. Consider authentication, replay/deduplication, event filtering, untrusted payloads, delivery retries, and the effects of autonomous runs before implementing one. Do not configure subscriptions or external services without authorization.
+
+## Local spike and limitations
+
+In the authoring session, shell lookup found neither `app` nor `monocode` on PATH. MonoCode-related environment variable names were present, but their values and internal endpoints were not inspected or invoked. No dedicated Mono management tool was exposed. No webhook, SSE listener, external subscription, automation, or Mono run was created or exercised; event delivery and target selection remain unverified locally.

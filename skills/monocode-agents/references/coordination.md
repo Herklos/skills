@@ -1,0 +1,20 @@
+# Coordination and event research
+
+Evidence inspected 2026-11-08: local upstream checkout `164957961717a02ffff91a6c25e1f0ae8007a40e`, and installed MonoCode Native 0.16.0. The installed binary's `monocode-gpui app --help` succeeded without a session. Source and binary may differ; source observations are not runtime verification.
+
+## Practical paths
+
+- In a Mono conversation, ask it to delegate project work. Its session-scoped app bridge documents `sessions.start` with `prompt`, optional assigned `project`, and `notifyOnComplete:true`. The source's Mono instructions say that completion reports return after the launched sessions in that turn's group stop. This is delegation to project sessions, not a team of persistent Monos. The Mono can use `sessions.list`, `sessions.read`, and `sessions.send`; the Native host rejects sends to sessions outside assigned projects, or busy sessions or sessions with unsent drafts. Use separate worktrees for overlapping work. Inspect results before integrating.
+- A Mono can use `soul.read` and `soul.update` with `expectedHash`, memory operations, and `habits.list/add/update/run/remove` through its own bridge. These are scoped to the calling Mono, not arbitrary roster management. A run is real execution. Retry uncertain mutations only with the same request ID and identical input, as the bridge help says.
+- Native source has project Automations with time, GitHub, Linear, Jira, GitLab and Azure DevOps triggers. Jira documentation says its issue-appeared trigger polls after an initial snapshot. Inspect the installed trigger editor and its connection and filters before relying on a particular event. These are project automation sessions; a trigger that invokes a particular persistent Mono has not been established.
+- For human-mediated coordination, one Mono can produce a note or document and another can be asked to inspect it if both have appropriate access. Confirm actual visibility and permissions; no automatic delivery is implied.
+
+## External events
+
+A possible integration is GitHub webhook → authenticated receiver → durable queue and routing policy → supported Mono dispatch interface. The final link is unverified: the inspected bridge binds loopback and uses session-scoped credentials inherited by provider children; its help exposes no roster selection or external Mono invocation. Do not extract credentials or treat internal bridge calls as a public API. Without a supported dispatch interface, use a human to review the event and send it to the chosen Mono, or use supported project Automations where suitable. SSE is a one-way server-to-client stream, not by itself a command endpoint or proof of Mono event support; OpenCode HTTP/SSE in the source is a provider transport.
+
+For a future receiver, subscribe only to needed events, verify `X-Hub-Signature-256` over raw body using a securely stored secret and constant-time comparison, record delivery IDs for deduplication, acknowledge promptly after durable acceptance, and handle failed deliveries, ordering, replay and reconciliation. GitHub does not support localhost as a webhook URL. Treat event content as untrusted data, restrict actions and avoid automatic execution of event-supplied instructions. Sources: [GitHub signatures](https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries), [event headers](https://docs.github.com/en/webhooks/webhook-events-and-payloads), [troubleshooting](https://docs.github.com/en/webhooks/testing-and-troubleshooting-webhooks/troubleshooting-webhooks).
+
+## Evidence and limits
+
+Source: `crates/monocode-core/src/mono/bridge.rs`, `mono.rs`, `crates/monocode-gpui/src/monos/host.rs`, `monos/files.rs`, `automations.rs`, and `docs/jira.md` in the checkout. Native delete confirmation says scheduled habits stop and created sessions and notes remain. Reset clears the Mono session and outbox in source. No Mono was created, deleted, messaged or scheduled, no automation or webhook was configured, and no end-to-end event delivery was tested. UI behavior and integrations need verification on the actual installation before use.
