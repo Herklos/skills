@@ -1,11 +1,12 @@
 # Agent-ops skills
 
-Companion skills for running a multi-agent org: **Anytype** as the org source of truth, plus runtime apply skills (**Hermes**, **Osaurus**, …). Compatible with Claude Code, Cursor, Codex, and other skills installers.
+Companion skills for running a multi-agent org: **Anytype** as the org source of truth, plus runtime apply skills (**Hermes**, **Osaurus**, **any/anyrt**, …). Compatible with Claude Code, Cursor, Codex, and other skills installers.
 
 | Skill | Version | Role |
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.46.0 | Lifecycle and config for Hermes Agent profiles (v0.23 hearth gateway, Bot Mode HQ sidebar sections, groups.context routing, plugins/curator) |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.5.2 | Define Osaurus agents via `osaurus config` / bundles / tools (avatars, Workspaces≠local teams, two-pass chiefs, sandbox secrets) |
+| [any-agents](./skills/any-agents/SKILL.md) | 1.0.0 | Install/operate agents and teams on open-source **any** + **anyrt** (anybao): overlays, tiers, triggers, connectors, sync |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.59.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Group purpose/notes/routing, Prompts, atomic Memories, versioned Shared Rules, suggestions, and Projects via Anytype MCP |
 
 Use them together when an agent page in Anytype should decline into a live Hermes profile. Editing Anytype does not push configs; apply with `hermes-profiles` after an accepted suggestion or when the user asks.
@@ -107,6 +108,23 @@ Skill: [`skills/anytype-agents/SKILL.md`](./skills/anytype-agents/SKILL.md)
 
 ---
 
+## any-agents
+
+Operate personal AI agents and agent teams on Anytype's MIT **any** database + **anyrt** runtime (anybao). Distinct from the closed Anytype app stack and from `anytype-agents` (org docs in Anytype). Covers host bootstrap (macOS / Linux), mnemonic multi-device sync, LLM tiers, overlay deploy, team space conventions, triggers, connectors, traces, and backup.
+
+**What it covers**
+
+- Install `any` + build `anyrt`; align listen port (default **2046**, not hard-coded 7001)
+- Secrets via `.connectors.env`; readiness `overlays synced — agent ready`
+- Model tiers (Anthropic / OpenRouter / local) through `agent_config`
+- Custom agent overlays (`anyrt deploy`), one serve per `any` server
+- Cron / once / event triggers; shipped connectors; security isolation
+- Design-only extension notes (ACP, host capabilities, future approvals)
+
+Skill: [`skills/any-agents/SKILL.md`](./skills/any-agents/SKILL.md) · Sources: any + anybao ADRs (see skill `reference/sources.md`)
+
+---
+
 ## osaurus-agents
 
 Define **Osaurus** agents with declarative config (`osaurus config plan|apply`) or Osaurus Bundles (`osaurus import`). Mirrors hermes-profiles for the Osaurus platform: discover with `config export` / `import list`, plan before apply, secrets via `env:` / Keychain refs only. Anytype Team/Subteam/Group map to chief `subagents` + standing prompt text + `channels` (chat ids required); Osaurus **Workspaces** share agents with other *people* via Router (not a local Team mirror); avatars via `agents/avatars/{UUID}.png` + `customAvatarFilename` (outside YAML); two-pass chief `subagents` after all agents exist; sandbox secrets in `ai.osaurus.agent-secrets`; org defaults (tools/memory/recall/db/self-sched/browser/charts; sandbox.enabled always; tools.policies auto + permission_defaults always_allow; web_search off); model+runtime from harness_profile; Agenda→`schedules`; `osk-v1.…` access key when local admin routes require it.
@@ -133,9 +151,10 @@ Anytype (org truth)          Runtime (Agent.runtime)
 ─────────────────            ───────────────────────
 agent + runtime:hermes   →   hermes-profiles (profile home)
 agent + runtime:osaurus  →   osaurus-agents (config / bundle)
+agent + runtime:anyrt    →   any-agents (any + anyrt / anybao)
 agent + runtime:grok-bot →   (manual / Grok Build for now)
 agent + runtime:noodle   →   (manual for now)
-agent.system_prompt      →   SOUL / system_prompt / agent prompt
+agent.system_prompt      →   SOUL / system_prompt / agent prompt / overlay skills
 suggestion (accepted)    →   gate before live apply
 ```
 
@@ -150,7 +169,7 @@ suggestion (accepted)    →   gate before live apply
 ```bash
 claude plugin marketplace add Herklos/skills
 claude plugin install agent-ops-skills@herklos-skills
-# or: hermes-profiles@herklos-skills / osaurus-agents@herklos-skills / anytype-agents@herklos-skills
+# or: hermes-profiles@herklos-skills / osaurus-agents@herklos-skills / any-agents@herklos-skills / anytype-agents@herklos-skills
 ```
 
 ### Other installers
@@ -162,6 +181,7 @@ npx ai-agent-skills install Herklos/skills
 # Manual copy into a harness skills folder
 cp -r skills/hermes-profiles ~/.claude/skills/
 cp -r skills/osaurus-agents ~/.claude/skills/
+cp -r skills/any-agents ~/.claude/skills/
 cp -r skills/anytype-agents ~/.claude/skills/
 ```
 

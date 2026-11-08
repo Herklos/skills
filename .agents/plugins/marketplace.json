@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "agent-ops-skills",
-      "description": "Bundle: Hermes profiles + Osaurus agents + Anytype Agents management.",
+      "description": "Bundle: Hermes profiles + Osaurus agents + any/anyrt + Anytype Agents management.",
       "source": {
         "source": "github",
         "repo": "Herklos/skills"
@@ -38,6 +38,20 @@
         "source": "github",
         "repo": "Herklos/skills",
         "path": "skills/osaurus-agents"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "any-agents",
+      "description": "Install and operate agents/teams on open-source any + anyrt (anybao).",
+      "source": {
+        "source": "github",
+        "repo": "Herklos/skills",
+        "path": "skills/any-agents"
       },
       "policy": {
         "installation": "AVAILABLE",
