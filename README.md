@@ -6,7 +6,6 @@ Companion skills for running a multi-agent org: **Anytype** as the org source of
 |-------|---------|------|
 | [hermes-profiles](./skills/hermes-profiles/SKILL.md) | 1.46.0 | Lifecycle and config for Hermes Agent profiles (v0.23 hearth gateway, Bot Mode HQ sidebar sections, groups.context routing, plugins/curator) |
 | [osaurus-agents](./skills/osaurus-agents/SKILL.md) | 1.5.2 | Define Osaurus agents via `osaurus config` / bundles / tools (avatars, Workspaces≠local teams, two-pass chiefs, sandbox secrets) |
-| [monocode-operator](./skills/monocode-operator/SKILL.md) | 1.0.0 | Use the MonoCode app bridge and discover its Mono creation limits |
 | [monocode-agents](./skills/monocode-agents/SKILL.md) | 1.0.0 | Create and manage MonoCode Monos, their identity, projects, memory and habits |
 | [any-agents](./skills/any-agents/SKILL.md) | 1.3.1 | Install/operate agents and teams on open-source **any** + **anyrt** (anybao): overlays, tiers, triggers, connectors, MCP, sync |
 | [anytype-agents](./skills/anytype-agents/SKILL.md) | 1.59.0 | Org roster, typed inventory (incl. **Runtime** + featured `avatar`), Group purpose/notes/routing, Prompts, atomic Memories, versioned Shared Rules, suggestions, and Projects via Anytype MCP |

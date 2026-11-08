@@ -23,7 +23,7 @@ For GitHub events, webhooks, SSE and the distinction between automations and Mon
 3. Use the Soul page for durable Markdown standing instructions (`SOUL.md`), Memory for facts and preferences, and Habits for scheduled tasks. A Mono can also update its soul or memory when asked. Preserve existing material when updating; avoid inserting credentials into prompts or memory. Configure schedules only as requested and verify their timing and enabled state in the app.
 4. Reopen Details and the relevant pages to verify the result. Resetting a conversation clears messages but retains soul, memory and habits; it is not equivalent to deleting an agent. Use destructive controls only for the requested target and report their effects.
 
-For the bridge workflow and its Mono creation boundary, see [monocode-operator](../monocode-operator/SKILL.md). Use the app's supported controls for lifecycle changes. `/operator` grants thread-scoped access to the local `app` CLI for documented session, project and note operations; it is not evidence of a Mono lifecycle CLI. Do not edit the database or invent commands when a control is absent. If a feature is unavailable in the installed build, report the limitation.
+Use the app's supported controls for lifecycle changes. `/operator` grants thread-scoped access to the local `app` CLI for documented session, project and note operations; it is not evidence of a Mono lifecycle CLI. Do not edit the database or invent commands when a control is absent. If a feature is unavailable in the installed build, report the limitation.
 
 ## Anytype mapping
 
