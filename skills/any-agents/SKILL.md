@@ -4,7 +4,7 @@ description: >
   Set up, run, configure, or debug AI agents and teams on any + anyrt (anybao).
   Use for anyrt serve, overlays, tiers, triggers, connectors, sync. Use when
   the user runs /any-agents.
-version: 1.1.0
+version: 1.2.0
 license: MIT
 metadata:
   category: agents
@@ -58,6 +58,7 @@ effects are required. Details: `reference/security.md`.
 | `reference/triggers.md` | Cron / once / event triggers |
 | `reference/connectors.md` | Shipped connectors + writing a new one |
 | `reference/http-api.md` | Verified `/v1` curls |
+| `reference/ui-and-observability.md` | `/ui`, any-tui, `trace follow`, desktop any-ui |
 | `reference/debugging.md` | `trace` / `replay` / `drift`; common failures |
 | `reference/upgrades-and-backup.md` | Pins, backup, NDJSON export |
 | `reference/security.md` | Trust model and isolation |
@@ -140,9 +141,18 @@ Check: `./scripts/agent-ready.sh` and one chat turn (`reference/http-api.md`).
 ### 2. Talk to the agent
 
 Space and chat ids are in the `anyrt serving space=… chat=…` log line.
+To **follow** live work: browser `$ANY_ADDR/ui`, or **any-tui**, or
+`anyrt trace follow` — see `reference/ui-and-observability.md`.
 
 ```bash
-# Host: Mac / Linux
+# Host: Mac / Linux — TUI (override any-tui's stale :7001 default)
+any-tui --api "${ANY_ADDR:-http://127.0.0.1:2046}/v1"
+# or web debug harness:
+open "${ANY_ADDR:-http://127.0.0.1:2046}/ui"
+```
+
+```bash
+# Host: Mac / Linux — CLI / scripts
 any chat send <bao-space-id> <chat-id> --text "hi, what can you do?"
 # read via HTTP query (no `any chat list` in current CLI)
 curl -s -X POST "$ANY_ADDR/v1/spaces/<space>/query" -H 'Content-Type: application/json' \
@@ -181,17 +191,18 @@ binary/kernel changes. Details: `reference/agents-and-teams.md`.
 - Schedules: `reference/triggers.md`
 - Connectors: `reference/connectors.md`
 
-### 6. Debug
+### 6. Debug / follow a run
 
 ```bash
-# Host: Mac / Linux
+# Host: Mac / Linux — live effects as they land
+anyrt trace follow --addr "$ANY_ADDR" --program toolcaller
 anyrt trace ls --addr "$ANY_ADDR" --program toolcaller
 anyrt trace show --addr "$ANY_ADDR" run_<id> --stats
 anyrt replay run_<id>
 anyrt drift
 ```
 
-See `reference/debugging.md`.
+See `reference/debugging.md` and `reference/ui-and-observability.md`.
 
 ## Workflow checklist
 
@@ -211,3 +222,5 @@ See `reference/debugging.md`.
 - **Cron every 4h:** `triggers.md`
 - **GitHub connector:** `.connectors.env` + `connectors.md`
 - **Export spaces:** `./scripts/export-ndjson.sh`
+- **Watch chat / bao status:** `/ui` or any-tui (`ui-and-observability.md`)
+- **Watch tool/LLM effects live:** `anyrt trace follow --program toolcaller`

@@ -8,6 +8,7 @@ Host: **Mac / Linux**.
 
 ```bash
 A="${ANY_ADDR:-http://127.0.0.1:2046}"
+anyrt trace follow --addr "$A" --program toolcaller   # live; exits when run ends
 anyrt trace ls --addr "$A" --program toolcaller
 anyrt trace ls --addr "$A" -n 0
 anyrt trace show --addr "$A" run_<id>
@@ -17,6 +18,8 @@ anyrt trace show --addr "$A" run_<id> --system
 anyrt replay run_<id>                            # strict bit-exact replay
 anyrt drift                                      # vendored any OpenAPI pin vs coverage
 ```
+
+Chat / status UIs (browser `/ui`, any-tui, desktop): `reference/ui-and-observability.md`.
 
 Map a chat reply to its run:
 

@@ -35,6 +35,9 @@ Live smoke root: `/tmp/any-agents-smoke` (`any` + `anybao` checkouts,
 | Full LLM reply (Anthropic/OpenRouter) | **UNVERIFIED** this session (no key supplied) |
 | Second device / second agent / cron | **UNVERIFIED** this session |
 | Ollama / llama.cpp / Grok tiers | Example JSON in `models.md` still **UNVERIFIED** live |
+| Embedded `/ui` | `GET http://127.0.0.1:2046/ui` → **200** HTML debug harness |
+| any-tui | Built **0.6.0** (`cargo build --release`); launched with `--api http://127.0.0.1:2046/v1 --agent-space bao`. Default API in binary help is still **:7001** — must override |
+| `anyrt trace follow` | Subcommand present (`--program`, `--addr` URL, `--space`); live effect stream |
 
 ## Open questions — answers
 
@@ -45,12 +48,16 @@ Live smoke root: `/tmp/any-agents-smoke` (`any` + `anybao` checkouts,
 4. **Python:** anybao needs **≥3.14**; on Mac use Homebrew `python@3.14`
    / `UV_PYTHON=python3.14`.
 5. **CLI addr:** Always `host:port` for `--addr`; full URL only for HTTP/`ANY_ADDR`.
+6. **Follow UI:** `/ui` (browser), any-tui (terminal; override `--api`), or
+   `anyrt trace follow` for internals. See `reference/ui-and-observability.md`.
 
 ## Prompt vs sources (follow sources)
 
 - Prompt / anybao README 7001 → skill uses discovery + 2046.
 - Prompt / README `any chat list` → HTTP query / `query-subscribe`.
 - README ready phrase `overlays synced…` → runtime `wait set clear…`.
+- any-tui / some READMEs still default API **:7001** → always pass
+  `--api http://127.0.0.1:2046/v1` (or your listen).
 - Full acceptance (paid model reply, second device, two tiers, cron)
   still needs a model key + extra hosts.
 
@@ -59,6 +66,8 @@ Live smoke root: `/tmp/any-agents-smoke` (`any` + `anybao` checkouts,
 ```bash
 # Host: Mac — with .connectors.env llm.key.anthropic=…
 ./scripts/agent-ready.sh
+any-tui --api http://127.0.0.1:2046/v1   # or open http://127.0.0.1:2046/ui
+anyrt trace follow --addr http://127.0.0.1:2046 --program toolcaller
 ./scripts/chat.sh "$SP" "$CHAT" "ping"
 # expect an agent-tagged model reply, not only the “need a language model” stub
 # second ANY_DATA_DIR + mnemonic-stdin

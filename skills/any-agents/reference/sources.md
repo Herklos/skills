@@ -1,9 +1,10 @@
 # Sources
 
-Read for skill version **1.1.0** on **2026-11-08**. Prefer live main
+Read for skill version **1.2.0** on **2026-11-08**. Prefer live main
 over this snapshot when they disagree; update this file when you re-verify.
 Live smoke also pinned: any `v0.3.8-nightly.20261107.1` @`0b73c01`,
-anyrt **0.11.1** (anybao checkout under `/tmp/any-agents-smoke`).
+anyrt **0.11.1** (anybao checkout under `/tmp/any-agents-smoke`),
+any-tui **0.6.0** (built `/tmp/any-tui`).
 
 ## Primary
 
@@ -38,6 +39,9 @@ anyrt **0.11.1** (anybao checkout under `/tmp/any-agents-smoke`).
 | https://github.com/anyproto/any-store | linked from any README |
 | https://github.com/anyproto/any-sync | protocol |
 | https://github.com/anyproto/any-sync-dockercompose | README read 2026-11-08 (coordinator, node×3, filenode, consensus) |
+| https://github.com/anyproto/any-tui | README + `--help` 2026-11-08 (v0.6.0; default API still :7001) |
+| any embedded `/ui` | live `GET :2046/ui` → 200 on smoke any |
+| https://docs.any.org/agents/index.html | agents overview; progress/UI notes |
 | https://agentclientprotocol.com/ | ACP landing, extensions notes |
 
 ## Explicitly out of scope
