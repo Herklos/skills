@@ -1,5 +1,10 @@
 # Agents and teams
 
+**Teams** here means ops layout: spaces + one `anyrt serve` per `any`
+server. anyrt has **no** product “team / Bot Mode room / Orchestrator
+spawn list” and **no** harness runtime that hands chats to Claude Code
+or Pi (`reference/extensions.md`). Subagents are in-process only.
+
 ## Creating a custom agent (overlay)
 
 Host: **Mac / Linux**, anybao checkout.
@@ -40,6 +45,14 @@ bao space (`docs/testing-agent-changes.md`).
 `toolcaller` in the **same** space (no chat post, no history). This is
 delegation inside one agent — not a second team member process.
 
+Limits vs richer hosts:
+
+- No per-task model route map (`model_map`) or “run as another profile”
+  (`profile_routes`).
+- No spawn budgets / permission_defaults product surface.
+- Child shares the parent serve’s overlays, credentials, and effect
+  boundary; isolate peers with a **second `any` + serve** instead.
+
 ## How many agents per serve?
 
 From the official anyrt quickstart:
@@ -56,6 +69,8 @@ From the official anyrt quickstart:
 | Several overlays on one serve | One `agent` overlay alias + optional `connectors` (and more aliases for `use("alias:…")`) — still **one** chat agent identity |
 | Second distinct agent on one machine | **Second `any` process** (own `--data-dir`, `--addr`) + second `anyrt serve` + own `anybao.toml` |
 | Quiet child tasks | `subagent@v1` inside the same serve |
+| External CLI runs the chat (Claude Code / Pi / ACP) | **Not shipped** — design only (`extensions.md`) |
+| Multi-bot messaging room (Telegram / hosted group) | **Not in anyrt** — use chats in shared `any` spaces |
 
 App slug for election is constant **`bao`** (ADR-015) — one account
 runs one bao election identity. Extra agents need separate servers

@@ -3,12 +3,22 @@
 **Do not implement these in this skill.** Runtime changes need an
 **accepted ADR in anybao** first ("no code lands ahead of its ADR").
 
+**Shipped today:** anyrt **is** the harness (Wasm/CPython guest +
+recorded effects). Optional coding shell = `make runtime-shell`
+(ADR-024). Browser tools = MCP HTTP client (`tools-and-mcp.md`), often
+via desktop clipper relay — not an external chat runtime.
+
+**Not shipped:** handing a chat to Claude Code / Pi / another CLI
+(Osaurus-style harness runtime), ACP broker effects, mutate approval
+UX, host-capability routing objects.
+
 ## ACP action for CLI agents
 
-[Agent Client Protocol](https://agentclientprotocol.com/) can expose
-Claude Code, Codex, Mistral Vibe (`vibe-acp`), etc. as a **host-side
-broker effect** (same class as `http.get` / `llm.chat`): available only
-on hosts where the CLI is installed.
+[Agent Client Protocol](https://agentclientprotocol.com/) **could**
+expose Claude Code, Codex, Mistral Vibe (`vibe-acp`), etc. as a
+**host-side broker effect** (same class as `http.get` / `llm.chat`) —
+available only on hosts where the CLI is installed. **No accepted ADR
+and no runtime surface yet**; do not configure or claim ACP support.
 
 - Map ACP `session/request_permission` to **future** human approvals.
 - Keep credentials and process spawn on the host; guest sees a typed

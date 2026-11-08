@@ -4,7 +4,7 @@ description: >
   Set up, run, configure, or debug AI agents and teams on any + anyrt (anybao).
   Use for anyrt serve, overlays, tiers, triggers, connectors, MCP servers
   (mcp.server.* / agent:mcp@v1), sync. Use when the user runs /any-agents.
-version: 1.3.0
+version: 1.3.1
 license: MIT
 metadata:
   category: agents
@@ -81,14 +81,16 @@ Scripts: `scripts/any-health.sh`, `agent-ready.sh`, `chat.sh`, `set-tier.sh`,
 | Trigger | `agent_triggers` record: `cron` / `once` / `event` |
 | Tool | Guest program with `__any_tool__ = True` (`use("agent:…")`) |
 | MCP server | `mcp.server.<id>` row + optional `mcp.key.<id>`; called via `agent:mcp@v1` |
-| Subagent | In-process quiet `toolcaller` child (`subagent@v1`), same space |
-| Team HQ | Convention: one `any` space per team + one serve (or shared rules space) |
+| Subagent | In-process quiet `toolcaller` child (`subagent@v1`), same space — not a peer bot |
+| Team HQ | Ops convention: one `any` space + one serve (see `agents-and-teams.md`) |
 
 **One agent per `any` server.** Two `anyrt serve` processes against the same
 `any` instance share device identity and both answer chat. For a second agent
 on one machine, run a second `any` (separate `--data-dir` and `--addr`) plus
 its own `anyrt serve`. Cross-device: one active bao per account (election);
-standby devices still fire device-pinned triggers.
+standby devices still fire device-pinned triggers. anyrt does **not** hand
+chats to Claude Code/Pi (no harness runtime); ACP is design-only
+(`extensions.md`).
 
 Org catalog (Anytype MCP / `anytype-agents`) can describe intent; this skill
 applies into `any`/`anyrt`. Editing Anytype does not push into anyrt.

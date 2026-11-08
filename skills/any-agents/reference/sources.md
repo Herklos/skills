@@ -1,6 +1,6 @@
 # Sources
 
-Read for skill version **1.3.0** on **2026-11-08**. Prefer live main
+Read for skill version **1.3.1** on **2026-11-08**. Prefer live main
 over this snapshot when they disagree; update this file when you re-verify.
 Live smoke also pinned: any `v0.3.8-nightly.20261107.1` @`0b73c01`,
 anyrt **0.11.1** (anybao checkout under `/tmp/any-agents-smoke`),
